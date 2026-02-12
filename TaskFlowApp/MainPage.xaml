@@ -1,19 +1,122 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="TaskFlowApp.MainPage" BackgroundColor="#111819">
-
+             x:Class="TaskFlowApp.MainPage" 
+             BackgroundColor="#0F172A">
     <Grid>
-        <Border WidthRequest="500" HeightRequest="500" BackgroundColor="#F1F5F9" StrokeShape="RoundRectangle 20"
-        Stroke="Transparent"
-        StrokeThickness="2" >
-            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="30">
-                <Image Source="https://logostack.com/wp-content/uploads/designers/Mjcreation235/1-png-1-900x600.png" WidthRequest="150" HeightRequest="150" />
-                <Entry Placeholder="Kullanıcı Adı Giriniz" WidthRequest="400" BackgroundColor="White" />
-                <Entry Placeholder="Şifre Giriniz" WidthRequest="400" IsPassword="True" BackgroundColor="White" />
-                <Button Text="Giriş Yap" WidthRequest="400" BackgroundColor="#007AFF" TextColor="White" />
+        <!-- Ana Login Kartı -->
+        <Border WidthRequest="480" 
+                HeightRequest="580" 
+                BackgroundColor="White" 
+                StrokeShape="RoundRectangle 24"
+                Stroke="Transparent"
+                VerticalOptions="Center"
+                HorizontalOptions="Center">
+            <Border.Shadow>
+                <Shadow Brush="#1E293B" Offset="0,20" Radius="40" Opacity="0.15"/>
+            </Border.Shadow>
+
+            <VerticalStackLayout Padding="40" Spacing="0">
+                <!-- Logo ve Başlık -->
+                <VerticalStackLayout Spacing="16" Margin="0,0,0,40">
+                    <Border WidthRequest="100" 
+                            HeightRequest="100" 
+                            StrokeShape="RoundRectangle 20"
+                            BackgroundColor="#F8FAFC"
+                            HorizontalOptions="Center">
+                        <Image Source="https://logostack.com/wp-content/uploads/designers/Mjcreation235/1-png-1-900x600.png" 
+                               WidthRequest="80" 
+                               HeightRequest="80"/>
+                    </Border>
+
+                    <Label Text="Hoş Geldiniz" 
+                           FontSize="28" 
+                           FontAttributes="Bold"
+                           TextColor="#1E293B"
+                           HorizontalOptions="Center"/>
+
+                    <Label Text="Hesabınıza giriş yapın" 
+                           FontSize="15" 
+                           TextColor="#64748B"
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+
+                <!-- Form Alanları -->
+                <VerticalStackLayout Spacing="20">
+                    <!-- Kullanıcı Adı -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Kullanıcı Adı" 
+                               FontSize="14" 
+                               FontAttributes="Bold"
+                               TextColor="#334155"/>
+
+                        <Grid ColumnDefinitions="50, *" 
+                              BackgroundColor="#F8FAFC"
+                              HeightRequest="52"
+                              Padding="4,0">
+                            <Image Grid.Column="0"
+                                   Source="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" 
+                                   HeightRequest="22" 
+                                   WidthRequest="22"
+                                   VerticalOptions="Center" 
+                                   HorizontalOptions="Center"
+                                   Opacity="0.6"/>
+
+                            <Entry Grid.Column="1"
+                                   Placeholder="kullanici@ornek.com" 
+                                   TextColor="#1E293B"
+                                   PlaceholderColor="#94A3B8"
+                                   BackgroundColor="Transparent"
+                                   FontSize="15"
+                                   VerticalOptions="Center"/>
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- Şifre -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Şifre" 
+                               FontSize="14" 
+                               FontAttributes="Bold"
+                               TextColor="#334155"/>
+
+                        <Grid ColumnDefinitions="50, *" 
+                              BackgroundColor="#F8FAFC"
+                              HeightRequest="52"
+                              Padding="4,0">
+                            <Image Grid.Column="0"
+                                   Source="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" 
+                                   HeightRequest="22" 
+                                   WidthRequest="22"
+                                   VerticalOptions="Center" 
+                                   HorizontalOptions="Center"
+                                   Opacity="0.6"/>
+
+                            <Entry Grid.Column="1"
+                                   Placeholder="••••••••" 
+                                   IsPassword="True"
+                                   TextColor="#1E293B"
+                                   PlaceholderColor="#94A3B8"
+                                   BackgroundColor="Transparent"
+                                   FontSize="15"
+                                   VerticalOptions="Center"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Giriş Butonu -->
+                <Button Text="Giriş Yap" 
+                        HeightRequest="54"
+                        BackgroundColor="#3B82F6" 
+                        TextColor="White" 
+                        CornerRadius="12"
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        Margin="0,32,0,0">
+                    <Button.Shadow>
+                        <Shadow Brush="#3B82F6" Offset="0,4" Radius="12" Opacity="0.3"/>
+                    </Button.Shadow>
+                </Button>
             </VerticalStackLayout>
         </Border>
     </Grid>
-
 </ContentPage>
