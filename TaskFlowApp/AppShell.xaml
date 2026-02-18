@@ -15,5 +15,21 @@
         Title=""
         ContentTemplate="{DataTemplate pages:DashBoardPage}"
         Route="DashBoardPage" />
+    <ShellContent
+        Title=""
+        ContentTemplate="{DataTemplate pages:ReportsPage}"
+        Route="ReportsPage" />
+    <ShellContent
+        Title=""
+        ContentTemplate="{DataTemplate pages:TasksPage}"
+        Route="TasksPage" />
+    <ShellContent
+        Title=""
+        ContentTemplate="{DataTemplate pages:MessagesPage}"
+        Route="MessagesPage" />
+    <ShellContent
+        Title=""
+        ContentTemplate="{DataTemplate pages:NotificationsPage}"
+        Route="NotificationsPage" />
 
 </Shell>
