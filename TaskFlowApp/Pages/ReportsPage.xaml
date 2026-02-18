@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TaskFlowApp.Pages.ReportsPage"
+             BackgroundColor="#0D1B2A"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+
+        <!-- TOP NAV BAR -->
+        <Grid Grid.Row="0"
+              Padding="20,16,20,10"
+              ColumnDefinitions="Auto,*,Auto"
+              BackgroundColor="#0D1B2A">
+
+            <Image Grid.Column="0"
+                   Source="taskflow_logo.png"
+                   WidthRequest="32"
+                   HeightRequest="32"
+                   Aspect="AspectFit"
+                   VerticalOptions="Center"/>
+
+            <Grid Grid.Column="2"
+                  WidthRequest="44"
+                  HeightRequest="44"
+                  HorizontalOptions="End"
+                  VerticalOptions="Center">
+                <Ellipse WidthRequest="44" HeightRequest="44"
+                         Stroke="#3A5068" StrokeThickness="1.5"
+                         Fill="#1A3A5C"
+                         HorizontalOptions="Center" VerticalOptions="Center"/>
+                <Grid WidthRequest="44" HeightRequest="44"
+                      HorizontalOptions="Center" VerticalOptions="Center">
+                    <Ellipse WidthRequest="16" HeightRequest="16"
+                             Fill="#5B8DB8"
+                             HorizontalOptions="Center" VerticalOptions="Start"
+                             Margin="0,10,0,0"/>
+                    <Ellipse WidthRequest="28" HeightRequest="20"
+                             Fill="#5B8DB8"
+                             HorizontalOptions="Center" VerticalOptions="End"
+                             Margin="0,0,0,2"/>
+                </Grid>
+                <Ellipse WidthRequest="12" HeightRequest="12"
+                         Fill="#4CAF50" Stroke="#0D1B2A" StrokeThickness="2"
+                         HorizontalOptions="End" VerticalOptions="End"
+                         Margin="0,0,1,1"/>
+            </Grid>
+        </Grid>
+
+        <!-- DIVIDER -->
+        <BoxView Grid.Row="1" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill"/>
+
+        <!-- CONTENT -->
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Padding="20,14,20,20" Spacing="16">
+
+                <!-- Sayfa Başlığı -->
+                <Label Text="Raporlar"
+                       TextColor="White"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       Margin="0,4,0,8"/>
+
+                <!-- Büyük rapor kartı -->
+                <Border BackgroundColor="#162030"
+                        StrokeShape="RoundRectangle 16"
+                        Stroke="Transparent"
+                        HeightRequest="180"/>
+
+                <!-- İki küçük rapor kartı -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                    <Border Grid.Column="0"
+                            BackgroundColor="#162030"
+                            StrokeShape="RoundRectangle 16"
+                            Stroke="Transparent"
+                            HeightRequest="120"/>
+                    <Border Grid.Column="1"
+                            BackgroundColor="#162030"
+                            StrokeShape="RoundRectangle 16"
+                            Stroke="Transparent"
+                            HeightRequest="120"/>
+                </Grid>
+
+                <!-- Üç küçük rapor kartı -->
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                    <Border Grid.Column="0"
+                            BackgroundColor="#162030"
+                            StrokeShape="RoundRectangle 16"
+                            Stroke="Transparent"
+                            HeightRequest="90"/>
+                    <Border Grid.Column="1"
+                            BackgroundColor="#162030"
+                            StrokeShape="RoundRectangle 16"
+                            Stroke="Transparent"
+                            HeightRequest="90"/>
+                    <Border Grid.Column="2"
+                            BackgroundColor="#162030"
+                            StrokeShape="RoundRectangle 16"
+                            Stroke="Transparent"
+                            HeightRequest="90"/>
+                </Grid>
+
+                <!-- Skeleton satırlar -->
+                <BoxView Color="#162030" HeightRequest="12" CornerRadius="6" Margin="0,8,40,0"/>
+                <BoxView Color="#162030" HeightRequest="12" CornerRadius="6" Margin="0,0,100,0"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- DIVIDER -->
+        <BoxView Grid.Row="3" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill"/>
+
+        <!-- BOTTOM TAB BAR -->
+        <Grid Grid.Row="4"
+              ColumnDefinitions="*,*,*,*,*"
+              BackgroundColor="#0F1E2D"
+              Padding="0,6,0,18">
+
+            <!-- Ana Sayfa -->
+            <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="3">
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                    <Grid WidthRequest="18" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Polygon Points="9,0 18,9 0,9" Fill="#4A5568"/>
+                        <Rectangle Fill="#4A5568" WidthRequest="11" HeightRequest="9"
+                                   HorizontalOptions="Center" VerticalOptions="End"/>
+                    </Grid>
+                </Border>
+                <Label Text="Ana Sayfa" FontSize="9" TextColor="#5A5A5A" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Raporlar (Active) -->
+            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="3">
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                    <Grid WidthRequest="18" HeightRequest="14" ColumnDefinitions="*,*,*"
+                          ColumnSpacing="3" HorizontalOptions="Center" VerticalOptions="Center">
+                        <BoxView Grid.Column="0" Color="#2196F3" CornerRadius="2" HeightRequest="9" VerticalOptions="End"/>
+                        <BoxView Grid.Column="1" Color="#2196F3" CornerRadius="2" HeightRequest="14" VerticalOptions="End"/>
+                        <BoxView Grid.Column="2" Color="#2196F3" CornerRadius="2" HeightRequest="6" VerticalOptions="End"/>
+                    </Grid>
+                </Border>
+                <Label Text="Raporlar" FontSize="9" TextColor="#2196F3" HorizontalOptions="Center"/>
+                <BoxView Color="#2196F3" WidthRequest="4" HeightRequest="3" CornerRadius="1.5" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Görevler -->
+            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="3">
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                    <VerticalStackLayout Spacing="3" HorizontalOptions="Center"
+                                        VerticalOptions="Center" WidthRequest="16">
+                        <BoxView Color="#4A5568" HeightRequest="2" CornerRadius="1"/>
+                        <BoxView Color="#4A5568" HeightRequest="2" CornerRadius="1"/>
+                        <BoxView Color="#4A5568" HeightRequest="2" CornerRadius="1"
+                                 WidthRequest="11" HorizontalOptions="Start"/>
+                    </VerticalStackLayout>
+                </Border>
+                <Label Text="Görevler" FontSize="9" TextColor="#5A5A5A" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Mesajlar -->
+            <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center" Spacing="3">
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                    <Grid WidthRequest="18" HeightRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border WidthRequest="18" HeightRequest="12" StrokeShape="RoundRectangle 4"
+                                Stroke="#4A5568" StrokeThickness="2" BackgroundColor="Transparent" VerticalOptions="Start"/>
+                        <Polygon Points="4,11 0,16 8,11" Fill="#4A5568"
+                                 VerticalOptions="End" HorizontalOptions="Start" Margin="3,0,0,0"/>
+                    </Grid>
+                </Border>
+                <Label Text="Mesajlar" FontSize="9" TextColor="#5A5A5A" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Bildirimler -->
+            <VerticalStackLayout Grid.Column="4" HorizontalOptions="Center" Spacing="3">
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                    <Grid WidthRequest="16" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border WidthRequest="14" HeightRequest="10" StrokeShape="RoundRectangle 7 7 0 0"
+                                Stroke="#4A5568" StrokeThickness="2" BackgroundColor="Transparent"
+                                VerticalOptions="Start" HorizontalOptions="Center" Margin="0,2,0,0"/>
+                        <BoxView Color="#4A5568" WidthRequest="16" HeightRequest="2" CornerRadius="1"
+                                 VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,4"/>
+                        <Ellipse WidthRequest="5" HeightRequest="5" Stroke="#4A5568" StrokeThickness="2"
+                                 Fill="Transparent" VerticalOptions="End" HorizontalOptions="Center"/>
+                    </Grid>
+                </Border>
+                <Label Text="Bildirimler" FontSize="9" TextColor="#5A5A5A" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+        </Grid>
+    </Grid>
+</ContentPage>
