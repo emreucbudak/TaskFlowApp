@@ -14,13 +14,13 @@
               BackgroundColor="#0D1B2A">
 
             <Image Grid.Column="0"
-                   Source="taskflow_logo.png"
+                   Source="https://www.logoai.com/uploads/icon/2021/08/06/732ca933-7df8-43e8-b085-69466243c919.png"
                    WidthRequest="32" HeightRequest="32"
                    Aspect="AspectFit" VerticalOptions="Center"/>
 
             <Grid Grid.Column="2" WidthRequest="44" HeightRequest="44"
                   HorizontalOptions="End" VerticalOptions="Center">
-                <Ellipse WidthRequest="44" HeightRequest="44"
+<Ellipse WidthRequest="44" HeightRequest="44"
                          Stroke="#3A5068" StrokeThickness="1.5" Fill="#1A3A5C"
                          HorizontalOptions="Center" VerticalOptions="Center"/>
                 <Grid WidthRequest="44" HeightRequest="44"
@@ -43,13 +43,7 @@
         <ScrollView Grid.Row="2">
             <VerticalStackLayout Padding="20,14,20,20" Spacing="16">
 
-                <Label Text="Mesajlar"
-                       TextColor="White"
-                       FontSize="22"
-                       FontAttributes="Bold"
-                       Margin="0,4,0,8"/>
-
-                <!-- Mesaj satırları: avatar dairesi + skeleton çizgiler -->
+                <!-- Mesaj satÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±rlarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±: avatar dairesi + skeleton ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬ÂÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§izgiler -->
                 <Border BackgroundColor="#162030" StrokeShape="RoundRectangle 16"
                         Stroke="Transparent" HeightRequest="72"/>
                 <Border BackgroundColor="#162030" StrokeShape="RoundRectangle 16"
@@ -74,12 +68,15 @@
 
         <!-- BOTTOM TAB BAR -->
         <Grid Grid.Row="4"
-              ColumnDefinitions="*,*,*,*,*"
+              ColumnDefinitions="*,*,*,*,*,*"
               BackgroundColor="#0F1E2D"
               Padding="0,6,0,18">
 
             <!-- Ana Sayfa -->
             <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnHomeTapped" />
+                </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
                     <Grid WidthRequest="18" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center">
@@ -88,11 +85,13 @@
                                    HorizontalOptions="Center" VerticalOptions="End"/>
                     </Grid>
                 </Border>
-                <Label Text="Ana Sayfa" FontSize="9" TextColor="#5A5A5A" HorizontalOptions="Center"/>
             </VerticalStackLayout>
 
             <!-- Raporlar -->
             <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnReportsTapped" />
+                </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
                     <Grid WidthRequest="18" HeightRequest="14" ColumnDefinitions="*,*,*"
@@ -102,11 +101,13 @@
                         <BoxView Grid.Column="2" Color="#4A5568" CornerRadius="2" HeightRequest="6" VerticalOptions="End"/>
                     </Grid>
                 </Border>
-                <Label Text="Raporlar" FontSize="9" TextColor="#5A5A5A" HorizontalOptions="Center"/>
             </VerticalStackLayout>
 
-            <!-- Görevler -->
+            <!-- GÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬ÂÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¶revler -->
             <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnTasksTapped" />
+                </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
                     <VerticalStackLayout Spacing="3" HorizontalOptions="Center"
@@ -117,11 +118,13 @@
                                  WidthRequest="11" HorizontalOptions="Start"/>
                     </VerticalStackLayout>
                 </Border>
-                <Label Text="Görevler" FontSize="9" TextColor="#5A5A5A" HorizontalOptions="Center"/>
             </VerticalStackLayout>
 
             <!-- Mesajlar (Active) -->
             <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnMessagesTapped" />
+                </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
                     <Grid WidthRequest="18" HeightRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
@@ -131,12 +134,14 @@
                                  VerticalOptions="End" HorizontalOptions="Start" Margin="3,0,0,0"/>
                     </Grid>
                 </Border>
-                <Label Text="Mesajlar" FontSize="9" TextColor="#2196F3" HorizontalOptions="Center"/>
                 <BoxView Color="#2196F3" WidthRequest="4" HeightRequest="3" CornerRadius="1.5" HorizontalOptions="Center"/>
             </VerticalStackLayout>
 
             <!-- Bildirimler -->
             <VerticalStackLayout Grid.Column="4" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnNotificationsTapped" />
+                </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
                     <Grid WidthRequest="16" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center">
@@ -149,9 +154,45 @@
                                  Fill="Transparent" VerticalOptions="End" HorizontalOptions="Center"/>
                     </Grid>
                 </Border>
-                <Label Text="Bildirimler" FontSize="9" TextColor="#5A5A5A" HorizontalOptions="Center"/>
             </VerticalStackLayout>
-
+            <!-- Cikis -->
+            <VerticalStackLayout Grid.Column="5" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLogoutTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E"
+                        StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent"
+                        WidthRequest="38"
+                        HeightRequest="28"
+                        HorizontalOptions="Center">
+                    <Grid WidthRequest="18" HeightRequest="18"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center">
+                        <Border WidthRequest="10"
+                                HeightRequest="14"
+                                Stroke="#4A5568"
+                                StrokeThickness="2"
+                                BackgroundColor="Transparent"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="2"/>
+                            </Border.StrokeShape>
+                        </Border>
+                        <BoxView Color="#4A5568"
+                                 WidthRequest="7"
+                                 HeightRequest="2"
+                                 HorizontalOptions="End"
+                                 VerticalOptions="Center"
+                                 Margin="0,0,2,0"/>
+                        <Polygon Points="13,6 18,9 13,12"
+                                 Fill="#4A5568"
+                                 HorizontalOptions="End"
+                                 VerticalOptions="Center"/>
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
         </Grid>
     </Grid>
 </ContentPage>
