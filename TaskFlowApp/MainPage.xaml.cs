@@ -8,7 +8,10 @@
         {
             InitializeComponent();
         }
-
+        public async void OnLoginButtonClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("///DashBoardPage");
+        }
 
     }
 }
