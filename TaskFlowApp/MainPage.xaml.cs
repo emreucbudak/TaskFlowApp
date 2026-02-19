@@ -1,17 +1,13 @@
-﻿namespace TaskFlowApp
+using TaskFlowApp.Infrastructure;
+using TaskFlowApp.ViewModels;
+
+namespace TaskFlowApp;
+
+public partial class MainPage : ContentPage
 {
-    public partial class MainPage : ContentPage
+    public MainPage()
     {
-
-
-        public MainPage()
-        {
-            InitializeComponent();
-        }
-        public async void OnLoginButtonClicked(object sender, EventArgs e)
-        {
-            await Shell.Current.GoToAsync("///DashBoardPage");
-        }
-
+        InitializeComponent();
+        BindingContext = ServiceLocator.GetRequiredService<MainPageViewModel>();
     }
 }

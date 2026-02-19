@@ -93,6 +93,7 @@
                                 x:Name="EmailEntry"
                                 Placeholder="ornek@sirket.com"
                                 PlaceholderColor="#64748b"
+                                Text="{Binding Email}"
                                 TextColor="White"
                                 BackgroundColor="Transparent"
                                 VerticalOptions="Center"
@@ -131,6 +132,7 @@
                                 x:Name="PasswordEntry"
                                 Placeholder="••••••••"
                                 PlaceholderColor="#64748b"
+                                Text="{Binding Password}"
                                 TextColor="White"
                                 BackgroundColor="Transparent"
                                 VerticalOptions="Center"
@@ -149,7 +151,19 @@
                     TextColor="White"
                     CornerRadius="12"
                     HeightRequest="56"
-                    Margin="0,16,0,0" Clicked="OnLoginButtonClicked"/>
+                    Margin="0,16,0,0"
+                    Command="{Binding LoginCommand}"/>
+
+                <ActivityIndicator
+                    IsRunning="{Binding IsBusy}"
+                    IsVisible="{Binding IsBusy}"
+                    Color="#137fec"/>
+
+                <Label
+                    Text="{Binding ErrorMessage}"
+                    TextColor="#f87171"
+                    FontSize="13"
+                    HorizontalTextAlignment="Center"/>
 
             </VerticalStackLayout>
 

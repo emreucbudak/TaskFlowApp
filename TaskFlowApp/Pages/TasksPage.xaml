@@ -42,6 +42,20 @@
         <!-- CONTENT -->
         <ScrollView Grid.Row="2">
             <VerticalStackLayout Padding="20,14,20,20" Spacing="16">
+                <ActivityIndicator
+                    IsRunning="{Binding IsBusy}"
+                    IsVisible="{Binding IsBusy}"
+                    Color="#2196F3" />
+
+                <Label
+                    Text="{Binding StatusText}"
+                    TextColor="#cbd5e1"
+                    FontSize="13" />
+
+                <Label
+                    Text="{Binding ErrorMessage}"
+                    TextColor="#f87171"
+                    FontSize="12" />
 
                 <!-- GÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬ÂÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¶rev liste kartlarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â± (skeleton) -->
                 <Border BackgroundColor="#162030" StrokeShape="RoundRectangle 16"
@@ -50,6 +64,23 @@
                         Stroke="Transparent" HeightRequest="70"/>
                 <Border BackgroundColor="#162030" StrokeShape="RoundRectangle 16"
                         Stroke="Transparent" HeightRequest="70"/>
+
+                <CollectionView ItemsSource="{Binding Tasks}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="#162030"
+                                    StrokeShape="RoundRectangle 12"
+                                    Stroke="Transparent"
+                                    Margin="0,0,0,8"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding TaskTitle}" TextColor="White" FontAttributes="Bold"/>
+                                    <Label Text="{Binding Description}" TextColor="#94a3b8" FontSize="12" LineBreakMode="TailTruncation"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
                 <Border BackgroundColor="#162030" StrokeShape="RoundRectangle 16"
                         Stroke="Transparent" HeightRequest="70"/>
                 <Border BackgroundColor="#162030" StrokeShape="RoundRectangle 16"
