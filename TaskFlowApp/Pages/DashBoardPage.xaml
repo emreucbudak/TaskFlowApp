@@ -73,18 +73,45 @@
         <!-- CONTENT AREA -->
         <ScrollView Grid.Row="2">
             <VerticalStackLayout Padding="20,14,20,20" Spacing="16">
+                <ActivityIndicator
+                    IsRunning="{Binding IsBusy}"
+                    IsVisible="{Binding IsBusy}"
+                    Color="#2196F3" />
+
+                <Label
+                    Text="{Binding StatusText}"
+                    TextColor="#cbd5e1"
+                    FontSize="13" />
+
+                <Label
+                    Text="{Binding ErrorMessage}"
+                    TextColor="#f87171"
+                    FontSize="12" />
 
                 <Border BackgroundColor="#162030"
                         StrokeShape="RoundRectangle 16"
                         Stroke="Transparent"
-                        HeightRequest="170"/>
+                        HeightRequest="170">
+                    <VerticalStackLayout Padding="16" Spacing="8">
+                        <Label Text="Kisisel Istatistikler" TextColor="White" FontAttributes="Bold" />
+                        <Label Text="{Binding TotalAssigned, StringFormat='Atanan gorev: {0}'}" TextColor="#94a3b8" />
+                        <Label Text="{Binding TotalCompleted, StringFormat='Tamamlanan gorev: {0}'}" TextColor="#94a3b8" />
+                        <Label Text="{Binding OverdueTasks, StringFormat='Geciken gorev: {0}'}" TextColor="#94a3b8" />
+                        <Label Text="{Binding UnreadMessageCount, StringFormat='Okunmamis mesaj: {0}'}" TextColor="#94a3b8" />
+                    </VerticalStackLayout>
+                </Border>
 
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
                     <Border Grid.Column="0"
                             BackgroundColor="#162030"
                             StrokeShape="RoundRectangle 16"
                             Stroke="Transparent"
-                            HeightRequest="110"/>
+                            HeightRequest="110">
+                        <VerticalStackLayout Padding="12" Spacing="6">
+                            <Label Text="Gorevlerim" TextColor="White" FontAttributes="Bold" FontSize="13" />
+                            <Label Text="{Binding MyTaskCount}" TextColor="#2196F3" FontAttributes="Bold" FontSize="22" />
+                        </VerticalStackLayout>
+                    </Border>
                     <Border Grid.Column="1"
                             BackgroundColor="#162030"
                             StrokeShape="RoundRectangle 16"
