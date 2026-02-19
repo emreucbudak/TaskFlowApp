@@ -6,6 +6,7 @@ using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Pages;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Services.Realtime;
 using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp;
@@ -30,7 +31,7 @@ public static class MauiProgram
             var userSession = serviceProvider.GetRequiredService<IUserSession>();
             var httpClient = new HttpClient
             {
-                BaseAddress = new Uri("http://localhost:5172/"),
+                BaseAddress = new Uri(AppEndpoints.ApiBaseUrl),
                 Timeout = TimeSpan.FromSeconds(30)
             };
 
@@ -44,6 +45,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<ReportApiClient>();
         builder.Services.AddSingleton<StatsApiClient>();
         builder.Services.AddSingleton<TenantApiClient>();
+        builder.Services.AddSingleton<ISignalRChatService, SignalRChatService>();
+        builder.Services.AddSingleton<ISignalRNotificationService, SignalRNotificationService>();
+        builder.Services.AddSingleton<IRealtimeConnectionManager, RealtimeConnectionManager>();
 
         builder.Services.AddTransient<MainPageViewModel>();
         builder.Services.AddTransient<DashBoardPageViewModel>();

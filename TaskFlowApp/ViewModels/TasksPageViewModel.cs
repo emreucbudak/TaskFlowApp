@@ -6,13 +6,15 @@ using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.ProjectManagement;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Services.Realtime;
 
 namespace TaskFlowApp.ViewModels;
 
 public partial class TasksPageViewModel(
     INavigationService navigationService,
     IUserSession userSession,
-    ProjectManagementApiClient projectManagementApiClient) : PageViewModelBase(navigationService, userSession)
+    IRealtimeConnectionManager realtimeConnectionManager,
+    ProjectManagementApiClient projectManagementApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     public ObservableCollection<IndividualTaskDto> Tasks { get; } = [];
 

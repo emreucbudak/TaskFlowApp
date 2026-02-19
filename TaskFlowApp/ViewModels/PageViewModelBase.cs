@@ -2,13 +2,18 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
+using TaskFlowApp.Services.Realtime;
 
 namespace TaskFlowApp.ViewModels;
 
-public abstract partial class PageViewModelBase(INavigationService navigationService, IUserSession userSession) : ObservableObject
+public abstract partial class PageViewModelBase(
+    INavigationService navigationService,
+    IUserSession userSession,
+    IRealtimeConnectionManager realtimeConnectionManager) : ObservableObject
 {
     protected IUserSession UserSession { get; } = userSession;
     protected INavigationService NavigationService { get; } = navigationService;
+    protected IRealtimeConnectionManager RealtimeConnectionManager { get; } = realtimeConnectionManager;
 
     [ObservableProperty]
     private bool isBusy;
@@ -35,9 +40,10 @@ public abstract partial class PageViewModelBase(INavigationService navigationSer
     private Task NavigateNotificationsAsync() => NavigationService.GoToRootAsync("NotificationsPage");
 
     [RelayCommand]
-    private Task LogoutAsync()
+    private async Task LogoutAsync()
     {
+        await RealtimeConnectionManager.DisconnectAllAsync();
         UserSession.Clear();
-        return NavigationService.GoToRootAsync("MainPage");
+        await NavigationService.GoToRootAsync("MainPage");
     }
 }
