@@ -5,13 +5,15 @@ using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Services.Realtime;
 
 namespace TaskFlowApp.ViewModels;
 
 public partial class MainPageViewModel(
     IdentityApiClient identityApiClient,
     IUserSession userSession,
-    INavigationService navigationService) : ObservableObject
+    INavigationService navigationService,
+    IRealtimeConnectionManager realtimeConnectionManager) : ObservableObject
 {
     [ObservableProperty]
     private string email = string.Empty;
@@ -57,6 +59,15 @@ public partial class MainPageViewModel(
             }
 
             userSession.SetTokens(response.AccessToken, response.RefreshToken);
+            try
+            {
+                await realtimeConnectionManager.ConnectAllAsync();
+            }
+            catch
+            {
+                // Login should still succeed even if realtime channels are temporarily unavailable.
+            }
+
             await navigationService.GoToRootAsync("DashBoardPage");
         }
         catch (ApiException ex)

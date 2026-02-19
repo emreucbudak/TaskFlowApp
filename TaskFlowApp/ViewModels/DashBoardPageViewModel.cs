@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
+using TaskFlowApp.Services.Realtime;
 using TaskFlowApp.Services.ApiClients;
 
 namespace TaskFlowApp.ViewModels;
@@ -10,9 +11,10 @@ namespace TaskFlowApp.ViewModels;
 public partial class DashBoardPageViewModel(
     INavigationService navigationService,
     IUserSession userSession,
+    IRealtimeConnectionManager realtimeConnectionManager,
     StatsApiClient statsApiClient,
     ProjectManagementApiClient projectManagementApiClient,
-    ChatApiClient chatApiClient) : PageViewModelBase(navigationService, userSession)
+    ChatApiClient chatApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     [ObservableProperty]
     private int totalAssigned;

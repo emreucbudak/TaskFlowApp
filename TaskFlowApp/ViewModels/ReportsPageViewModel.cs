@@ -6,13 +6,15 @@ using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Report;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Services.Realtime;
 
 namespace TaskFlowApp.ViewModels;
 
 public partial class ReportsPageViewModel(
     INavigationService navigationService,
     IUserSession userSession,
-    ReportApiClient reportApiClient) : PageViewModelBase(navigationService, userSession)
+    IRealtimeConnectionManager realtimeConnectionManager,
+    ReportApiClient reportApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     public ObservableCollection<ReportDto> Reports { get; } = [];
 
