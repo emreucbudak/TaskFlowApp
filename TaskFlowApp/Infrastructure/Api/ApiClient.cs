@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using TaskFlowApp.Infrastructure;
 using TaskFlowApp.Infrastructure.Session;
 
 namespace TaskFlowApp.Infrastructure.Api;
@@ -13,18 +12,16 @@ public sealed class ApiClient(HttpClient httpClient, IUserSession userSession) :
     {
         PropertyNameCaseInsensitive = true
     };
-    private static readonly Uri[] BaseAddressCandidates = AppEndpoints.ApiBaseUrls.Select(static url => new Uri(url)).ToArray();
-    private Uri? resolvedBaseAddress;
 
     public async Task PostAsync(string route, object? payload = null, bool includeAuth = true, CancellationToken cancellationToken = default)
     {
-        using var response = await SendWithFallbackAsync(route, payload, includeAuth, cancellationToken);
+        using var response = await SendAsync(route, payload, includeAuth, cancellationToken);
         await EnsureSuccessAsync(response, cancellationToken);
     }
 
     public async Task<T> PostAsync<T>(string route, object? payload = null, bool includeAuth = true, CancellationToken cancellationToken = default)
     {
-        using var response = await SendWithFallbackAsync(route, payload, includeAuth, cancellationToken);
+        using var response = await SendAsync(route, payload, includeAuth, cancellationToken);
         await EnsureSuccessAsync(response, cancellationToken);
 
         if (response.Content.Headers.ContentLength is 0)
@@ -36,36 +33,15 @@ public sealed class ApiClient(HttpClient httpClient, IUserSession userSession) :
         return result!;
     }
 
-    private async Task<HttpResponseMessage> SendWithFallbackAsync(string route, object? payload, bool includeAuth, CancellationToken cancellationToken)
+    private async Task<HttpResponseMessage> SendAsync(string route, object? payload, bool includeAuth, CancellationToken cancellationToken)
     {
-        Exception? lastException = null;
-
-        foreach (var baseAddress in GetAddressCandidates())
+        if (httpClient.BaseAddress is null)
         {
-            var requestUri = new Uri(baseAddress, route);
-
-            try
-            {
-                var response = await SendWithManualRedirectAsync(requestUri, payload, includeAuth, cancellationToken);
-                resolvedBaseAddress = baseAddress;
-                return response;
-            }
-            catch (HttpRequestException ex)
-            {
-                lastException = ex;
-            }
-            catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
-            {
-                lastException = ex;
-            }
+            throw new InvalidOperationException("HttpClient.BaseAddress must be configured.");
         }
 
-        if (lastException is not null)
-        {
-            throw lastException;
-        }
-
-        throw new HttpRequestException("No reachable API endpoint was found.");
+        var requestUri = new Uri(httpClient.BaseAddress, route);
+        return await SendWithManualRedirectAsync(requestUri, payload, includeAuth, cancellationToken);
     }
 
     private async Task<HttpResponseMessage> SendWithManualRedirectAsync(
@@ -111,24 +87,6 @@ public sealed class ApiClient(HttpClient httpClient, IUserSession userSession) :
             or HttpStatusCode.RedirectKeepVerb
             or HttpStatusCode.TemporaryRedirect
             or HttpStatusCode.PermanentRedirect;
-    }
-
-    private IEnumerable<Uri> GetAddressCandidates()
-    {
-        if (resolvedBaseAddress is not null)
-        {
-            yield return resolvedBaseAddress;
-        }
-
-        foreach (var candidate in BaseAddressCandidates)
-        {
-            if (candidate == resolvedBaseAddress)
-            {
-                continue;
-            }
-
-            yield return candidate;
-        }
     }
 
     private HttpRequestMessage BuildRequest(Uri requestUri, object? payload, bool includeAuth)

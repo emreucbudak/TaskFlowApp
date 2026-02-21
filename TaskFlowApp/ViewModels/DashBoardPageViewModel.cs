@@ -83,19 +83,19 @@ public partial class DashBoardPageViewModel(
         }
         catch (ApiException ex)
         {
-            ErrorMessage = $"Dashboard verisi alinamadi ({ex.StatusCode}).";
+            ErrorMessage = ResolveApiErrorMessage(ex, GenericLoadErrorMessage);
         }
         catch (HttpRequestException)
         {
-            ErrorMessage = "API baglantisi kurulamadi. API servisinin calistigini kontrol edin.";
+            ErrorMessage = GenericConnectionErrorMessage;
         }
         catch (TaskCanceledException)
         {
-            ErrorMessage = "API yanit vermedi. Daha sonra tekrar deneyin.";
+            ErrorMessage = GenericConnectionErrorMessage;
         }
         catch (Exception)
         {
-            ErrorMessage = "Dashboard yuklenirken hata olustu.";
+            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
         }
         finally
         {

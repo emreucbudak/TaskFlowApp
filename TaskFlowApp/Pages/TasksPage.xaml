@@ -103,11 +103,13 @@
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
-                    <Grid WidthRequest="18" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center">
-                        <Polygon Points="9,0 18,9 0,9" Fill="#4A5568"/>
-                        <Rectangle Fill="#4A5568" WidthRequest="11" HeightRequest="9"
-                                   HorizontalOptions="Center" VerticalOptions="End"/>
-                    </Grid>
+                    <Image x:Name="HomeIconImage"
+                           Source="nav_home_outline.svg"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
                 </Border>
             </VerticalStackLayout>
 
@@ -118,12 +120,13 @@
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
-                    <Grid WidthRequest="18" HeightRequest="14" ColumnDefinitions="*,*,*"
-                          ColumnSpacing="3" HorizontalOptions="Center" VerticalOptions="Center">
-                        <BoxView Grid.Column="0" Color="#4A5568" CornerRadius="2" HeightRequest="9" VerticalOptions="End"/>
-                        <BoxView Grid.Column="1" Color="#4A5568" CornerRadius="2" HeightRequest="14" VerticalOptions="End"/>
-                        <BoxView Grid.Column="2" Color="#4A5568" CornerRadius="2" HeightRequest="6" VerticalOptions="End"/>
-                    </Grid>
+                    <Image x:Name="ReportsIconImage"
+                           Source="nav_reports_outline.svg"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
                 </Border>
             </VerticalStackLayout>
 
@@ -134,13 +137,13 @@
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
-                    <VerticalStackLayout Spacing="3" HorizontalOptions="Center"
-                                        VerticalOptions="Center" WidthRequest="16">
-                        <BoxView Color="#2196F3" HeightRequest="2" CornerRadius="1"/>
-                        <BoxView Color="#2196F3" HeightRequest="2" CornerRadius="1"/>
-                        <BoxView Color="#2196F3" HeightRequest="2" CornerRadius="1"
-                                 WidthRequest="11" HorizontalOptions="Start"/>
-                    </VerticalStackLayout>
+                    <Image x:Name="TasksIconImage"
+                           Source="nav_tasks_outline.svg"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
                 </Border>
                 <BoxView Color="#2196F3" WidthRequest="4" HeightRequest="3" CornerRadius="1.5" HorizontalOptions="Center"/>
             </VerticalStackLayout>
@@ -152,12 +155,13 @@
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
-                    <Grid WidthRequest="18" HeightRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
-                        <Border WidthRequest="18" HeightRequest="12" StrokeShape="RoundRectangle 4"
-                                Stroke="#4A5568" StrokeThickness="2" BackgroundColor="Transparent" VerticalOptions="Start"/>
-                        <Polygon Points="4,11 0,16 8,11" Fill="#4A5568"
-                                 VerticalOptions="End" HorizontalOptions="Start" Margin="3,0,0,0"/>
-                    </Grid>
+                    <Image x:Name="MessagesIconImage"
+                           Source="nav_messages_outline.svg"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
                 </Border>
             </VerticalStackLayout>
 
@@ -168,15 +172,13 @@
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
-                    <Grid WidthRequest="16" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center">
-                        <Border WidthRequest="14" HeightRequest="10" StrokeShape="RoundRectangle 7 7 0 0"
-                                Stroke="#4A5568" StrokeThickness="2" BackgroundColor="Transparent"
-                                VerticalOptions="Start" HorizontalOptions="Center" Margin="0,2,0,0"/>
-                        <BoxView Color="#4A5568" WidthRequest="16" HeightRequest="2" CornerRadius="1"
-                                 VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,4"/>
-                        <Ellipse WidthRequest="5" HeightRequest="5" Stroke="#4A5568" StrokeThickness="2"
-                                 Fill="Transparent" VerticalOptions="End" HorizontalOptions="Center"/>
-                    </Grid>
+                    <Image x:Name="NotificationsIconImage"
+                           Source="nav_notifications_outline.svg"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
                 </Border>
             </VerticalStackLayout>
             <!-- Cikis -->
@@ -190,31 +192,13 @@
                         WidthRequest="38"
                         HeightRequest="28"
                         HorizontalOptions="Center">
-                    <Grid WidthRequest="18" HeightRequest="18"
-                          HorizontalOptions="Center"
-                          VerticalOptions="Center">
-                        <Border WidthRequest="10"
-                                HeightRequest="14"
-                                Stroke="#4A5568"
-                                StrokeThickness="2"
-                                BackgroundColor="Transparent"
-                                HorizontalOptions="Start"
-                                VerticalOptions="Center">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="2"/>
-                            </Border.StrokeShape>
-                        </Border>
-                        <BoxView Color="#4A5568"
-                                 WidthRequest="7"
-                                 HeightRequest="2"
-                                 HorizontalOptions="End"
-                                 VerticalOptions="Center"
-                                 Margin="0,0,2,0"/>
-                        <Polygon Points="13,6 18,9 13,12"
-                                 Fill="#4A5568"
-                                 HorizontalOptions="End"
-                                 VerticalOptions="Center"/>
-                    </Grid>
+                    <Image x:Name="LogoutIconImage"
+                           Source="nav_logout_outline.svg"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
                 </Border>
             </VerticalStackLayout>
         </Grid>

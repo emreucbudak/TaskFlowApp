@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Services.Realtime;
@@ -23,6 +24,17 @@ public abstract partial class PageViewModelBase(
 
     [ObservableProperty]
     private string errorMessage = string.Empty;
+
+    protected const string GenericConnectionErrorMessage = "Su anda islem gerceklestirilemiyor. Lutfen tekrar deneyin.";
+    protected const string GenericLoadErrorMessage = "Veriler su anda yuklenemiyor. Lutfen tekrar deneyin.";
+    protected const string SessionExpiredMessage = "Oturumunuz sona erdi. Lutfen yeniden giris yapin.";
+
+    protected static string ResolveApiErrorMessage(ApiException exception, string defaultMessage)
+    {
+        return exception.StatusCode is 401 or 403
+            ? SessionExpiredMessage
+            : defaultMessage;
+    }
 
     [RelayCommand]
     private Task NavigateHomeAsync() => NavigationService.GoToRootAsync("DashBoardPage");
