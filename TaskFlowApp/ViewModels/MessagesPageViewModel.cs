@@ -41,7 +41,15 @@ public partial class MessagesPageViewModel(
         {
             IsBusy = true;
             ErrorMessage = string.Empty;
-            await signalRChatService.EnsureConnectedAsync();
+
+            try
+            {
+                await signalRChatService.EnsureConnectedAsync();
+            }
+            catch
+            {
+                // Realtime baglanti kurulamasa da mesajlar API'den yuklenmeye devam eder.
+            }
 
             var userId = UserSession.UserId.Value;
             var messagesTask = chatApiClient.GetMessagesByUserIdAsync(userId, 1, 20);
@@ -56,11 +64,18 @@ public partial class MessagesPageViewModel(
             }
 
             UnreadCount = await unreadTask;
-            StatusText = $"Mesaj: {Messages.Count} | Okunmamis: {UnreadCount} | SignalR: {(signalRChatService.IsConnected ? "Bagli" : "Bagli Degil")}";
         }
         catch (ApiException ex)
         {
             ErrorMessage = $"Mesajlar alinamadi ({ex.StatusCode}).";
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = "API baglantisi kurulamadi. API servisinin calistigini kontrol edin.";
+        }
+        catch (TaskCanceledException)
+        {
+            ErrorMessage = "API yanit vermedi. Daha sonra tekrar deneyin.";
         }
         catch (Exception)
         {
@@ -75,26 +90,15 @@ public partial class MessagesPageViewModel(
     [RelayCommand]
     private Task DisconnectRealtimeAsync() => signalRChatService.DisconnectAsync();
 
-    partial void OnUnreadCountChanged(int value)
-    {
-        if (!string.IsNullOrWhiteSpace(StatusText))
-        {
-            StatusText = $"Mesaj: {Messages.Count} | Okunmamis: {value} | SignalR: {(signalRChatService.IsConnected ? "Bagli" : "Bagli Degil")}";
-        }
-    }
-
     public void RegisterRealtimeHandlers()
     {
         signalRChatService.PrivateMessageReceived -= OnPrivateMessageReceived;
         signalRChatService.PrivateMessageReceived += OnPrivateMessageReceived;
-        signalRChatService.ConnectionStateChanged -= OnConnectionStateChanged;
-        signalRChatService.ConnectionStateChanged += OnConnectionStateChanged;
     }
 
     public void UnregisterRealtimeHandlers()
     {
         signalRChatService.PrivateMessageReceived -= OnPrivateMessageReceived;
-        signalRChatService.ConnectionStateChanged -= OnConnectionStateChanged;
     }
 
     private void OnPrivateMessageReceived(MessageDto message)
@@ -106,11 +110,4 @@ public partial class MessagesPageViewModel(
         });
     }
 
-    private void OnConnectionStateChanged(string state)
-    {
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            StatusText = $"Mesaj: {Messages.Count} | Okunmamis: {UnreadCount} | SignalR: {state}";
-        });
-    }
 }

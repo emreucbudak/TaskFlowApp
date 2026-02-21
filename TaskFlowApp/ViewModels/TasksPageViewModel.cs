@@ -44,12 +44,18 @@ public partial class TasksPageViewModel(
             {
                 Tasks.Add(task);
             }
-
-            StatusText = $"Toplam gorev: {response?.TotalCount ?? 0}";
         }
         catch (ApiException ex)
         {
             ErrorMessage = $"Gorevler alinamadi ({ex.StatusCode}).";
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = "API baglantisi kurulamadi. API servisinin calistigini kontrol edin.";
+        }
+        catch (TaskCanceledException)
+        {
+            ErrorMessage = "API yanit vermedi. Daha sonra tekrar deneyin.";
         }
         catch (Exception)
         {

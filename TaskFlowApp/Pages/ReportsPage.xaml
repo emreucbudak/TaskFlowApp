@@ -59,11 +59,6 @@
                     Color="#2196F3" />
 
                 <Label
-                    Text="{Binding StatusText}"
-                    TextColor="#cbd5e1"
-                    FontSize="13" />
-
-                <Label
                     Text="{Binding ErrorMessage}"
                     TextColor="#f87171"
                     FontSize="12" />

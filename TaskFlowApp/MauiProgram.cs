@@ -29,7 +29,12 @@ public static class MauiProgram
         builder.Services.AddSingleton<IApiClient>(serviceProvider =>
         {
             var userSession = serviceProvider.GetRequiredService<IUserSession>();
-            var httpClient = new HttpClient
+            var handler = new HttpClientHandler
+            {
+                AllowAutoRedirect = false
+            };
+
+            var httpClient = new HttpClient(handler)
             {
                 BaseAddress = new Uri(AppEndpoints.ApiBaseUrl),
                 Timeout = TimeSpan.FromSeconds(30)

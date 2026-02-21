@@ -74,6 +74,14 @@ public partial class MainPageViewModel(
         {
             ErrorMessage = $"Giris basarisiz ({ex.StatusCode}).";
         }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = "API baglantisi kurulamadi. API servisinin calistigini kontrol edin.";
+        }
+        catch (TaskCanceledException)
+        {
+            ErrorMessage = "API yanit vermedi. Daha sonra tekrar deneyin.";
+        }
         catch (Exception)
         {
             ErrorMessage = "Beklenmeyen bir hata olustu.";
