@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
              x:Class="TaskFlowApp.Pages.DashBoardPage"
              BackgroundColor="#0D1B2A"
              Shell.NavBarIsVisible="False">
@@ -156,7 +157,7 @@
                         HeightRequest="28"
                         HorizontalOptions="Center">
                     <Image x:Name="HomeIconImage"
-                           Source="nav_home_outline.svg"
+                           Source="{mi:MaterialOutlined Icon=Home}"
                            WidthRequest="18"
                            HeightRequest="18"
                            Aspect="AspectFit"
@@ -182,7 +183,7 @@
                         HeightRequest="28"
                         HorizontalOptions="Center">
                     <Image x:Name="ReportsIconImage"
-                           Source="nav_reports_outline.svg"
+                           Source="{mi:MaterialOutlined Icon=InsertChartOutlined}"
                            WidthRequest="18"
                            HeightRequest="18"
                            Aspect="AspectFit"
@@ -191,7 +192,7 @@
                 </Border>
             </VerticalStackLayout>
 
-            <!-- GÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬ÂÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¶revler -->
+            <!-- GÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬ÂÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¶revler -->
             <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTasksTapped" />
@@ -203,7 +204,7 @@
                         HeightRequest="28"
                         HorizontalOptions="Center">
                     <Image x:Name="TasksIconImage"
-                           Source="nav_tasks_outline.svg"
+                           Source="{mi:MaterialOutlined Icon=Checklist}"
                            WidthRequest="18"
                            HeightRequest="18"
                            Aspect="AspectFit"
@@ -224,7 +225,7 @@
                         HeightRequest="28"
                         HorizontalOptions="Center">
                     <Image x:Name="MessagesIconImage"
-                           Source="nav_messages_outline.svg"
+                           Source="{mi:MaterialOutlined Icon=ChatBubbleOutline}"
                            WidthRequest="18"
                            HeightRequest="18"
                            Aspect="AspectFit"
@@ -245,7 +246,7 @@
                         HeightRequest="28"
                         HorizontalOptions="Center">
                     <Image x:Name="NotificationsIconImage"
-                           Source="nav_notifications_outline.svg"
+                           Source="{mi:MaterialOutlined Icon=NotificationsNone}"
                            WidthRequest="18"
                            HeightRequest="18"
                            Aspect="AspectFit"
@@ -265,7 +266,7 @@
                         HeightRequest="28"
                         HorizontalOptions="Center">
                     <Image x:Name="LogoutIconImage"
-                           Source="nav_logout_outline.svg"
+                           Source="{mi:MaterialOutlined Icon=Logout}"
                            WidthRequest="18"
                            HeightRequest="18"
                            Aspect="AspectFit"
@@ -276,3 +277,4 @@
         </Grid>
     </Grid>
 </ContentPage>
+
