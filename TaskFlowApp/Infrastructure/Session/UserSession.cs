@@ -16,8 +16,15 @@ public sealed class UserSession : IUserSession
     [
         "companyId",
         "CompanyId",
+        "companyid",
+        "company_id",
         "tenantId",
-        "TenantId"
+        "TenantId",
+        "tenantid",
+        "tenant_id",
+        "sid",
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid",
+        "http://schemas.microsoft.com/identity/claims/tenantid"
     ];
 
     private static readonly string[] RoleClaimKeys =
@@ -34,13 +41,29 @@ public sealed class UserSession : IUserSession
     public Guid? CompanyId { get; private set; }
     public string? Role { get; private set; }
 
-    public void SetTokens(string accessToken, string? refreshToken)
+    public void SetRawTokens(string accessToken, string? refreshToken)
     {
         AccessToken = accessToken;
         RefreshToken = refreshToken;
-        UserId = ReadGuidClaim(accessToken, UserIdClaimKeys);
-        CompanyId = ReadGuidClaim(accessToken, CompanyIdClaimKeys);
-        Role = ReadRoleClaim(accessToken, RoleClaimKeys);
+        UserId = null;
+        CompanyId = null;
+        Role = null;
+    }
+
+    public void SetTokens(
+        string accessToken,
+        string? refreshToken,
+        Guid? userIdOverride = null,
+        Guid? companyIdOverride = null,
+        string? roleOverride = null)
+    {
+        AccessToken = accessToken;
+        RefreshToken = refreshToken;
+        UserId = userIdOverride ?? ReadGuidClaim(accessToken, UserIdClaimKeys);
+        CompanyId = companyIdOverride ?? ReadGuidClaim(accessToken, CompanyIdClaimKeys);
+        Role = string.IsNullOrWhiteSpace(roleOverride)
+            ? ReadRoleClaim(accessToken, RoleClaimKeys)
+            : roleOverride;
     }
 
     public void Clear()
@@ -79,7 +102,7 @@ public sealed class UserSession : IUserSession
 
             foreach (var key in claimKeys)
             {
-                if (!root.TryGetProperty(key, out var value))
+                if (!TryGetPropertyIgnoreCase(root, key, out var value))
                 {
                     continue;
                 }
@@ -126,7 +149,7 @@ public sealed class UserSession : IUserSession
 
             foreach (var key in claimKeys)
             {
-                if (!root.TryGetProperty(key, out var value))
+                if (!TryGetPropertyIgnoreCase(root, key, out var value))
                 {
                     continue;
                 }
@@ -164,5 +187,25 @@ public sealed class UserSession : IUserSession
         }
 
         return null;
+    }
+
+    private static bool TryGetPropertyIgnoreCase(JsonElement root, string key, out JsonElement value)
+    {
+        if (root.TryGetProperty(key, out value))
+        {
+            return true;
+        }
+
+        foreach (var property in root.EnumerateObject())
+        {
+            if (string.Equals(property.Name, key, StringComparison.OrdinalIgnoreCase))
+            {
+                value = property.Value;
+                return true;
+            }
+        }
+
+        value = default;
+        return false;
     }
 }

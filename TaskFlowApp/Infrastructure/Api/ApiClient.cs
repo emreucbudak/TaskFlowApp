@@ -15,13 +15,13 @@ public sealed class ApiClient(HttpClient httpClient, IUserSession userSession) :
 
     public async Task PostAsync(string route, object? payload = null, bool includeAuth = true, CancellationToken cancellationToken = default)
     {
-        using var response = await SendAsync(route, payload, includeAuth, cancellationToken);
+        using var response = await SendPostAsync(route, payload, includeAuth, cancellationToken);
         await EnsureSuccessAsync(response, cancellationToken);
     }
 
     public async Task<T> PostAsync<T>(string route, object? payload = null, bool includeAuth = true, CancellationToken cancellationToken = default)
     {
-        using var response = await SendAsync(route, payload, includeAuth, cancellationToken);
+        using var response = await SendPostAsync(route, payload, includeAuth, cancellationToken);
         await EnsureSuccessAsync(response, cancellationToken);
 
         if (response.Content.Headers.ContentLength is 0)
@@ -33,7 +33,21 @@ public sealed class ApiClient(HttpClient httpClient, IUserSession userSession) :
         return result!;
     }
 
-    private async Task<HttpResponseMessage> SendAsync(string route, object? payload, bool includeAuth, CancellationToken cancellationToken)
+    public async Task<T> GetAsync<T>(string route, bool includeAuth = true, CancellationToken cancellationToken = default)
+    {
+        using var response = await SendGetAsync(route, includeAuth, cancellationToken);
+        await EnsureSuccessAsync(response, cancellationToken);
+
+        if (response.Content.Headers.ContentLength is 0)
+        {
+            return default!;
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<T>(SerializerOptions, cancellationToken);
+        return result!;
+    }
+
+    private async Task<HttpResponseMessage> SendPostAsync(string route, object? payload, bool includeAuth, CancellationToken cancellationToken)
     {
         if (httpClient.BaseAddress is null)
         {
@@ -41,10 +55,21 @@ public sealed class ApiClient(HttpClient httpClient, IUserSession userSession) :
         }
 
         var requestUri = new Uri(httpClient.BaseAddress, route);
-        return await SendWithManualRedirectAsync(requestUri, payload, includeAuth, cancellationToken);
+        return await SendPostWithManualRedirectAsync(requestUri, payload, includeAuth, cancellationToken);
     }
 
-    private async Task<HttpResponseMessage> SendWithManualRedirectAsync(
+    private async Task<HttpResponseMessage> SendGetAsync(string route, bool includeAuth, CancellationToken cancellationToken)
+    {
+        if (httpClient.BaseAddress is null)
+        {
+            throw new InvalidOperationException("HttpClient.BaseAddress must be configured.");
+        }
+
+        var requestUri = new Uri(httpClient.BaseAddress, route);
+        return await SendGetWithManualRedirectAsync(requestUri, includeAuth, cancellationToken);
+    }
+
+    private async Task<HttpResponseMessage> SendPostWithManualRedirectAsync(
         Uri requestUri,
         object? payload,
         bool includeAuth,
@@ -55,7 +80,41 @@ public sealed class ApiClient(HttpClient httpClient, IUserSession userSession) :
 
         for (var redirectCount = 0; redirectCount <= maxRedirectCount; redirectCount++)
         {
-            using var request = BuildRequest(currentUri, payload, includeAuth);
+            using var request = BuildPostRequest(currentUri, payload, includeAuth);
+            var response = await httpClient.SendAsync(request, cancellationToken);
+
+            if (!IsRedirectStatusCode(response.StatusCode) || response.Headers.Location is null)
+            {
+                return response;
+            }
+
+            if (redirectCount == maxRedirectCount)
+            {
+                return response;
+            }
+
+            var redirectUri = response.Headers.Location.IsAbsoluteUri
+                ? response.Headers.Location
+                : new Uri(currentUri, response.Headers.Location);
+
+            response.Dispose();
+            currentUri = redirectUri;
+        }
+
+        throw new HttpRequestException("Unexpected redirect loop while calling API.");
+    }
+
+    private async Task<HttpResponseMessage> SendGetWithManualRedirectAsync(
+        Uri requestUri,
+        bool includeAuth,
+        CancellationToken cancellationToken)
+    {
+        const int maxRedirectCount = 3;
+        var currentUri = requestUri;
+
+        for (var redirectCount = 0; redirectCount <= maxRedirectCount; redirectCount++)
+        {
+            using var request = BuildGetRequest(currentUri, includeAuth);
             var response = await httpClient.SendAsync(request, cancellationToken);
 
             if (!IsRedirectStatusCode(response.StatusCode) || response.Headers.Location is null)
@@ -89,12 +148,24 @@ public sealed class ApiClient(HttpClient httpClient, IUserSession userSession) :
             or HttpStatusCode.PermanentRedirect;
     }
 
-    private HttpRequestMessage BuildRequest(Uri requestUri, object? payload, bool includeAuth)
+    private HttpRequestMessage BuildPostRequest(Uri requestUri, object? payload, bool includeAuth)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, requestUri)
         {
             Content = JsonContent.Create(payload ?? new { }, options: SerializerOptions)
         };
+
+        if (includeAuth && !string.IsNullOrWhiteSpace(userSession.AccessToken))
+        {
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", userSession.AccessToken);
+        }
+
+        return request;
+    }
+
+    private HttpRequestMessage BuildGetRequest(Uri requestUri, bool includeAuth)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
         if (includeAuth && !string.IsNullOrWhiteSpace(userSession.AccessToken))
         {

@@ -5,6 +5,11 @@ namespace TaskFlowApp.Services.ApiClients;
 
 public abstract class ControllerApiClientBase(IApiClient apiClient, string controllerName)
 {
+    protected Task<T> GetForResultAsync<T>(string action, bool includeAuth = true, CancellationToken cancellationToken = default)
+    {
+        return apiClient.GetAsync<T>($"api/{controllerName}/{action}", includeAuth, cancellationToken);
+    }
+
     protected Task PostAsync(string action, object? request = null, bool includeAuth = true, CancellationToken cancellationToken = default)
     {
         return apiClient.PostAsync($"api/{controllerName}/{action}", request, includeAuth, cancellationToken);

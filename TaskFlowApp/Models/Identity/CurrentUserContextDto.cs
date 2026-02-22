@@ -1,9 +1,7 @@
 namespace TaskFlowApp.Models.Identity;
 
-public sealed record LoginCommandResponseDto
+public sealed record CurrentUserContextDto
 {
-    public string AccessToken { get; init; } = string.Empty;
-    public string RefreshToken { get; init; } = string.Empty;
     public Guid UserId { get; init; }
     public Guid CompanyId { get; init; }
     public string Role { get; init; } = string.Empty;

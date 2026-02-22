@@ -62,6 +62,16 @@
 
         <ScrollView Grid.Row="2">
             <VerticalStackLayout Padding="20,14,20,20" Spacing="14">
+                <ActivityIndicator
+                    IsRunning="{Binding IsBusy}"
+                    IsVisible="{Binding IsBusy}"
+                    Color="#2196F3" />
+
+                <Label
+                    Text="{Binding ErrorMessage}"
+                    TextColor="#f87171"
+                    FontSize="12" />
+
                 <Border BackgroundColor="#162030"
                         Stroke="Transparent"
                         StrokeShape="RoundRectangle 16"
@@ -71,15 +81,64 @@
                                FontSize="24"
                                FontAttributes="Bold"
                                TextColor="White" />
-                        <Label Text="Calisan ekleme, duzenleme ve rol islemlerini bu sayfadan yonetebilirsiniz."
-                               FontSize="14"
+                        <Label Text="{Binding GroupCount, StringFormat='Ekip sayisi: {0}'}"
+                               FontSize="13"
                                TextColor="#94a3b8" />
+                        <Label Text="{Binding WorkerCount, StringFormat='Toplam calisan: {0}'}"
+                               FontSize="13"
+                               TextColor="#94a3b8" />
+                        <Label Text="{Binding StatusText}"
+                               FontSize="12"
+                               TextColor="#cbd5e1" />
                     </VerticalStackLayout>
                 </Border>
 
-                <Border BackgroundColor="#162030" Stroke="Transparent" StrokeShape="RoundRectangle 12" HeightRequest="90" />
-                <Border BackgroundColor="#162030" Stroke="Transparent" StrokeShape="RoundRectangle 12" HeightRequest="90" />
-                <Border BackgroundColor="#162030" Stroke="Transparent" StrokeShape="RoundRectangle 12" HeightRequest="90" />
+                <CollectionView ItemsSource="{Binding Groups}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="#162030"
+                                    Stroke="Transparent"
+                                    StrokeShape="RoundRectangle 12"
+                                    Margin="0,0,0,10"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="{Binding GroupName}"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="White" />
+
+                                    <Label Text="{Binding WorkerName.Count, StringFormat='Calisan sayisi: {0}'}"
+                                           FontSize="12"
+                                           TextColor="#94a3b8" />
+
+                                    <Label Text="Calisanlar"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#cbd5e1" />
+                                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding WorkerName}" Spacing="2">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate>
+                                                <Label Text="{Binding .}" FontSize="12" TextColor="#94a3b8" />
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </VerticalStackLayout>
+
+                                    <Label Text="Departmanlar"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#cbd5e1" />
+                                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding DepartmenName}" Spacing="2">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate>
+                                                <Label Text="{Binding .}" FontSize="12" TextColor="#94a3b8" />
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </VerticalStackLayout>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </VerticalStackLayout>
         </ScrollView>
 

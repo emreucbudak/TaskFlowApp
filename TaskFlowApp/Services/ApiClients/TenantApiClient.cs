@@ -5,6 +5,9 @@ namespace TaskFlowApp.Services.ApiClients;
 
 public sealed class TenantApiClient(IApiClient apiClient) : ControllerApiClientBase(apiClient, "Tenant")
 {
+    public Task<List<CompanyPlanDto>> GetCompanyPlansAsync(CancellationToken cancellationToken = default) =>
+        GetForResultAsync<List<CompanyPlanDto>>("CompanyPlans", includeAuth: false, cancellationToken: cancellationToken);
+
     public Task CreateCompanyPlanCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("CreateCompanyPlanCommandRequest", request, cancellationToken: cancellationToken);
 

@@ -68,26 +68,103 @@
                  HorizontalOptions="Fill" />
 
         <ScrollView Grid.Row="2">
-            <VerticalStackLayout Padding="20,14,20,20" Spacing="16">
+            <VerticalStackLayout Padding="20,14,20,20" Spacing="14">
+                <ActivityIndicator
+                    IsRunning="{Binding IsBusy}"
+                    IsVisible="{Binding IsBusy}"
+                    Color="#2196F3" />
+
+                <Label
+                    Text="{Binding ErrorMessage}"
+                    TextColor="#f87171"
+                    FontSize="12" />
+
                 <Border BackgroundColor="#162030"
                         Stroke="Transparent"
                         StrokeShape="RoundRectangle 16"
-                        Padding="18"
-                        VerticalOptions="Start">
-                    <VerticalStackLayout Spacing="10">
+                        Padding="18">
+                    <VerticalStackLayout Spacing="8">
                         <Label Text="Company Dashboard"
-                               FontSize="26"
+                               FontSize="24"
                                FontAttributes="Bold"
                                TextColor="White" />
-                        <Label Text="Sirket yonetici paneline hos geldiniz."
-                               FontSize="14"
-                               TextColor="#94a3b8" />
-                        <Label Text="Bu sayfa company rolundeki kullanicilar icin acilir."
-                               FontSize="14"
-                               TextColor="#cbd5e1" />
-                        <Label Text="Ilerleyen adimlarda sirket odakli KPI ve yonetim kartlari buraya eklenebilir."
+                        <Label Text="Sirketin genel operasyon durumunu bu ekrandan takip edebilirsiniz."
                                FontSize="13"
                                TextColor="#94a3b8" />
+                        <Label Text="{Binding StatusText}"
+                               FontSize="12"
+                               TextColor="#cbd5e1" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+                    <Border Grid.Row="0"
+                            Grid.Column="0"
+                            BackgroundColor="#162030"
+                            Stroke="Transparent"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="12">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Ekip Sayisi" TextColor="#94a3b8" FontSize="12" />
+                            <Label Text="{Binding TotalTeamCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="0"
+                            Grid.Column="1"
+                            BackgroundColor="#162030"
+                            Stroke="Transparent"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="12">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Calisan Sayisi" TextColor="#94a3b8" FontSize="12" />
+                            <Label Text="{Binding TotalWorkerCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="1"
+                            Grid.Column="0"
+                            BackgroundColor="#162030"
+                            Stroke="Transparent"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="12">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Toplam Gorev" TextColor="#94a3b8" FontSize="12" />
+                            <Label Text="{Binding TotalTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="1"
+                            Grid.Column="1"
+                            BackgroundColor="#162030"
+                            Stroke="Transparent"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="12">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Toplam Rapor" TextColor="#94a3b8" FontSize="12" />
+                            <Label Text="{Binding TotalReportCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <Border BackgroundColor="#162030"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="14">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Operasyon Ozeti"
+                               TextColor="White"
+                               FontAttributes="Bold"
+                               FontSize="14" />
+                        <Label Text="{Binding CompletedTaskCount, StringFormat='Tamamlanan gorev: {0}'}"
+                               TextColor="#94a3b8"
+                               FontSize="12" />
+                        <Label Text="{Binding OverdueTaskCount, StringFormat='Geciken gorev: {0}'}"
+                               TextColor="#94a3b8"
+                               FontSize="12" />
+                        <Label Text="{Binding AvailablePlanCount, StringFormat='Kullanilabilir plan: {0}'}"
+                               TextColor="#94a3b8"
+                               FontSize="12" />
                     </VerticalStackLayout>
                 </Border>
             </VerticalStackLayout>

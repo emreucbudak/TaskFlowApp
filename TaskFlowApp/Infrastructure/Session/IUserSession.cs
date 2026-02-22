@@ -8,6 +8,7 @@ public interface IUserSession
     Guid? CompanyId { get; }
     string? Role { get; }
 
-    void SetTokens(string accessToken, string? refreshToken);
+    void SetRawTokens(string accessToken, string? refreshToken);
+    void SetTokens(string accessToken, string? refreshToken, Guid? userIdOverride = null, Guid? companyIdOverride = null, string? roleOverride = null);
     void Clear();
 }
