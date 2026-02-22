@@ -18,6 +18,14 @@
                    Aspect="AspectFit"
                    VerticalOptions="Center" />
 
+            <Label Grid.Column="1"
+                   Text="Company Gorevleri"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+
             <Grid Grid.Column="2"
                   WidthRequest="44"
                   HeightRequest="44"

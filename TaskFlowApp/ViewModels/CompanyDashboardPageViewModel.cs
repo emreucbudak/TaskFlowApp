@@ -39,6 +39,12 @@ public partial class CompanyDashboardPageViewModel(
     private int overdueTaskCount;
 
     [ObservableProperty]
+    private int resolvedReportCount;
+
+    [ObservableProperty]
+    private int rejectedReportCount;
+
+    [ObservableProperty]
     private int availablePlanCount;
 
     [RelayCommand]
@@ -65,7 +71,7 @@ public partial class CompanyDashboardPageViewModel(
 
             var groupsTask = identityApiClient.GetAllCompanyGroupsAsync(companyId);
             var tasksTask = projectManagementApiClient.GetAllTasksByCompanyIdAsync(companyId, 1, 30);
-            var reportsTask = reportApiClient.GetAllReportsAsync(1, 30);
+            var reportsTask = reportApiClient.GetAllReportsAsync(1, 200);
             var statsTask = statsApiClient.GetAllWorkersStatsByPeriodQueryRequestAsync(new { Period = period, Page = 1, PageSize = 100 });
             var plansTask = tenantApiClient.GetCompanyPlansAsync();
 
@@ -88,6 +94,8 @@ public partial class CompanyDashboardPageViewModel(
             TotalReportCount = reports?.TotalCount > 0 ? reports.TotalCount : reports?.Items.Count ?? 0;
             CompletedTaskCount = stats?.Items.Sum(item => item.TotalTasksCompleted) ?? 0;
             OverdueTaskCount = stats?.Items.Sum(item => item.OverdueIncompleteTasksCount) ?? 0;
+            ResolvedReportCount = reports?.Items.Count(item => IsResolvedReportStatus(item.ReportStatusId)) ?? 0;
+            RejectedReportCount = reports?.Items.Count(item => IsRejectedReportStatus(item.ReportStatusId)) ?? 0;
             AvailablePlanCount = plans.Count;
 
             StatusText = $"Ekip: {TotalTeamCount} | Calisan: {TotalWorkerCount} | Gorev: {TotalTaskCount}";
@@ -113,6 +121,10 @@ public partial class CompanyDashboardPageViewModel(
             IsBusy = false;
         }
     }
+
+    private static bool IsResolvedReportStatus(int reportStatusId) => reportStatusId == 3;
+
+    private static bool IsRejectedReportStatus(int reportStatusId) => reportStatusId == 4;
 
     private static List<CompanyGroupDto> NormalizeGroups(IEnumerable<CompanyGroupDto> groups)
     {

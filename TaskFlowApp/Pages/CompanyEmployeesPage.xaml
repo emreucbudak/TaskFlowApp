@@ -7,10 +7,13 @@
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+
+        <!-- TOP BAR -->
         <Grid Grid.Row="0"
-              Padding="20,16,20,10"
+              Padding="20,16,20,12"
               ColumnDefinitions="Auto,*,Auto"
               BackgroundColor="#0D1B2A">
+
             <Image Grid.Column="0"
                    Source="https://www.logoai.com/uploads/icon/2021/08/06/732ca933-7df8-43e8-b085-69466243c919.png"
                    WidthRequest="32"
@@ -18,6 +21,16 @@
                    Aspect="AspectFit"
                    VerticalOptions="Center" />
 
+            <!-- Sayfa başlığı ortada -->
+            <Label Grid.Column="1"
+                   Text="Ekip Yonetimi"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+
+            <!-- Avatar -->
             <Grid Grid.Column="2"
                   WidthRequest="44"
                   HeightRequest="44"
@@ -60,39 +73,37 @@
 
         <BoxView Grid.Row="1" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
 
+        <!-- SCROLL CONTENT -->
         <ScrollView Grid.Row="2">
-            <VerticalStackLayout Padding="20,14,20,20" Spacing="14">
+            <VerticalStackLayout Padding="16,14,16,24" Spacing="12">
+
                 <ActivityIndicator
                     IsRunning="{Binding IsBusy}"
                     IsVisible="{Binding IsBusy}"
                     Color="#2196F3" />
 
-                <Label
-                    Text="{Binding ErrorMessage}"
-                    TextColor="#f87171"
-                    FontSize="12" />
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="#f87171"
+                       FontSize="12" />
 
+                <!-- Hero Card -->
                 <Border BackgroundColor="#162030"
                         Stroke="Transparent"
                         StrokeShape="RoundRectangle 16"
-                        Padding="18">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Calisan Islemleri"
-                               FontSize="24"
+                        Padding="18,16">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Calisan ve Departman"
+                               FontSize="20"
                                FontAttributes="Bold"
                                TextColor="White" />
-                        <Label Text="{Binding GroupCount, StringFormat='Ekip sayisi: {0}'}"
-                               FontSize="13"
-                               TextColor="#94a3b8" />
-                        <Label Text="{Binding WorkerCount, StringFormat='Toplam calisan: {0}'}"
-                               FontSize="13"
-                               TextColor="#94a3b8" />
-                        <Label Text="{Binding StatusText}"
+                        <Label Text="Mevcut ekip, departman ve calisan dagilimini asagida gorebilirsiniz."
                                FontSize="12"
-                               TextColor="#cbd5e1" />
+                               TextColor="#94a3b8"
+                               LineHeight="1.4" />
                     </VerticalStackLayout>
                 </Border>
 
+                <!-- Groups List -->
                 <CollectionView ItemsSource="{Binding Groups}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
@@ -100,69 +111,326 @@
                                     Stroke="Transparent"
                                     StrokeShape="RoundRectangle 12"
                                     Margin="0,0,0,10"
-                                    Padding="12">
-                                <VerticalStackLayout Spacing="8">
-                                    <Label Text="{Binding GroupName}"
-                                           FontSize="16"
-                                           FontAttributes="Bold"
-                                           TextColor="White" />
+                                    Padding="16,14">
+                                <VerticalStackLayout Spacing="10">
 
-                                    <Label Text="{Binding WorkerName.Count, StringFormat='Calisan sayisi: {0}'}"
-                                           FontSize="12"
-                                           TextColor="#94a3b8" />
+                                    <!-- Grup başlığı + çalışan sayısı yan yana -->
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Grid.Column="0"
+                                               Text="{Binding GroupName}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="White"
+                                               VerticalOptions="Center" />
+                                        <Border Grid.Column="1"
+                                                BackgroundColor="#1A3A5C"
+                                                StrokeShape="RoundRectangle 8"
+                                                Stroke="Transparent"
+                                                Padding="8,3"
+                                                VerticalOptions="Center">
+                                            <Label Text="{Binding WorkerName.Count, StringFormat='Calisan sayisi: {0}'}"
+                                                   FontSize="11"
+                                                   TextColor="#94a3b8" />
+                                        </Border>
+                                    </Grid>
 
-                                    <Label Text="Calisanlar"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="#cbd5e1" />
-                                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding WorkerName}" Spacing="2">
-                                        <BindableLayout.ItemTemplate>
-                                            <DataTemplate>
-                                                <Label Text="{Binding .}" FontSize="12" TextColor="#94a3b8" />
-                                            </DataTemplate>
-                                        </BindableLayout.ItemTemplate>
+                                    <BoxView Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
+
+                                    <!-- Çalışanlar -->
+                                    <VerticalStackLayout Spacing="6">
+                                        <Label Text="Calisanlar"
+                                               FontSize="11"
+                                               FontAttributes="Bold"
+                                               TextColor="#cbd5e1"
+                                               CharacterSpacing="0.5" />
+                                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding WorkerName}" Spacing="3">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid ColumnDefinitions="Auto,*">
+                                                        <BoxView Grid.Column="0"
+                                                                 WidthRequest="4"
+                                                                 HeightRequest="4"
+                                                                 Color="#94a3b8"
+                                                                 CornerRadius="2"
+                                                                 VerticalOptions="Center"
+                                                                 Margin="0,0,8,0" />
+                                                        <Label Grid.Column="1"
+                                                               Text="{Binding .}"
+                                                               FontSize="13"
+                                                               TextColor="#94a3b8"
+                                                               VerticalOptions="Center" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </VerticalStackLayout>
                                     </VerticalStackLayout>
 
-                                    <Label Text="Departmanlar"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="#cbd5e1" />
-                                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding DepartmenName}" Spacing="2">
-                                        <BindableLayout.ItemTemplate>
-                                            <DataTemplate>
-                                                <Label Text="{Binding .}" FontSize="12" TextColor="#94a3b8" />
-                                            </DataTemplate>
-                                        </BindableLayout.ItemTemplate>
+                                    <!-- Departmanlar -->
+                                    <VerticalStackLayout Spacing="6">
+                                        <Label Text="Departmanlar"
+                                               FontSize="11"
+                                               FontAttributes="Bold"
+                                               TextColor="#cbd5e1"
+                                               CharacterSpacing="0.5" />
+                                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding DepartmenName}" Spacing="3">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid ColumnDefinitions="Auto,*">
+                                                        <BoxView Grid.Column="0"
+                                                                 WidthRequest="4"
+                                                                 HeightRequest="4"
+                                                                 Color="#94a3b8"
+                                                                 CornerRadius="2"
+                                                                 VerticalOptions="Center"
+                                                                 Margin="0,0,8,0" />
+                                                        <Label Grid.Column="1"
+                                                               Text="{Binding .}"
+                                                               FontSize="13"
+                                                               TextColor="#94a3b8"
+                                                               VerticalOptions="Center" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </VerticalStackLayout>
                                     </VerticalStackLayout>
+
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+
+                <!-- Form mesajı -->
+                <Label Text="{Binding FormMessage}"
+                       TextColor="#86efac"
+                       FontSize="12" />
+
+                <!-- Çalışan Ekle -->
+                <Border BackgroundColor="#162030"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="16,14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Calisan Ekle"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+
+                        <BoxView Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
+
+                        <Border BackgroundColor="#0F1E2D"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                Padding="4,0">
+                            <Entry Placeholder="Ad Soyad"
+                                   Text="{Binding WorkerNameInput}"
+                                   TextColor="White"
+                                   PlaceholderColor="#64748b"
+                                   BackgroundColor="Transparent"
+                                   HeightRequest="44" />
+                        </Border>
+
+                        <Border BackgroundColor="#0F1E2D"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                Padding="4,0">
+                            <Entry Placeholder="E-posta"
+                                   Text="{Binding WorkerEmailInput}"
+                                   Keyboard="Email"
+                                   TextColor="White"
+                                   PlaceholderColor="#64748b"
+                                   BackgroundColor="Transparent"
+                                   HeightRequest="44" />
+                        </Border>
+
+                        <Border BackgroundColor="#0F1E2D"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                Padding="4,0">
+                            <Entry Placeholder="Sifre"
+                                   Text="{Binding WorkerPasswordInput}"
+                                   IsPassword="True"
+                                   TextColor="White"
+                                   PlaceholderColor="#64748b"
+                                   BackgroundColor="Transparent"
+                                   HeightRequest="44" />
+                        </Border>
+
+                        <Border BackgroundColor="#0F1E2D"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                Padding="8,0">
+                            <Grid HeightRequest="44"
+                                  VerticalOptions="Center">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnDepartmentSelectTapped" />
+                                </Grid.GestureRecognizers>
+                                <Grid ColumnDefinitions="*,Auto"
+                                      VerticalOptions="Center">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding SelectedDepartmentDisplayText}"
+                                           TextColor="White"
+                                           VerticalOptions="Center"
+                                           FontSize="14" />
+                                    <Label Grid.Column="1"
+                                           Text="v"
+                                           TextColor="#94a3b8"
+                                           VerticalOptions="Center"
+                                           FontSize="14"
+                                           Margin="8,0,0,0" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Button Text="Calisan Ekle"
+                                Command="{Binding AddWorkerCommand}"
+                                BackgroundColor="#2196F3"
+                                TextColor="White"
+                                CornerRadius="10"
+                                HeightRequest="46"
+                                FontAttributes="Bold" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Departman Ekle -->
+                <Border BackgroundColor="#162030"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="16,14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Departman Ekle"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+
+                        <BoxView Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
+
+                        <Border BackgroundColor="#0F1E2D"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                Padding="4,0">
+                            <Entry Placeholder="Departman Adi (2-10 karakter)"
+                                   Text="{Binding DepartmentNameInput}"
+                                   TextColor="White"
+                                   PlaceholderColor="#64748b"
+                                   BackgroundColor="Transparent"
+                                   HeightRequest="44" />
+                        </Border>
+
+                        <Button Text="Departman Ekle"
+                                Command="{Binding AddDepartmentCommand}"
+                                BackgroundColor="#2196F3"
+                                TextColor="White"
+                                CornerRadius="10"
+                                HeightRequest="46"
+                                FontAttributes="Bold" />
+                    </VerticalStackLayout>
+                </Border>
+                
+                <Border BackgroundColor="#162030"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="16,14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Calisan Transfer Et"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+
+                        <BoxView Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
+
+                        <Border BackgroundColor="#0F1E2D"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                Padding="8,0">
+                            <Grid HeightRequest="44"
+                                  VerticalOptions="Center">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnUserSelectTapped" />
+                                </Grid.GestureRecognizers>
+                                <Grid ColumnDefinitions="*,Auto"
+                                      VerticalOptions="Center">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding SelectedUserDisplayText}"
+                                           TextColor="White"
+                                           VerticalOptions="Center"
+                                           FontSize="14" />
+                                    <Label Grid.Column="1"
+                                           Text="v"
+                                           TextColor="#94a3b8"
+                                           VerticalOptions="Center"
+                                           FontSize="14"
+                                           Margin="8,0,0,0" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Border BackgroundColor="#0F1E2D"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                Padding="8,0">
+                            <Grid HeightRequest="44"
+                                  VerticalOptions="Center">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnTransferDepartmentSelectTapped" />
+                                </Grid.GestureRecognizers>
+                                <Grid ColumnDefinitions="*,Auto"
+                                      VerticalOptions="Center">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding SelectedTransferDepartmentDisplayText}"
+                                           TextColor="White"
+                                           VerticalOptions="Center"
+                                           FontSize="14" />
+                                    <Label Grid.Column="1"
+                                           Text="v"
+                                           TextColor="#94a3b8"
+                                           VerticalOptions="Center"
+                                           FontSize="14"
+                                           Margin="8,0,0,0" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Label Text="Ayni anda departman secmesini istiyorsan alttaki kaydi kullan."
+                               FontSize="12"
+                               TextColor="#94a3b8" />
+
+                        <Button Text="Calisan Transfer Et"
+                                Command="{Binding TransferUserCommand}"
+                                BackgroundColor="#2196F3"
+                                TextColor="White"
+                                CornerRadius="10"
+                                HeightRequest="46"
+                                FontAttributes="Bold" />
+                    </VerticalStackLayout>
+                </Border>
+
             </VerticalStackLayout>
         </ScrollView>
 
         <BoxView Grid.Row="3" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
 
+        <!-- BOTTOM NAV BAR -->
         <Grid Grid.Row="4"
               ColumnDefinitions="*,*,*,*,*,*"
               BackgroundColor="#0F1E2D"
-              Padding="0,6,0,18">
+              Padding="0,8,0,20">
 
             <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnHomeTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="40" HeightRequest="30" HorizontalOptions="Center">
                     <Image Source="{mi:MaterialOutlined Icon=Home}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
 
+            <!-- Aktif sekme -->
             <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnMessagesTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                <Border BackgroundColor="#1A3A5C" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="40" HeightRequest="30" HorizontalOptions="Center">
                     <Image Source="{mi:MaterialOutlined Icon=ManageAccounts}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
                 <BoxView Color="#2196F3" WidthRequest="4" HeightRequest="3" CornerRadius="1.5" HorizontalOptions="Center" />
@@ -172,7 +440,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnNotificationsTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="40" HeightRequest="30" HorizontalOptions="Center">
                     <Image Source="{mi:MaterialOutlined Icon=Subscriptions}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
@@ -181,7 +449,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTasksTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="40" HeightRequest="30" HorizontalOptions="Center">
                     <Image Source="{mi:MaterialOutlined Icon=Checklist}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
@@ -190,7 +458,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnReportsTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="40" HeightRequest="30" HorizontalOptions="Center">
                     <Image Source="{mi:MaterialOutlined Icon=InsertChartOutlined}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
@@ -199,10 +467,11 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnLogoutTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="40" HeightRequest="30" HorizontalOptions="Center">
                     <Image Source="{mi:MaterialOutlined Icon=Logout}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
+
         </Grid>
     </Grid>
 </ContentPage>
