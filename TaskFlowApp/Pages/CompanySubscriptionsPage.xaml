@@ -62,6 +62,16 @@
 
         <ScrollView Grid.Row="2">
             <VerticalStackLayout Padding="20,14,20,20" Spacing="14">
+                <ActivityIndicator
+                    IsRunning="{Binding IsBusy}"
+                    IsVisible="{Binding IsBusy}"
+                    Color="#2196F3" />
+
+                <Label
+                    Text="{Binding ErrorMessage}"
+                    TextColor="#f87171"
+                    FontSize="12" />
+
                 <Border BackgroundColor="#162030"
                         Stroke="Transparent"
                         StrokeShape="RoundRectangle 16"
@@ -71,15 +81,35 @@
                                FontSize="24"
                                FontAttributes="Bold"
                                TextColor="White" />
-                        <Label Text="Sirket paket ve abonelik islemlerini bu sayfadan yonetebilirsiniz."
-                               FontSize="14"
+                        <Label Text="Sirket abonelik islemlerini bu alandan yonetebilirsiniz."
+                               FontSize="13"
                                TextColor="#94a3b8" />
                     </VerticalStackLayout>
                 </Border>
 
-                <Border BackgroundColor="#162030" Stroke="Transparent" StrokeShape="RoundRectangle 12" HeightRequest="90" />
-                <Border BackgroundColor="#162030" Stroke="Transparent" StrokeShape="RoundRectangle 12" HeightRequest="90" />
-                <Border BackgroundColor="#162030" Stroke="Transparent" StrokeShape="RoundRectangle 12" HeightRequest="90" />
+                <Border BackgroundColor="#162030"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="18">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Abonelik Iptali"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+                        <Label Text="Aboneliginizi iptal etmek icin alttaki butonu kullanin."
+                               FontSize="13"
+                               TextColor="#94a3b8" />
+                        <Button Text="Abonelik Iptal Talebi Olustur"
+                                Command="{Binding CancelSubscriptionCommand}"
+                                BackgroundColor="#B91C1C"
+                                TextColor="White"
+                                CornerRadius="10"
+                                HeightRequest="42" />
+                        <Label Text="{Binding StatusText}"
+                               FontSize="12"
+                               TextColor="#cbd5e1" />
+                    </VerticalStackLayout>
+                </Border>
             </VerticalStackLayout>
         </ScrollView>
 

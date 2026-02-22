@@ -43,11 +43,20 @@ public sealed class IdentityApiClient(IApiClient apiClient) : ControllerApiClien
     public Task<List<JsonElement>> GetAllCompanyGroupsQueriesRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostForResultAsync<List<JsonElement>>("GetAllCompanyGroupsQueriesRequest", request, cancellationToken: cancellationToken);
 
+    public Task<List<CompanyGroupDto>> GetAllCompanyGroupsAsync(Guid companyId, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<List<CompanyGroupDto>>(
+            "GetAllCompanyGroupsQueriesRequest",
+            new { CompanyId = companyId },
+            cancellationToken: cancellationToken);
+
     public Task<JsonElement> GetDepartmentLeaderQueryRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostForJsonAsync("GetDepartmentLeaderQueryRequest", request, cancellationToken: cancellationToken);
 
     public Task<LoginCommandResponseDto> LoginCommandRequestAsync(LoginCommandRequestDto request, CancellationToken cancellationToken = default) =>
         PostForResultAsync<LoginCommandResponseDto>("LoginCommandRequest", request, includeAuth: false, cancellationToken: cancellationToken);
+
+    public Task<CurrentUserContextDto> GetCurrentUserContextAsync(CancellationToken cancellationToken = default) =>
+        GetForResultAsync<CurrentUserContextDto>("GetCurrentUserContext", includeAuth: true, cancellationToken: cancellationToken);
 
     public Task RegisterCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("RegisterCommandRequest", request, includeAuth: false, cancellationToken: cancellationToken);

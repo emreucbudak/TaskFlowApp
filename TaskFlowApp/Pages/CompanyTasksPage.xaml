@@ -62,24 +62,71 @@
 
         <ScrollView Grid.Row="2">
             <VerticalStackLayout Padding="20,14,20,20" Spacing="14">
+                <ActivityIndicator
+                    IsRunning="{Binding IsBusy}"
+                    IsVisible="{Binding IsBusy}"
+                    Color="#2196F3" />
+
+                <Label
+                    Text="{Binding ErrorMessage}"
+                    TextColor="#f87171"
+                    FontSize="12" />
+
                 <Border BackgroundColor="#162030"
                         Stroke="Transparent"
                         StrokeShape="RoundRectangle 16"
                         Padding="18">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Company Tasks"
+                        <Label Text="Company Gorevleri"
                                FontSize="24"
                                FontAttributes="Bold"
                                TextColor="White" />
-                        <Label Text="Sirket gorev yonetimini bu ekrandan takip edebilirsiniz."
-                               FontSize="14"
+                        <Label Text="{Binding TotalTaskCount, StringFormat='Toplam gorev: {0}'}"
+                               FontSize="13"
                                TextColor="#94a3b8" />
+                        <Label Text="{Binding OpenTaskCount, StringFormat='Acik gorev: {0}'}"
+                               FontSize="13"
+                               TextColor="#94a3b8" />
+                        <Label Text="{Binding OverdueTaskCount, StringFormat='Geciken gorev: {0}'}"
+                               FontSize="13"
+                               TextColor="#94a3b8" />
+                        <Label Text="{Binding StatusText}"
+                               FontSize="12"
+                               TextColor="#cbd5e1" />
                     </VerticalStackLayout>
                 </Border>
 
-                <Border BackgroundColor="#162030" Stroke="Transparent" StrokeShape="RoundRectangle 12" HeightRequest="90" />
-                <Border BackgroundColor="#162030" Stroke="Transparent" StrokeShape="RoundRectangle 12" HeightRequest="90" />
-                <Border BackgroundColor="#162030" Stroke="Transparent" StrokeShape="RoundRectangle 12" HeightRequest="90" />
+                <CollectionView ItemsSource="{Binding Tasks}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="#162030"
+                                    Stroke="Transparent"
+                                    StrokeShape="RoundRectangle 12"
+                                    Margin="0,0,0,10"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding TaskName}"
+                                           TextColor="White"
+                                           FontSize="15"
+                                           FontAttributes="Bold" />
+                                    <Label Text="{Binding Description}"
+                                           TextColor="#94a3b8"
+                                           FontSize="12"
+                                           LineBreakMode="WordWrap" />
+                                    <Label Text="{Binding DeadlineTime, StringFormat='Teslim: {0}'}"
+                                           TextColor="#cbd5e1"
+                                           FontSize="12" />
+                                    <Label Text="{Binding StatusName, StringFormat='Durum: {0}'}"
+                                           TextColor="#94a3b8"
+                                           FontSize="12" />
+                                    <Label Text="{Binding CategoryName, StringFormat='Kategori: {0}'}"
+                                           TextColor="#94a3b8"
+                                           FontSize="12" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </VerticalStackLayout>
         </ScrollView>
 

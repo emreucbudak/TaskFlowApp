@@ -13,6 +13,12 @@ public partial class CompanyReportsPage : ContentPage
         BindingContext = ServiceLocator.GetRequiredService<CompanyReportsPageViewModel>();
     }
 
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await ViewModel.LoadCommand.ExecuteAsync(null);
+    }
+
     private async void OnHomeTapped(object? sender, TappedEventArgs e) => await ViewModel.NavigateHomeCommand.ExecuteAsync(null);
     private async void OnReportsTapped(object? sender, TappedEventArgs e) => await ViewModel.NavigateReportsCommand.ExecuteAsync(null);
     private async void OnTasksTapped(object? sender, TappedEventArgs e) => await ViewModel.NavigateTasksCommand.ExecuteAsync(null);

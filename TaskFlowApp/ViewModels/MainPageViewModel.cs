@@ -58,7 +58,25 @@ public partial class MainPageViewModel(
                 return;
             }
 
-            userSession.SetTokens(response.AccessToken, response.RefreshToken);
+            userSession.SetRawTokens(response.AccessToken, response.RefreshToken);
+
+            var currentUserContext = await identityApiClient.GetCurrentUserContextAsync();
+            if (currentUserContext is null ||
+                currentUserContext.UserId == Guid.Empty ||
+                currentUserContext.CompanyId == Guid.Empty ||
+                string.IsNullOrWhiteSpace(currentUserContext.Role))
+            {
+                userSession.Clear();
+                ErrorMessage = "Sirket bilgisi alinamadi. Lutfen tekrar giris yapin.";
+                return;
+            }
+
+            userSession.SetTokens(
+                response.AccessToken,
+                response.RefreshToken,
+                currentUserContext.UserId,
+                currentUserContext.CompanyId,
+                currentUserContext.Role);
             try
             {
                 await realtimeConnectionManager.ConnectAllAsync();
