@@ -84,7 +84,7 @@
                         StrokeShape="RoundRectangle 16"
                         Padding="18">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Company Dashboard"
+                        <Label Text="Sirket Yonetim Paneliniz"
                                FontSize="24"
                                FontAttributes="Bold"
                                TextColor="White" />
@@ -160,9 +160,6 @@
                                TextColor="#94a3b8"
                                FontSize="12" />
                         <Label Text="{Binding OverdueTaskCount, StringFormat='Geciken gorev: {0}'}"
-                               TextColor="#94a3b8"
-                               FontSize="12" />
-                        <Label Text="{Binding AvailablePlanCount, StringFormat='Kullanilabilir plan: {0}'}"
                                TextColor="#94a3b8"
                                FontSize="12" />
                     </VerticalStackLayout>
