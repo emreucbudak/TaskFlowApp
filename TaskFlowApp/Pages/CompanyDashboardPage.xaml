@@ -96,9 +96,6 @@
                                FontSize="24"
                                FontAttributes="Bold"
                                TextColor="White" />
-                        <Label Text="Sirketin genel operasyon durumunu bu ekrandan takip edebilirsiniz."
-                               FontSize="13"
-                               TextColor="#94a3b8" />
                     </VerticalStackLayout>
                 </Border>
 

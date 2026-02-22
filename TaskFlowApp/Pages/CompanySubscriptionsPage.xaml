@@ -84,42 +84,6 @@
                         Stroke="Transparent"
                         StrokeShape="RoundRectangle 16"
                         Padding="18">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Abonelik Islemleri"
-                               FontSize="24"
-                               FontAttributes="Bold"
-                               TextColor="White" />
-                        <Label Text="Sirket abonelik islemlerini bu alandan yonetebilirsiniz."
-                               FontSize="13"
-                               TextColor="#94a3b8" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <Border BackgroundColor="#162030"
-                        Stroke="Transparent"
-                        StrokeShape="RoundRectangle 16"
-                        Padding="18">
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="Abonelik Iptali"
-                               FontSize="20"
-                               FontAttributes="Bold"
-                               TextColor="White" />
-                        <Button Text="Abonelik Iptal Talebi Olustur"
-                                Command="{Binding CancelSubscriptionCommand}"
-                                BackgroundColor="#B91C1C"
-                                TextColor="White"
-                                CornerRadius="10"
-                                HeightRequest="42" />
-                        <Label Text="{Binding StatusText}"
-                               FontSize="12"
-                               TextColor="#cbd5e1" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <Border BackgroundColor="#162030"
-                        Stroke="Transparent"
-                        StrokeShape="RoundRectangle 16"
-                        Padding="18">
                     <VerticalStackLayout Spacing="10">
                         <Label Text="Aktif Plan ve Kullanim"
                                FontSize="20"
@@ -192,6 +156,24 @@
                         <Label Text="{Binding InternalReportingText}"
                                FontSize="12"
                                TextColor="#94a3b8" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border BackgroundColor="#162030"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="18">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Abonelik Iptali"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+                        <Button Text="Abonelik Iptal Talebi Olustur"
+                                Command="{Binding CancelSubscriptionCommand}"
+                                BackgroundColor="#B91C1C"
+                                TextColor="White"
+                                CornerRadius="10"
+                                HeightRequest="42" />
                     </VerticalStackLayout>
                 </Border>
             </VerticalStackLayout>
