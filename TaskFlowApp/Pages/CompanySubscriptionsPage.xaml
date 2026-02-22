@@ -104,9 +104,6 @@
                                FontSize="20"
                                FontAttributes="Bold"
                                TextColor="White" />
-                        <Label Text="Aboneliginizi iptal etmek icin alttaki butonu kullanin."
-                               FontSize="13"
-                               TextColor="#94a3b8" />
                         <Button Text="Abonelik Iptal Talebi Olustur"
                                 Command="{Binding CancelSubscriptionCommand}"
                                 BackgroundColor="#B91C1C"
@@ -116,6 +113,85 @@
                         <Label Text="{Binding StatusText}"
                                FontSize="12"
                                TextColor="#cbd5e1" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border BackgroundColor="#162030"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="18">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Aktif Plan ve Kullanim"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+                        <Label Text="{Binding ActivePlanName, StringFormat='Aktif plan: {0}'}"
+                               FontSize="13"
+                               TextColor="#94a3b8" />
+                        <Label Text="{Binding ActivePlanPriceText, StringFormat='Plan ucreti: {0}'}"
+                               FontSize="13"
+                               TextColor="#94a3b8" />
+
+                        <Grid ColumnDefinitions="2*,*,*,*"
+                              Padding="0,4,0,2">
+                            <Label Grid.Column="0"
+                                   Text="Ozellik"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   TextColor="#e2e8f0" />
+                            <Label Grid.Column="1"
+                                   Text="Limit"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   TextColor="#e2e8f0"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="2"
+                                   Text="Kullanim"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   TextColor="#e2e8f0"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="3"
+                                   Text="Kalan"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   TextColor="#e2e8f0"
+                                   HorizontalTextAlignment="Center" />
+                        </Grid>
+
+                        <CollectionView ItemsSource="{Binding PlanUsageRows}"
+                                        SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="2*,*,*,*"
+                                          Padding="0,6,0,6">
+                                        <Label Grid.Column="0"
+                                               Text="{Binding Feature}"
+                                               FontSize="12"
+                                               TextColor="#cbd5e1" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding Limit}"
+                                               FontSize="12"
+                                               TextColor="#cbd5e1"
+                                               HorizontalTextAlignment="Center" />
+                                        <Label Grid.Column="2"
+                                               Text="{Binding Usage}"
+                                               FontSize="12"
+                                               TextColor="#cbd5e1"
+                                               HorizontalTextAlignment="Center" />
+                                        <Label Grid.Column="3"
+                                               Text="{Binding Remaining}"
+                                               FontSize="12"
+                                               TextColor="#cbd5e1"
+                                               HorizontalTextAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <Label Text="{Binding InternalReportingText}"
+                               FontSize="12"
+                               TextColor="#94a3b8" />
                     </VerticalStackLayout>
                 </Border>
             </VerticalStackLayout>
