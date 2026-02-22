@@ -54,7 +54,7 @@ public partial class MainPageViewModel(
 
             if (response is null || string.IsNullOrWhiteSpace(response.AccessToken))
             {
-                ErrorMessage = "Giris yaniti bos dondu.";
+                ErrorMessage = "Giris su anda tamamlanamiyor. Lutfen tekrar deneyin.";
                 return;
             }
 
@@ -68,15 +68,31 @@ public partial class MainPageViewModel(
                 // Login should still succeed even if realtime channels are temporarily unavailable.
             }
 
-            await navigationService.GoToRootAsync("DashBoardPage");
+            var targetRoute = string.Equals(userSession.Role, "company", StringComparison.OrdinalIgnoreCase)
+                ? "CompanyDashboardPage"
+                : "DashBoardPage";
+
+            await navigationService.GoToRootAsync(targetRoute);
         }
-        catch (ApiException ex)
+        catch (ApiException ex) when (ex.StatusCode is 400 or 401 or 403)
         {
-            ErrorMessage = $"Giris basarisiz ({ex.StatusCode}).";
+            ErrorMessage = "E-posta veya sifre hatali.";
+        }
+        catch (ApiException)
+        {
+            ErrorMessage = "Giris su anda yapilamiyor. Lutfen tekrar deneyin.";
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = "Giris su anda yapilamiyor. Lutfen tekrar deneyin.";
+        }
+        catch (TaskCanceledException)
+        {
+            ErrorMessage = "Giris su anda yapilamiyor. Lutfen tekrar deneyin.";
         }
         catch (Exception)
         {
-            ErrorMessage = "Beklenmeyen bir hata olustu.";
+            ErrorMessage = "Beklenmeyen bir sorun olustu. Lutfen tekrar deneyin.";
         }
         finally
         {

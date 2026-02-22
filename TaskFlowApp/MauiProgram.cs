@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MauiIcons.Material.Outlined;
 using TaskFlowApp.Infrastructure;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Navigation;
@@ -18,6 +19,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .UseMaterialOutlinedMauiIcons()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -29,7 +31,12 @@ public static class MauiProgram
         builder.Services.AddSingleton<IApiClient>(serviceProvider =>
         {
             var userSession = serviceProvider.GetRequiredService<IUserSession>();
-            var httpClient = new HttpClient
+            var handler = new HttpClientHandler
+            {
+                AllowAutoRedirect = false
+            };
+
+            var httpClient = new HttpClient(handler)
             {
                 BaseAddress = new Uri(AppEndpoints.ApiBaseUrl),
                 Timeout = TimeSpan.FromSeconds(30)
@@ -51,6 +58,11 @@ public static class MauiProgram
 
         builder.Services.AddTransient<MainPageViewModel>();
         builder.Services.AddTransient<DashBoardPageViewModel>();
+        builder.Services.AddTransient<CompanyDashboardPageViewModel>();
+        builder.Services.AddTransient<CompanyReportsPageViewModel>();
+        builder.Services.AddTransient<CompanyTasksPageViewModel>();
+        builder.Services.AddTransient<CompanyEmployeesPageViewModel>();
+        builder.Services.AddTransient<CompanySubscriptionsPageViewModel>();
         builder.Services.AddTransient<ReportsPageViewModel>();
         builder.Services.AddTransient<TasksPageViewModel>();
         builder.Services.AddTransient<MessagesPageViewModel>();
@@ -58,6 +70,11 @@ public static class MauiProgram
 
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<DashBoardPage>();
+        builder.Services.AddTransient<CompanyDashboardPage>();
+        builder.Services.AddTransient<CompanyReportsPage>();
+        builder.Services.AddTransient<CompanyTasksPage>();
+        builder.Services.AddTransient<CompanyEmployeesPage>();
+        builder.Services.AddTransient<CompanySubscriptionsPage>();
         builder.Services.AddTransient<ReportsPage>();
         builder.Services.AddTransient<TasksPage>();
         builder.Services.AddTransient<MessagesPage>();

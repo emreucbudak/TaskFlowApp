@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
              x:Class="TaskFlowApp.Pages.NotificationsPage"
              BackgroundColor="#0D1B2A"
              Shell.NavBarIsVisible="False">
@@ -48,16 +49,11 @@
                     Color="#2196F3" />
 
                 <Label
-                    Text="{Binding StatusText}"
-                    TextColor="#cbd5e1"
-                    FontSize="13" />
-
-                <Label
                     Text="{Binding ErrorMessage}"
                     TextColor="#f87171"
                     FontSize="12" />
 
-                <!-- Bildirim kartlarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â± (skeleton) -->
+                <!-- Bildirim kartlarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬ÂÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â± (skeleton) -->
                 <Border BackgroundColor="#162030" StrokeShape="RoundRectangle 16"
                         Stroke="Transparent" HeightRequest="68"/>
                 <Border BackgroundColor="#162030" StrokeShape="RoundRectangle 16"
@@ -110,11 +106,13 @@
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
-                    <Grid WidthRequest="18" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center">
-                        <Polygon Points="9,0 18,9 0,9" Fill="#4A5568"/>
-                        <Rectangle Fill="#4A5568" WidthRequest="11" HeightRequest="9"
-                                   HorizontalOptions="Center" VerticalOptions="End"/>
-                    </Grid>
+                    <Image x:Name="HomeIconImage"
+                           Source="{mi:MaterialOutlined Icon=Home}"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
                 </Border>
             </VerticalStackLayout>
 
@@ -125,29 +123,30 @@
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
-                    <Grid WidthRequest="18" HeightRequest="14" ColumnDefinitions="*,*,*"
-                          ColumnSpacing="3" HorizontalOptions="Center" VerticalOptions="Center">
-                        <BoxView Grid.Column="0" Color="#4A5568" CornerRadius="2" HeightRequest="9" VerticalOptions="End"/>
-                        <BoxView Grid.Column="1" Color="#4A5568" CornerRadius="2" HeightRequest="14" VerticalOptions="End"/>
-                        <BoxView Grid.Column="2" Color="#4A5568" CornerRadius="2" HeightRequest="6" VerticalOptions="End"/>
-                    </Grid>
+                    <Image x:Name="ReportsIconImage"
+                           Source="{mi:MaterialOutlined Icon=InsertChartOutlined}"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
                 </Border>
             </VerticalStackLayout>
 
-            <!-- GÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬ÂÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¶revler -->
+            <!-- GÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬ÂÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¶revler -->
             <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTasksTapped" />
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
-                    <VerticalStackLayout Spacing="3" HorizontalOptions="Center"
-                                        VerticalOptions="Center" WidthRequest="16">
-                        <BoxView Color="#4A5568" HeightRequest="2" CornerRadius="1"/>
-                        <BoxView Color="#4A5568" HeightRequest="2" CornerRadius="1"/>
-                        <BoxView Color="#4A5568" HeightRequest="2" CornerRadius="1"
-                                 WidthRequest="11" HorizontalOptions="Start"/>
-                    </VerticalStackLayout>
+                    <Image x:Name="TasksIconImage"
+                           Source="{mi:MaterialOutlined Icon=Checklist}"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
                 </Border>
             </VerticalStackLayout>
 
@@ -158,12 +157,13 @@
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
-                    <Grid WidthRequest="18" HeightRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
-                        <Border WidthRequest="18" HeightRequest="12" StrokeShape="RoundRectangle 4"
-                                Stroke="#4A5568" StrokeThickness="2" BackgroundColor="Transparent" VerticalOptions="Start"/>
-                        <Polygon Points="4,11 0,16 8,11" Fill="#4A5568"
-                                 VerticalOptions="End" HorizontalOptions="Start" Margin="3,0,0,0"/>
-                    </Grid>
+                    <Image x:Name="MessagesIconImage"
+                           Source="{mi:MaterialOutlined Icon=ChatBubbleOutline}"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
                 </Border>
             </VerticalStackLayout>
 
@@ -174,15 +174,13 @@
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8"
                         Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
-                    <Grid WidthRequest="16" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Center">
-                        <Border WidthRequest="14" HeightRequest="10" StrokeShape="RoundRectangle 7 7 0 0"
-                                Stroke="#2196F3" StrokeThickness="2" BackgroundColor="Transparent"
-                                VerticalOptions="Start" HorizontalOptions="Center" Margin="0,2,0,0"/>
-                        <BoxView Color="#2196F3" WidthRequest="16" HeightRequest="2" CornerRadius="1"
-                                 VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,4"/>
-                        <Ellipse WidthRequest="5" HeightRequest="5" Stroke="#2196F3" StrokeThickness="2"
-                                 Fill="Transparent" VerticalOptions="End" HorizontalOptions="Center"/>
-                    </Grid>
+                    <Image x:Name="NotificationsIconImage"
+                           Source="{mi:MaterialOutlined Icon=NotificationsNone}"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
                 </Border>
                 <BoxView Color="#2196F3" WidthRequest="4" HeightRequest="3" CornerRadius="1.5" HorizontalOptions="Center"/>
             </VerticalStackLayout>
@@ -197,33 +195,16 @@
                         WidthRequest="38"
                         HeightRequest="28"
                         HorizontalOptions="Center">
-                    <Grid WidthRequest="18" HeightRequest="18"
-                          HorizontalOptions="Center"
-                          VerticalOptions="Center">
-                        <Border WidthRequest="10"
-                                HeightRequest="14"
-                                Stroke="#4A5568"
-                                StrokeThickness="2"
-                                BackgroundColor="Transparent"
-                                HorizontalOptions="Start"
-                                VerticalOptions="Center">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="2"/>
-                            </Border.StrokeShape>
-                        </Border>
-                        <BoxView Color="#4A5568"
-                                 WidthRequest="7"
-                                 HeightRequest="2"
-                                 HorizontalOptions="End"
-                                 VerticalOptions="Center"
-                                 Margin="0,0,2,0"/>
-                        <Polygon Points="13,6 18,9 13,12"
-                                 Fill="#4A5568"
-                                 HorizontalOptions="End"
-                                 VerticalOptions="Center"/>
-                    </Grid>
+                    <Image x:Name="LogoutIconImage"
+                           Source="{mi:MaterialOutlined Icon=Logout}"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
                 </Border>
             </VerticalStackLayout>
         </Grid>
     </Grid>
 </ContentPage>
+

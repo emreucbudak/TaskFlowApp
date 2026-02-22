@@ -44,16 +44,22 @@ public partial class TasksPageViewModel(
             {
                 Tasks.Add(task);
             }
-
-            StatusText = $"Toplam gorev: {response?.TotalCount ?? 0}";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = $"Gorevler alinamadi ({ex.StatusCode}).";
+            ErrorMessage = ResolveApiErrorMessage(ex, GenericLoadErrorMessage);
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
+        }
+        catch (TaskCanceledException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
         }
         catch (Exception)
         {
-            ErrorMessage = "Gorevler yuklenirken hata olustu.";
+            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
         }
         finally
         {

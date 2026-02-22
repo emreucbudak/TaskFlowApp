@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
+using TaskFlowApp.Models.Stats;
 using TaskFlowApp.Services.Realtime;
 using TaskFlowApp.Services.ApiClients;
 
@@ -53,13 +54,22 @@ public partial class DashBoardPageViewModel(
             var userId = UserSession.UserId.Value;
             var period = DateOnly.FromDateTime(DateTime.UtcNow);
 
-            var statsTask = statsApiClient.GetWorkerStatsByUserAndPeriodAsync(userId, period);
             var tasksTask = projectManagementApiClient.GetIndividualTasksByUserIdAsync(userId, 1, 10);
             var unreadTask = chatApiClient.GetUnreadMessageCountAsync(userId);
 
-            await Task.WhenAll(statsTask, tasksTask, unreadTask);
+            WorkerStatsDto? stats = null;
+            try
+            {
+                stats = await statsApiClient.GetWorkerStatsByUserAndPeriodAsync(userId, period);
+            }
+            catch (ApiException ex) when (ex.StatusCode == 404)
+            {
+                // Bu ay icin istatistik kaydi olmayabilir; dashboard yine de acilmalidir.
+                stats = null;
+            }
 
-            var stats = await statsTask;
+            await Task.WhenAll(tasksTask, unreadTask);
+
             var tasks = await tasksTask;
             var unread = await unreadTask;
 
@@ -73,11 +83,19 @@ public partial class DashBoardPageViewModel(
         }
         catch (ApiException ex)
         {
-            ErrorMessage = $"Dashboard verisi alinamadi ({ex.StatusCode}).";
+            ErrorMessage = ResolveApiErrorMessage(ex, GenericLoadErrorMessage);
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
+        }
+        catch (TaskCanceledException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
         }
         catch (Exception)
         {
-            ErrorMessage = "Dashboard yuklenirken hata olustu.";
+            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
         }
         finally
         {

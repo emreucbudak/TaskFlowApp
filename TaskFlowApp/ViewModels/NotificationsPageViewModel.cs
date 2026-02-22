@@ -38,35 +38,41 @@ public partial class NotificationsPageViewModel(
         {
             IsBusy = true;
             ErrorMessage = string.Empty;
-            var realtimeState = "Disconnected";
 
             try
             {
                 await signalRNotificationService.EnsureConnectedAsync();
-                realtimeState = signalRNotificationService.IsConnected ? "Connected" : "Disconnected";
             }
             catch
             {
-                realtimeState = "ConnectionFailed";
+                // SignalR baglantisi gecici olarak kurulamasa da bildirim listesi API'den yuklenmeye devam eder.
             }
 
             var response = await notificationApiClient.GetUserAllNotificationsAsync(UserSession.UserId.Value, 1, 20);
+            var items = response?.Items ?? [];
 
             Notifications.Clear();
-            foreach (var item in response.Items)
+            foreach (var item in items)
             {
                 Notifications.Add(item);
             }
 
-            StatusText = $"Toplam bildirim: {response.TotalCount} | SignalR: {realtimeState}";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = $"Bildirimler alinamadi ({ex.StatusCode}).";
+            ErrorMessage = ResolveApiErrorMessage(ex, GenericLoadErrorMessage);
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
+        }
+        catch (TaskCanceledException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
         }
         catch (Exception)
         {
-            ErrorMessage = "Bildirimler yuklenirken hata olustu.";
+            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
         }
         finally
         {
@@ -81,14 +87,11 @@ public partial class NotificationsPageViewModel(
     {
         signalRNotificationService.NotificationReceived -= OnNotificationReceived;
         signalRNotificationService.NotificationReceived += OnNotificationReceived;
-        signalRNotificationService.ConnectionStateChanged -= OnConnectionStateChanged;
-        signalRNotificationService.ConnectionStateChanged += OnConnectionStateChanged;
     }
 
     public void UnregisterRealtimeHandlers()
     {
         signalRNotificationService.NotificationReceived -= OnNotificationReceived;
-        signalRNotificationService.ConnectionStateChanged -= OnConnectionStateChanged;
     }
 
     private void OnNotificationReceived(NotificationDto item)
@@ -96,15 +99,6 @@ public partial class NotificationsPageViewModel(
         MainThread.BeginInvokeOnMainThread(() =>
         {
             Notifications.Insert(0, item);
-            StatusText = $"Toplam bildirim: {Notifications.Count} | SignalR: Connected";
-        });
-    }
-
-    private void OnConnectionStateChanged(string state)
-    {
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            StatusText = $"Toplam bildirim: {Notifications.Count} | SignalR: {state}";
         });
     }
 }

@@ -20,10 +20,19 @@ public sealed class UserSession : IUserSession
         "TenantId"
     ];
 
+    private static readonly string[] RoleClaimKeys =
+    [
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+        "role",
+        "Role",
+        "roles"
+    ];
+
     public string? AccessToken { get; private set; }
     public string? RefreshToken { get; private set; }
     public Guid? UserId { get; private set; }
     public Guid? CompanyId { get; private set; }
+    public string? Role { get; private set; }
 
     public void SetTokens(string accessToken, string? refreshToken)
     {
@@ -31,6 +40,7 @@ public sealed class UserSession : IUserSession
         RefreshToken = refreshToken;
         UserId = ReadGuidClaim(accessToken, UserIdClaimKeys);
         CompanyId = ReadGuidClaim(accessToken, CompanyIdClaimKeys);
+        Role = ReadRoleClaim(accessToken, RoleClaimKeys);
     }
 
     public void Clear()
@@ -39,6 +49,7 @@ public sealed class UserSession : IUserSession
         RefreshToken = null;
         UserId = null;
         CompanyId = null;
+        Role = null;
     }
 
     private static Guid? ReadGuidClaim(string jwtToken, IEnumerable<string> claimKeys)
@@ -77,6 +88,73 @@ public sealed class UserSession : IUserSession
                     Guid.TryParse(value.GetString(), out var parsed))
                 {
                     return parsed;
+                }
+            }
+        }
+        catch
+        {
+            return null;
+        }
+
+        return null;
+    }
+
+    private static string? ReadRoleClaim(string jwtToken, IEnumerable<string> claimKeys)
+    {
+        try
+        {
+            var tokenParts = jwtToken.Split('.');
+            if (tokenParts.Length < 2)
+            {
+                return null;
+            }
+
+            var payload = tokenParts[1].Replace('-', '+').Replace('_', '/');
+            switch (payload.Length % 4)
+            {
+                case 2:
+                    payload += "==";
+                    break;
+                case 3:
+                    payload += "=";
+                    break;
+            }
+
+            var jsonBytes = Convert.FromBase64String(payload);
+            using var document = JsonDocument.Parse(Encoding.UTF8.GetString(jsonBytes));
+            var root = document.RootElement;
+
+            foreach (var key in claimKeys)
+            {
+                if (!root.TryGetProperty(key, out var value))
+                {
+                    continue;
+                }
+
+                if (value.ValueKind == JsonValueKind.String)
+                {
+                    var role = value.GetString();
+                    if (!string.IsNullOrWhiteSpace(role))
+                    {
+                        return role;
+                    }
+                }
+
+                if (value.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var element in value.EnumerateArray())
+                    {
+                        if (element.ValueKind != JsonValueKind.String)
+                        {
+                            continue;
+                        }
+
+                        var role = element.GetString();
+                        if (!string.IsNullOrWhiteSpace(role))
+                        {
+                            return role;
+                        }
+                    }
                 }
             }
         }

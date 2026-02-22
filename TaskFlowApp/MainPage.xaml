@@ -154,16 +154,24 @@
                     Margin="0,16,0,0"
                     Command="{Binding LoginCommand}"/>
 
-                <ActivityIndicator
-                    IsRunning="{Binding IsBusy}"
-                    IsVisible="{Binding IsBusy}"
-                    Color="#137fec"/>
+                <Grid
+                    Margin="0,12,0,0"
+                    RowDefinitions="24,24">
+                    <ActivityIndicator
+                        Grid.Row="0"
+                        IsRunning="{Binding IsBusy}"
+                        IsVisible="{Binding IsBusy}"
+                        Color="#137fec"
+                        HorizontalOptions="Center"/>
 
-                <Label
-                    Text="{Binding ErrorMessage}"
-                    TextColor="#f87171"
-                    FontSize="13"
-                    HorizontalTextAlignment="Center"/>
+                    <Label
+                        Grid.Row="1"
+                        Text="{Binding ErrorMessage}"
+                        TextColor="#f87171"
+                        FontSize="13"
+                        HorizontalTextAlignment="Center"
+                        VerticalTextAlignment="Center"/>
+                </Grid>
 
             </VerticalStackLayout>
 

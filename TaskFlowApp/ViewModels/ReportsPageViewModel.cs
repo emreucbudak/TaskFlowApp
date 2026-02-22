@@ -38,16 +38,22 @@ public partial class ReportsPageViewModel(
             {
                 Reports.Add(report);
             }
-
-            StatusText = $"Toplam rapor: {response?.TotalCount ?? 0}";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = $"Raporlar alinamadi ({ex.StatusCode}).";
+            ErrorMessage = ResolveApiErrorMessage(ex, GenericLoadErrorMessage);
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
+        }
+        catch (TaskCanceledException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
         }
         catch (Exception)
         {
-            ErrorMessage = "Raporlar yuklenirken hata olustu.";
+            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
         }
         finally
         {

@@ -6,6 +6,7 @@ public interface IUserSession
     string? RefreshToken { get; }
     Guid? UserId { get; }
     Guid? CompanyId { get; }
+    string? Role { get; }
 
     void SetTokens(string accessToken, string? refreshToken);
     void Clear();
