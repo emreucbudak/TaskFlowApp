@@ -47,16 +47,44 @@ public abstract partial class PageViewModelBase(
     }
 
     [RelayCommand]
-    private Task NavigateReportsAsync() => NavigationService.GoToRootAsync("ReportsPage");
+    private Task NavigateReportsAsync()
+    {
+        var reportsRoute = string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase)
+            ? "CompanyReportsPage"
+            : "ReportsPage";
+
+        return NavigationService.GoToRootAsync(reportsRoute);
+    }
 
     [RelayCommand]
-    private Task NavigateTasksAsync() => NavigationService.GoToRootAsync("TasksPage");
+    private Task NavigateTasksAsync()
+    {
+        var tasksRoute = string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase)
+            ? "CompanyTasksPage"
+            : "TasksPage";
+
+        return NavigationService.GoToRootAsync(tasksRoute);
+    }
 
     [RelayCommand]
-    private Task NavigateMessagesAsync() => NavigationService.GoToRootAsync("MessagesPage");
+    private Task NavigateMessagesAsync()
+    {
+        var employeesRoute = string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase)
+            ? "CompanyEmployeesPage"
+            : "MessagesPage";
+
+        return NavigationService.GoToRootAsync(employeesRoute);
+    }
 
     [RelayCommand]
-    private Task NavigateNotificationsAsync() => NavigationService.GoToRootAsync("NotificationsPage");
+    private Task NavigateNotificationsAsync()
+    {
+        var subscriptionsRoute = string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase)
+            ? "CompanySubscriptionsPage"
+            : "NotificationsPage";
+
+        return NavigationService.GoToRootAsync(subscriptionsRoute);
+    }
 
     [RelayCommand]
     private async Task LogoutAsync()

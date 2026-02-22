@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             x:Class="TaskFlowApp.Pages.CompanySubscriptionsPage"
+             BackgroundColor="#0D1B2A"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+        <Grid Grid.Row="0"
+              Padding="20,16,20,10"
+              ColumnDefinitions="Auto,*,Auto"
+              BackgroundColor="#0D1B2A">
+            <Image Grid.Column="0"
+                   Source="https://www.logoai.com/uploads/icon/2021/08/06/732ca933-7df8-43e8-b085-69466243c919.png"
+                   WidthRequest="32"
+                   HeightRequest="32"
+                   Aspect="AspectFit"
+                   VerticalOptions="Center" />
+
+            <Grid Grid.Column="2"
+                  WidthRequest="44"
+                  HeightRequest="44"
+                  HorizontalOptions="End"
+                  VerticalOptions="Center">
+                <Ellipse WidthRequest="44"
+                         HeightRequest="44"
+                         Stroke="#3A5068"
+                         StrokeThickness="1.5"
+                         Fill="#1A3A5C"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center" />
+                <Grid WidthRequest="44"
+                      HeightRequest="44"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center">
+                    <Ellipse WidthRequest="16"
+                             HeightRequest="16"
+                             Fill="#5B8DB8"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Start"
+                             Margin="0,10,0,0" />
+                    <Ellipse WidthRequest="28"
+                             HeightRequest="20"
+                             Fill="#5B8DB8"
+                             HorizontalOptions="Center"
+                             VerticalOptions="End"
+                             Margin="0,0,0,2" />
+                </Grid>
+                <Ellipse WidthRequest="12"
+                         HeightRequest="12"
+                         Fill="#4CAF50"
+                         Stroke="#0D1B2A"
+                         StrokeThickness="2"
+                         HorizontalOptions="End"
+                         VerticalOptions="End"
+                         Margin="0,0,1,1" />
+            </Grid>
+        </Grid>
+
+        <BoxView Grid.Row="1" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
+
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Padding="20,14,20,20" Spacing="14">
+                <Border BackgroundColor="#162030"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="18">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Abonelik Islemleri"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+                        <Label Text="Sirket paket ve abonelik islemlerini bu sayfadan yonetebilirsiniz."
+                               FontSize="14"
+                               TextColor="#94a3b8" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border BackgroundColor="#162030" Stroke="Transparent" StrokeShape="RoundRectangle 12" HeightRequest="90" />
+                <Border BackgroundColor="#162030" Stroke="Transparent" StrokeShape="RoundRectangle 12" HeightRequest="90" />
+                <Border BackgroundColor="#162030" Stroke="Transparent" StrokeShape="RoundRectangle 12" HeightRequest="90" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <BoxView Grid.Row="3" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
+
+        <Grid Grid.Row="4"
+              ColumnDefinitions="*,*,*,*,*,*"
+              BackgroundColor="#0F1E2D"
+              Padding="0,6,0,18">
+
+            <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnHomeTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=Home}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnReportsTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=InsertChartOutlined}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnTasksTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=Checklist}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnMessagesTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=ChatBubbleOutline}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column="4" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnNotificationsTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=NotificationsNone}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+                <BoxView Color="#2196F3" WidthRequest="4" HeightRequest="3" CornerRadius="1.5" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column="5" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLogoutTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=Logout}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

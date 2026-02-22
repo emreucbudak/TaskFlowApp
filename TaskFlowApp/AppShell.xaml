@@ -21,6 +21,22 @@
         Route="CompanyDashboardPage" />
     <ShellContent
         Title=""
+        ContentTemplate="{DataTemplate pages:CompanyReportsPage}"
+        Route="CompanyReportsPage" />
+    <ShellContent
+        Title=""
+        ContentTemplate="{DataTemplate pages:CompanyTasksPage}"
+        Route="CompanyTasksPage" />
+    <ShellContent
+        Title=""
+        ContentTemplate="{DataTemplate pages:CompanyEmployeesPage}"
+        Route="CompanyEmployeesPage" />
+    <ShellContent
+        Title=""
+        ContentTemplate="{DataTemplate pages:CompanySubscriptionsPage}"
+        Route="CompanySubscriptionsPage" />
+    <ShellContent
+        Title=""
         ContentTemplate="{DataTemplate pages:ReportsPage}"
         Route="ReportsPage" />
     <ShellContent
