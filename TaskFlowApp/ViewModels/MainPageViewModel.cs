@@ -68,7 +68,11 @@ public partial class MainPageViewModel(
                 // Login should still succeed even if realtime channels are temporarily unavailable.
             }
 
-            await navigationService.GoToRootAsync("DashBoardPage");
+            var targetRoute = string.Equals(userSession.Role, "company", StringComparison.OrdinalIgnoreCase)
+                ? "CompanyDashboardPage"
+                : "DashBoardPage";
+
+            await navigationService.GoToRootAsync(targetRoute);
         }
         catch (ApiException ex) when (ex.StatusCode is 400 or 401 or 403)
         {

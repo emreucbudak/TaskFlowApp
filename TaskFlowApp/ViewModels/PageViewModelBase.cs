@@ -37,7 +37,14 @@ public abstract partial class PageViewModelBase(
     }
 
     [RelayCommand]
-    private Task NavigateHomeAsync() => NavigationService.GoToRootAsync("DashBoardPage");
+    private Task NavigateHomeAsync()
+    {
+        var homeRoute = string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase)
+            ? "CompanyDashboardPage"
+            : "DashBoardPage";
+
+        return NavigationService.GoToRootAsync(homeRoute);
+    }
 
     [RelayCommand]
     private Task NavigateReportsAsync() => NavigationService.GoToRootAsync("ReportsPage");

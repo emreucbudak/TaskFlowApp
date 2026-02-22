@@ -17,6 +17,10 @@
         Route="DashBoardPage" />
     <ShellContent
         Title=""
+        ContentTemplate="{DataTemplate pages:CompanyDashboardPage}"
+        Route="CompanyDashboardPage" />
+    <ShellContent
+        Title=""
         ContentTemplate="{DataTemplate pages:ReportsPage}"
         Route="ReportsPage" />
     <ShellContent
