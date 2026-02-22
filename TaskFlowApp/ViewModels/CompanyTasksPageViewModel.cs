@@ -18,6 +18,8 @@ public partial class CompanyTasksPageViewModel(
     : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     public ObservableCollection<CompanyTaskDto> Tasks { get; } = [];
+    public ObservableCollection<CompanyTaskDto> IndividualTasks { get; } = [];
+    public ObservableCollection<CompanyTaskDto> GroupTasks { get; } = [];
 
     [ObservableProperty]
     private int totalTaskCount;
@@ -51,9 +53,19 @@ public partial class CompanyTasksPageViewModel(
             var items = response?.Items ?? [];
 
             Tasks.Clear();
+            IndividualTasks.Clear();
+            GroupTasks.Clear();
             foreach (var item in items)
             {
                 Tasks.Add(item);
+                if (IsGroupTask(item))
+                {
+                    GroupTasks.Add(item);
+                }
+                else
+                {
+                    IndividualTasks.Add(item);
+                }
             }
 
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -97,5 +109,23 @@ public partial class CompanyTasksPageViewModel(
             || normalizedStatus.Contains("complete")
             || normalizedStatus.Contains("done")
             || normalizedStatus.Contains("closed");
+    }
+
+    private static bool IsGroupTask(CompanyTaskDto task)
+    {
+        if (task is null)
+        {
+            return false;
+        }
+
+        var category = task.CategoryName?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(category))
+        {
+            return false;
+        }
+
+        return category.Contains("grup", StringComparison.OrdinalIgnoreCase)
+            || category.Contains("group", StringComparison.OrdinalIgnoreCase)
+            || category.Contains("team", StringComparison.OrdinalIgnoreCase);
     }
 }

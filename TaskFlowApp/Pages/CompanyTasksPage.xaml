@@ -96,7 +96,65 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <CollectionView ItemsSource="{Binding Tasks}">
+                <Label Text="Bireysel Görevler"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       Margin="0,8,0,4" />
+                <CollectionView ItemsSource="{Binding IndividualTasks}"
+                                SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="Bireysel görev bulunamadı."
+                               FontSize="12"
+                               TextColor="#94a3b8"
+                               HorizontalTextAlignment="Center"
+                               Margin="0,10,0,0" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="#162030"
+                                    Stroke="Transparent"
+                                    StrokeShape="RoundRectangle 12"
+                                    Margin="0,0,0,10"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding TaskName}"
+                                           TextColor="White"
+                                           FontSize="15"
+                                           FontAttributes="Bold" />
+                                    <Label Text="{Binding Description}"
+                                           TextColor="#94a3b8"
+                                           FontSize="12"
+                                           LineBreakMode="WordWrap" />
+                                    <Label Text="{Binding DeadlineTime, StringFormat='Teslim: {0}'}"
+                                           TextColor="#cbd5e1"
+                                           FontSize="12" />
+                                    <Label Text="{Binding StatusName, StringFormat='Durum: {0}'}"
+                                           TextColor="#94a3b8"
+                                           FontSize="12" />
+                                    <Label Text="{Binding CategoryName, StringFormat='Kategori: {0}'}"
+                                           TextColor="#94a3b8"
+                                           FontSize="12" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Label Text="Grup Görevleri"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       Margin="0,12,0,4" />
+                <CollectionView ItemsSource="{Binding GroupTasks}"
+                                SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="Grup görev bulunamadı."
+                               FontSize="12"
+                               TextColor="#94a3b8"
+                               HorizontalTextAlignment="Center"
+                               Margin="0,10,0,0" />
+                    </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Border BackgroundColor="#162030"
