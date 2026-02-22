@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
@@ -19,7 +19,7 @@
                    VerticalOptions="Center" />
 
             <Label Grid.Column="1"
-                   Text="Company Raporlari"
+                   Text="&#350;irket Rapor Y&#246;netimi"
                    FontSize="16"
                    FontAttributes="Bold"
                    TextColor="White"
@@ -79,34 +79,6 @@
                     Text="{Binding ErrorMessage}"
                     TextColor="#f87171"
                     FontSize="12" />
-
-                <Border BackgroundColor="#162030"
-                        Stroke="Transparent"
-                        StrokeShape="RoundRectangle 16"
-                        Padding="18">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Company Raporlari"
-                               FontSize="24"
-                               FontAttributes="Bold"
-                               TextColor="White" />
-                        <Label Text="{Binding TotalReportCount, StringFormat='Toplam rapor: {0}'}"
-                               FontSize="13"
-                               TextColor="#94a3b8" />
-                        <Label Text="{Binding CurrentMonthReportCount, StringFormat='Bu ayki rapor: {0}'}"
-                               FontSize="13"
-                               TextColor="#94a3b8" />
-                        <Label Text="{Binding StatusText}"
-                               FontSize="12"
-                               TextColor="#cbd5e1" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <Button Text="Tum Raporlari Goruntule"
-                        Command="{Binding LoadAllReportsCommand}"
-                        BackgroundColor="#2196F3"
-                        TextColor="White"
-                        CornerRadius="10"
-                        Padding="14,10" />
 
                 <CollectionView ItemsSource="{Binding Reports}">
                     <CollectionView.ItemTemplate>
@@ -206,3 +178,6 @@
         </Grid>
     </Grid>
 </ContentPage>
+
+
+
