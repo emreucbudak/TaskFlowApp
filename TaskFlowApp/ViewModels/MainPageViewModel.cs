@@ -92,7 +92,7 @@ public partial class MainPageViewModel(
 
             await navigationService.GoToRootAsync(targetRoute);
         }
-        catch (ApiException ex) when (ex.StatusCode is 400 or 401 or 403)
+        catch (ApiException ex) when (ex.StatusCode is 400 or 401 or 403 or 404)
         {
             ErrorMessage = "E-posta veya sifre hatali.";
         }

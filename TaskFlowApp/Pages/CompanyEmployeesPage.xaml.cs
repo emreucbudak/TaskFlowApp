@@ -1,4 +1,5 @@
 using TaskFlowApp.Infrastructure;
+using TaskFlowApp.Models.Identity;
 using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp.Pages;
@@ -17,6 +18,96 @@ public partial class CompanyEmployeesPage : ContentPage
     {
         base.OnAppearing();
         await ViewModel.LoadCommand.ExecuteAsync(null);
+    }
+
+    private async void OnDepartmentSelectTapped(object? sender, TappedEventArgs e)
+    {
+        var departments = ViewModel.Departments.ToList();
+        if (departments.Count == 0)
+        {
+            await DisplayAlertAsync("Bilgi", "Departman listesi su anda alinamadi.", "Tamam");
+            return;
+        }
+
+        var cancelText = "Iptal";
+        var selectedName = await DisplayActionSheetAsync(
+            "Departman Secin",
+            cancelText,
+            null,
+            departments.Select(item => item.Name).ToArray());
+
+        if (string.IsNullOrWhiteSpace(selectedName) || selectedName == cancelText)
+        {
+            return;
+        }
+
+        DepartmentDto? selectedDepartment = departments.FirstOrDefault(item =>
+            string.Equals(item.Name, selectedName, StringComparison.Ordinal));
+
+        if (selectedDepartment is not null)
+        {
+            ViewModel.SelectedDepartment = selectedDepartment;
+        }
+    }
+
+    private async void OnTransferDepartmentSelectTapped(object? sender, TappedEventArgs e)
+    {
+        var departments = ViewModel.Departments.ToList();
+        if (departments.Count == 0)
+        {
+            await DisplayAlertAsync("Bilgi", "Departman listesi su anda alinamadi.", "Tamam");
+            return;
+        }
+
+        var cancelText = "Iptal";
+        var selectedName = await DisplayActionSheetAsync(
+            "Transfer Departman Secin",
+            cancelText,
+            null,
+            departments.Select(item => item.Name).ToArray());
+
+        if (string.IsNullOrWhiteSpace(selectedName) || selectedName == cancelText)
+        {
+            return;
+        }
+
+        var selectedDepartment = departments.FirstOrDefault(item =>
+            string.Equals(item.Name, selectedName, StringComparison.Ordinal));
+
+        if (selectedDepartment is not null)
+        {
+            ViewModel.SelectedTransferDepartment = selectedDepartment;
+        }
+    }
+
+    private async void OnUserSelectTapped(object? sender, TappedEventArgs e)
+    {
+        var users = ViewModel.CompanyUsers.ToList();
+        if (users.Count == 0)
+        {
+            await DisplayAlertAsync("Bilgi", "Calisanlar listesi su anda alinamadi.", "Tamam");
+            return;
+        }
+
+        var cancelText = "Iptal";
+        var selectedName = await DisplayActionSheetAsync(
+            "Kullanici Secin",
+            cancelText,
+            null,
+            users.Select(item => item.Name).ToArray());
+
+        if (string.IsNullOrWhiteSpace(selectedName) || selectedName == cancelText)
+        {
+            return;
+        }
+
+        var selectedUser = users.FirstOrDefault(item =>
+            string.Equals(item.Name, selectedName, StringComparison.Ordinal));
+
+        if (selectedUser is not null)
+        {
+            ViewModel.SelectedUser = selectedUser;
+        }
     }
 
     private async void OnHomeTapped(object? sender, TappedEventArgs e) => await ViewModel.NavigateHomeCommand.ExecuteAsync(null);

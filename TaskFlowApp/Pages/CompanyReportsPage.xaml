@@ -18,6 +18,14 @@
                    Aspect="AspectFit"
                    VerticalOptions="Center" />
 
+            <Label Grid.Column="1"
+                   Text="Company Raporlari"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+
             <Grid Grid.Column="2"
                   WidthRequest="44"
                   HeightRequest="44"
@@ -92,6 +100,13 @@
                                TextColor="#cbd5e1" />
                     </VerticalStackLayout>
                 </Border>
+
+                <Button Text="Tum Raporlari Goruntule"
+                        Command="{Binding LoadAllReportsCommand}"
+                        BackgroundColor="#2196F3"
+                        TextColor="White"
+                        CornerRadius="10"
+                        Padding="14,10" />
 
                 <CollectionView ItemsSource="{Binding Reports}">
                     <CollectionView.ItemTemplate>
