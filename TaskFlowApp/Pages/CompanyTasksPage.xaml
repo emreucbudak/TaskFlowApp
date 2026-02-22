@@ -80,7 +80,7 @@
                     TextColor="#f87171"
                     FontSize="12" />
 
-                <Label Text="Bireysel GÃ¶revler"
+                <Label Text="Bireysel G&#246;revler"
                        FontSize="20"
                        FontAttributes="Bold"
                        TextColor="White"
@@ -88,7 +88,7 @@
                 <CollectionView ItemsSource="{Binding IndividualTasks}"
                                 SelectionMode="None">
                     <CollectionView.EmptyView>
-                        <Label Text="Bireysel gÃ¶rev bulunamadÄ±."
+                        <Label Text="Bireysel g&#246;rev bulunamad&#305;."
                                FontSize="12"
                                TextColor="#94a3b8"
                                HorizontalTextAlignment="Center"
@@ -125,7 +125,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <Label Text="Grup GÃ¶revleri"
+                <Label Text="Grup G&#246;revleri"
                        FontSize="20"
                        FontAttributes="Bold"
                        TextColor="White"
@@ -133,7 +133,7 @@
                 <CollectionView ItemsSource="{Binding GroupTasks}"
                                 SelectionMode="None">
                     <CollectionView.EmptyView>
-                        <Label Text="Grup gÃ¶rev bulunamadÄ±."
+                        <Label Text="Grup g&#246;rev bulunamad&#305;."
                                FontSize="12"
                                TextColor="#94a3b8"
                                HorizontalTextAlignment="Center"
