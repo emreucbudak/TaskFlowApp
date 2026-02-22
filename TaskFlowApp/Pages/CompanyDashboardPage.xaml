@@ -129,7 +129,7 @@
 
             <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnReportsTapped" />
+                    <TapGestureRecognizer Tapped="OnMessagesTapped" />
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E"
                         StrokeShape="RoundRectangle 8"
@@ -137,7 +137,7 @@
                         WidthRequest="38"
                         HeightRequest="28"
                         HorizontalOptions="Center">
-                    <Image Source="{mi:MaterialOutlined Icon=InsertChartOutlined}"
+                    <Image Source="{mi:MaterialOutlined Icon=ManageAccounts}"
                            WidthRequest="18"
                            HeightRequest="18"
                            Aspect="AspectFit"
@@ -147,6 +147,25 @@
             </VerticalStackLayout>
 
             <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="3">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnNotificationsTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E"
+                        StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent"
+                        WidthRequest="38"
+                        HeightRequest="28"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=Subscriptions}"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTasksTapped" />
                 </VerticalStackLayout.GestureRecognizers>
@@ -165,28 +184,9 @@
                 </Border>
             </VerticalStackLayout>
 
-            <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center" Spacing="3">
-                <VerticalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnMessagesTapped" />
-                </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
-                        StrokeShape="RoundRectangle 8"
-                        Stroke="Transparent"
-                        WidthRequest="38"
-                        HeightRequest="28"
-                        HorizontalOptions="Center">
-                    <Image Source="{mi:MaterialOutlined Icon=ChatBubbleOutline}"
-                           WidthRequest="18"
-                           HeightRequest="18"
-                           Aspect="AspectFit"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center" />
-                </Border>
-            </VerticalStackLayout>
-
             <VerticalStackLayout Grid.Column="4" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnNotificationsTapped" />
+                    <TapGestureRecognizer Tapped="OnReportsTapped" />
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E"
                         StrokeShape="RoundRectangle 8"
@@ -194,7 +194,7 @@
                         WidthRequest="38"
                         HeightRequest="28"
                         HorizontalOptions="Center">
-                    <Image Source="{mi:MaterialOutlined Icon=NotificationsNone}"
+                    <Image Source="{mi:MaterialOutlined Icon=InsertChartOutlined}"
                            WidthRequest="18"
                            HeightRequest="18"
                            Aspect="AspectFit"
