@@ -17,8 +17,8 @@ public partial class CompanyReportsPageViewModel(
     ReportApiClient reportApiClient)
     : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
-    private const int InitialPageSize = 40;
-    private const int FullLoadPageSize = 100;
+    private const int DefaultPageSize = 10;
+    private const int MaxPageSize = 100;
 
     public ObservableCollection<ReportDto> Reports { get; } = [];
 
@@ -28,19 +28,79 @@ public partial class CompanyReportsPageViewModel(
     [ObservableProperty]
     private int currentMonthReportCount;
 
+    [ObservableProperty]
+    private int currentPage = 1;
+
+    [ObservableProperty]
+    private int pageSize = DefaultPageSize;
+
+    [ObservableProperty]
+    private int totalPageCount = 1;
+
+    [ObservableProperty]
+    private bool canGoPrevious;
+
+    [ObservableProperty]
+    private bool canGoNext;
+
+    [ObservableProperty]
+    private string pageInfoText = "Sayfa 1 / 1";
+
     [RelayCommand]
     private async Task LoadAsync()
     {
-        await LoadReportsInternalAsync(loadAllReports: false);
+        await LoadReportsInternalAsync();
     }
 
     [RelayCommand]
     private async Task LoadAllReportsAsync()
     {
-        await LoadReportsInternalAsync(loadAllReports: true);
+        await LoadReportsInternalAsync();
     }
 
-    private async Task LoadReportsInternalAsync(bool loadAllReports)
+    [RelayCommand]
+    private async Task PreviousPageAsync()
+    {
+        if (IsBusy || !CanGoPrevious)
+        {
+            return;
+        }
+
+        CurrentPage = Math.Max(1, CurrentPage - 1);
+        await LoadReportsInternalAsync();
+    }
+
+    [RelayCommand]
+    private async Task NextPageAsync()
+    {
+        if (IsBusy || !CanGoNext)
+        {
+            return;
+        }
+
+        CurrentPage += 1;
+        await LoadReportsInternalAsync();
+    }
+
+    [RelayCommand]
+    private async Task SetPageSizeAsync(string? requestedPageSizeText)
+    {
+        if (IsBusy || string.IsNullOrWhiteSpace(requestedPageSizeText))
+        {
+            return;
+        }
+
+        if (!int.TryParse(requestedPageSizeText, out var requestedPageSize) || requestedPageSize <= 0)
+        {
+            return;
+        }
+
+        PageSize = Math.Min(MaxPageSize, requestedPageSize);
+        CurrentPage = 1;
+        await LoadReportsInternalAsync();
+    }
+
+    private async Task LoadReportsInternalAsync()
     {
         if (IsBusy)
         {
@@ -52,31 +112,18 @@ public partial class CompanyReportsPageViewModel(
             IsBusy = true;
             ErrorMessage = string.Empty;
 
-            var pageSize = loadAllReports ? FullLoadPageSize : InitialPageSize;
-            var firstPage = await reportApiClient.GetAllReportsAsync(1, pageSize);
-            var items = firstPage?.Items?.ToList() ?? [];
-            var totalCount = firstPage?.TotalCount > 0 ? firstPage.TotalCount : items.Count;
-
-            if (loadAllReports && items.Count < totalCount)
-            {
-                var effectivePageSize = firstPage?.PageSize > 0 ? firstPage.PageSize : pageSize;
-                var totalPageCount = (int)Math.Ceiling(totalCount / (double)effectivePageSize);
-
-                for (var page = 2; page <= totalPageCount; page++)
-                {
-                    var pageResult = await reportApiClient.GetAllReportsAsync(page, effectivePageSize);
-                    var pageItems = pageResult?.Items ?? [];
-                    if (pageItems.Count == 0)
-                    {
-                        break;
-                    }
-
-                    foreach (var report in pageItems)
-                    {
-                        items.Add(report);
-                    }
-                }
-            }
+            var safePage = Math.Max(1, CurrentPage);
+            var safePageSize = Math.Clamp(PageSize, 1, MaxPageSize);
+            var pageResult = await reportApiClient.GetAllReportsAsync(safePage, safePageSize);
+            var items = pageResult?.Items?.ToList() ?? [];
+            var totalCount = pageResult?.TotalCount > 0 ? pageResult.TotalCount : items.Count;
+            var effectivePageSize = pageResult?.PageSize > 0 ? pageResult.PageSize : safePageSize;
+            var resolvedTotalPageCount = totalCount > 0
+                ? (int)Math.Ceiling(totalCount / (double)Math.Max(1, effectivePageSize))
+                : 1;
+            var resolvedPage = pageResult?.Page > 0
+                ? Math.Min(pageResult.Page, resolvedTotalPageCount)
+                : Math.Min(safePage, resolvedTotalPageCount);
 
             Reports.Clear();
             foreach (var report in items)
@@ -90,9 +137,13 @@ public partial class CompanyReportsPageViewModel(
                 report.CreatedAt.Year == now.Year &&
                 report.CreatedAt.Month == now.Month);
 
-            StatusText = loadAllReports
-                ? $"Tum raporlar listeleniyor: {Reports.Count}/{TotalReportCount} | Bu ay: {CurrentMonthReportCount}"
-                : $"Toplam rapor: {TotalReportCount} | Listelenen: {Reports.Count} | Bu ay: {CurrentMonthReportCount}";
+            CurrentPage = resolvedPage;
+            PageSize = effectivePageSize;
+            TotalPageCount = Math.Max(1, resolvedTotalPageCount);
+            CanGoPrevious = CurrentPage > 1;
+            CanGoNext = CurrentPage < TotalPageCount;
+            PageInfoText = $"Sayfa {CurrentPage} / {TotalPageCount}";
+            StatusText = $"Toplam rapor: {TotalReportCount} | Gosterilen: {Reports.Count} | Sayfa boyutu: {PageSize}";
         }
         catch (ApiException ex)
         {

@@ -86,19 +86,6 @@
                        TextColor="#f87171"
                        FontSize="12" />
 
-                <!-- Hero Card -->
-                <Border BackgroundColor="#162030"
-                        Stroke="Transparent"
-                        StrokeShape="RoundRectangle 16"
-                        Padding="18,16">
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Calisan ve Departman"
-                               FontSize="20"
-                               FontAttributes="Bold"
-                               TextColor="White" />
-                    </VerticalStackLayout>
-                </Border>
-
                 <!-- Groups List -->
                 <CollectionView ItemsSource="{Binding Groups}">
                     <CollectionView.ItemTemplate>

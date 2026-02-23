@@ -74,9 +74,15 @@ public partial class CompanyEmployeesPageViewModel(
             IsBusy = true;
             ErrorMessage = string.Empty;
             var companyId = UserSession.CompanyId.Value;
-            await RefreshGroupsAsync(companyId);
-            _ = await TryRefreshDepartmentsAsync(companyId);
-            _ = await TryRefreshUsersAsync(companyId);
+            var groupsTask = identityApiClient.GetAllCompanyGroupsAsync(companyId);
+            var departmentsTask = TryGetDepartmentsAsync(companyId);
+            var usersTask = TryGetUsersAsync(companyId);
+
+            await Task.WhenAll(groupsTask, departmentsTask, usersTask);
+
+            ApplyGroups((await groupsTask) ?? []);
+            ApplyDepartments(await departmentsTask);
+            ApplyUsers(await usersTask);
 
             if (SelectedDepartment is not null && Departments.All(item => item.Id != SelectedDepartment.Id))
             {
@@ -346,7 +352,64 @@ public partial class CompanyEmployeesPageViewModel(
     private async Task RefreshGroupsAsync(Guid companyId)
     {
         var response = await identityApiClient.GetAllCompanyGroupsAsync(companyId);
-        var normalizedGroups = NormalizeGroups(response ?? []);
+        ApplyGroups(response ?? []);
+    }
+
+    private async Task RefreshDepartmentsAsync(Guid companyId)
+    {
+        var response = await identityApiClient.GetAllCompanyDepartmentsAsync(companyId);
+        ApplyDepartments(response ?? []);
+    }
+
+    private async Task RefreshUsersAsync(Guid companyId)
+    {
+        var response = await identityApiClient.GetAllCompanyUsersAsync(companyId);
+        ApplyUsers(response ?? []);
+    }
+
+    private async Task<List<DepartmentDto>> TryGetDepartmentsAsync(Guid companyId)
+    {
+        try
+        {
+            return await identityApiClient.GetAllCompanyDepartmentsAsync(companyId) ?? [];
+        }
+        catch (ApiException)
+        {
+            return [];
+        }
+        catch (HttpRequestException)
+        {
+            return [];
+        }
+        catch (TaskCanceledException)
+        {
+            return [];
+        }
+    }
+
+    private async Task<List<CompanyUserDto>> TryGetUsersAsync(Guid companyId)
+    {
+        try
+        {
+            return await identityApiClient.GetAllCompanyUsersAsync(companyId) ?? [];
+        }
+        catch (ApiException)
+        {
+            return [];
+        }
+        catch (HttpRequestException)
+        {
+            return [];
+        }
+        catch (TaskCanceledException)
+        {
+            return [];
+        }
+    }
+
+    private void ApplyGroups(IEnumerable<CompanyGroupDto> groups)
+    {
+        var normalizedGroups = NormalizeGroups(groups);
 
         Groups.Clear();
         foreach (var group in normalizedGroups)
@@ -355,23 +418,19 @@ public partial class CompanyEmployeesPageViewModel(
         }
     }
 
-    private async Task RefreshDepartmentsAsync(Guid companyId)
+    private void ApplyDepartments(IEnumerable<DepartmentDto> departments)
     {
-        var response = await identityApiClient.GetAllCompanyDepartmentsAsync(companyId);
-
         Departments.Clear();
-        foreach (var department in (response ?? []).OrderBy(item => item.Name))
+        foreach (var department in departments.OrderBy(item => item.Name))
         {
             Departments.Add(department);
         }
     }
 
-    private async Task RefreshUsersAsync(Guid companyId)
+    private void ApplyUsers(IEnumerable<CompanyUserDto> users)
     {
-        var response = await identityApiClient.GetAllCompanyUsersAsync(companyId);
-
         CompanyUsers.Clear();
-        foreach (var user in (response ?? []).OrderBy(item => item.Name))
+        foreach (var user in users.OrderBy(item => item.Name))
         {
             CompanyUsers.Add(user);
         }

@@ -17,6 +17,9 @@ public partial class CompanyTasksPageViewModel(
     ProjectManagementApiClient projectManagementApiClient)
     : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
+    private const int TasksPageSize = 100;
+    private const int MaxPageTraversal = 200;
+
     public ObservableCollection<CompanyTaskDto> Tasks { get; } = [];
     public ObservableCollection<CompanyTaskDto> IndividualTasks { get; } = [];
     public ObservableCollection<CompanyTaskDto> GroupTasks { get; } = [];
@@ -49,8 +52,7 @@ public partial class CompanyTasksPageViewModel(
             IsBusy = true;
             ErrorMessage = string.Empty;
 
-            var response = await projectManagementApiClient.GetAllTasksByCompanyIdAsync(UserSession.CompanyId.Value, 1, 50);
-            var items = response?.Items ?? [];
+            var items = await LoadAllCompanyTasksAsync(UserSession.CompanyId.Value);
 
             Tasks.Clear();
             IndividualTasks.Clear();
@@ -69,7 +71,7 @@ public partial class CompanyTasksPageViewModel(
             }
 
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
-            TotalTaskCount = response?.TotalCount > 0 ? response.TotalCount : items.Count;
+            TotalTaskCount = items.Count;
             OpenTaskCount = items.Count(item => !IsCompletedStatus(item.StatusName));
             OverdueTaskCount = items.Count(item => item.DeadlineTime < now && !IsCompletedStatus(item.StatusName));
 
@@ -119,13 +121,48 @@ public partial class CompanyTasksPageViewModel(
         }
 
         var category = task.CategoryName?.Trim() ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(category))
-        {
-            return false;
-        }
+        var taskName = task.TaskName?.Trim() ?? string.Empty;
+        var description = task.Description?.Trim() ?? string.Empty;
 
         return category.Contains("grup", StringComparison.OrdinalIgnoreCase)
             || category.Contains("group", StringComparison.OrdinalIgnoreCase)
-            || category.Contains("team", StringComparison.OrdinalIgnoreCase);
+            || category.Contains("team", StringComparison.OrdinalIgnoreCase)
+            || category.Contains("ekip", StringComparison.OrdinalIgnoreCase)
+            || taskName.Contains("grup", StringComparison.OrdinalIgnoreCase)
+            || taskName.Contains("group", StringComparison.OrdinalIgnoreCase)
+            || taskName.Contains("team", StringComparison.OrdinalIgnoreCase)
+            || taskName.Contains("ekip", StringComparison.OrdinalIgnoreCase)
+            || description.Contains("grup", StringComparison.OrdinalIgnoreCase)
+            || description.Contains("group", StringComparison.OrdinalIgnoreCase)
+            || description.Contains("team", StringComparison.OrdinalIgnoreCase)
+            || description.Contains("ekip", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task<List<CompanyTaskDto>> LoadAllCompanyTasksAsync(Guid companyId)
+    {
+        var allTasks = new List<CompanyTaskDto>();
+        var pageNumber = 1;
+
+        while (pageNumber <= MaxPageTraversal)
+        {
+            var response = await projectManagementApiClient.GetAllTasksByCompanyIdAsync(companyId, pageNumber, TasksPageSize);
+            var pageItems = response?.Items ?? [];
+
+            if (pageItems.Count == 0)
+            {
+                break;
+            }
+
+            allTasks.AddRange(pageItems);
+
+            if (pageItems.Count < TasksPageSize)
+            {
+                break;
+            }
+
+            pageNumber++;
+        }
+
+        return allTasks;
     }
 }
