@@ -80,6 +80,79 @@
                     TextColor="#f87171"
                     FontSize="12" />
 
+                <Border BackgroundColor="#162030"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 12"
+                        Padding="12">
+                    <VerticalStackLayout Spacing="10">
+                        <HorizontalStackLayout Spacing="8">
+                            <Label Text="Sayfa Boyutu"
+                                   TextColor="#cbd5e1"
+                                   FontSize="12"
+                                   VerticalOptions="Center" />
+                            <Button Text="10"
+                                    Command="{Binding SetPageSizeCommand}"
+                                    CommandParameter="10"
+                                    BackgroundColor="#1E2E3E"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    HeightRequest="34"
+                                    Padding="10,4" />
+                            <Button Text="20"
+                                    Command="{Binding SetPageSizeCommand}"
+                                    CommandParameter="20"
+                                    BackgroundColor="#1E2E3E"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    HeightRequest="34"
+                                    Padding="10,4" />
+                            <Button Text="50"
+                                    Command="{Binding SetPageSizeCommand}"
+                                    CommandParameter="50"
+                                    BackgroundColor="#1E2E3E"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    HeightRequest="34"
+                                    Padding="10,4" />
+                            <Button Text="100"
+                                    Command="{Binding SetPageSizeCommand}"
+                                    CommandParameter="100"
+                                    BackgroundColor="#1E2E3E"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    HeightRequest="34"
+                                    Padding="10,4" />
+                        </HorizontalStackLayout>
+
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Button Grid.Column="0"
+                                    Text="Onceki"
+                                    Command="{Binding PreviousPageCommand}"
+                                    IsEnabled="{Binding CanGoPrevious}"
+                                    BackgroundColor="#1E2E3E"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    HeightRequest="36"
+                                    Padding="12,4" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding PageInfoText}"
+                                   HorizontalTextAlignment="Center"
+                                   VerticalTextAlignment="Center"
+                                   TextColor="#cbd5e1"
+                                   FontSize="13" />
+                            <Button Grid.Column="2"
+                                    Text="Sonraki"
+                                    Command="{Binding NextPageCommand}"
+                                    IsEnabled="{Binding CanGoNext}"
+                                    BackgroundColor="#1E2E3E"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    HeightRequest="36"
+                                    Padding="12,4" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
                 <CollectionView ItemsSource="{Binding Reports}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
