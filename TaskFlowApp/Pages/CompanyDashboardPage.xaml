@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:controls="clr-namespace:TaskFlowApp.Controls"
              x:Class="TaskFlowApp.Pages.CompanyDashboardPage"
              BackgroundColor="#0D1B2A"
              Shell.NavBarIsVisible="False">
@@ -152,50 +153,130 @@
                     </Border>
 
                     <Border Grid.Row="2"
-                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
                             BackgroundColor="#162030"
                             Stroke="Transparent"
                             StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Tamamlanan Gorev" TextColor="#94a3b8" FontSize="12" />
-                            <Label Text="{Binding CompletedTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
-                        </VerticalStackLayout>
-                    </Border>
+                            Padding="14,14,14,10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Gorev Dagilimi"
+                                   TextColor="White"
+                                   FontSize="14"
+                                   FontAttributes="Bold" />
 
-                    <Border Grid.Row="2"
-                            Grid.Column="1"
-                            BackgroundColor="#162030"
-                            Stroke="Transparent"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Geciken Gorev" TextColor="#94a3b8" FontSize="12" />
-                            <Label Text="{Binding OverdueTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                            <Grid ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="14">
+                                <controls:DonutChartView
+                                    WidthRequest="126"
+                                    HeightRequest="126"
+                                    FirstValue="{Binding CompletedTaskCount}"
+                                    SecondValue="{Binding OverdueTaskCount}"
+                                    FirstSegmentColor="#22c55e"
+                                    SecondSegmentColor="#f97316"
+                                    BackgroundRingColor="#2B3A4E" />
+
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="8"
+                                                     VerticalOptions="Center">
+                                    <Grid ColumnDefinitions="Auto,*,Auto"
+                                          ColumnSpacing="8">
+                                        <Ellipse WidthRequest="10"
+                                                 HeightRequest="10"
+                                                 Fill="#22c55e"
+                                                 VerticalOptions="Center" />
+                                        <Label Grid.Column="1"
+                                               Text="Tamamlanan Gorev"
+                                               TextColor="#cbd5e1"
+                                               FontSize="12" />
+                                        <Label Grid.Column="2"
+                                               Text="{Binding CompletedTaskLegendText}"
+                                               TextColor="White"
+                                               FontSize="12"
+                                               FontAttributes="Bold" />
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto,*,Auto"
+                                          ColumnSpacing="8">
+                                        <Ellipse WidthRequest="10"
+                                                 HeightRequest="10"
+                                                 Fill="#f97316"
+                                                 VerticalOptions="Center" />
+                                        <Label Grid.Column="1"
+                                               Text="Geciken Gorev"
+                                               TextColor="#cbd5e1"
+                                               FontSize="12" />
+                                        <Label Grid.Column="2"
+                                               Text="{Binding OverdueTaskLegendText}"
+                                               TextColor="White"
+                                               FontSize="12"
+                                               FontAttributes="Bold" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Grid>
                         </VerticalStackLayout>
                     </Border>
 
                     <Border Grid.Row="3"
-                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
                             BackgroundColor="#162030"
                             Stroke="Transparent"
                             StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Cozulen Rapor" TextColor="#94a3b8" FontSize="12" />
-                            <Label Text="{Binding ResolvedReportCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
-                        </VerticalStackLayout>
-                    </Border>
+                            Padding="14,14,14,10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Rapor Dagilimi"
+                                   TextColor="White"
+                                   FontSize="14"
+                                   FontAttributes="Bold" />
 
-                    <Border Grid.Row="3"
-                            Grid.Column="1"
-                            BackgroundColor="#162030"
-                            Stroke="Transparent"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Reddedilen Rapor" TextColor="#94a3b8" FontSize="12" />
-                            <Label Text="{Binding RejectedReportCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                            <Grid ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="14">
+                                <controls:DonutChartView
+                                    WidthRequest="126"
+                                    HeightRequest="126"
+                                    FirstValue="{Binding ResolvedReportCount}"
+                                    SecondValue="{Binding RejectedReportCount}"
+                                    FirstSegmentColor="#38bdf8"
+                                    SecondSegmentColor="#f43f5e"
+                                    BackgroundRingColor="#2B3A4E" />
+
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="8"
+                                                     VerticalOptions="Center">
+                                    <Grid ColumnDefinitions="Auto,*,Auto"
+                                          ColumnSpacing="8">
+                                        <Ellipse WidthRequest="10"
+                                                 HeightRequest="10"
+                                                 Fill="#38bdf8"
+                                                 VerticalOptions="Center" />
+                                        <Label Grid.Column="1"
+                                               Text="Cozulen Rapor"
+                                               TextColor="#cbd5e1"
+                                               FontSize="12" />
+                                        <Label Grid.Column="2"
+                                               Text="{Binding ResolvedReportLegendText}"
+                                               TextColor="White"
+                                               FontSize="12"
+                                               FontAttributes="Bold" />
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto,*,Auto"
+                                          ColumnSpacing="8">
+                                        <Ellipse WidthRequest="10"
+                                                 HeightRequest="10"
+                                                 Fill="#f43f5e"
+                                                 VerticalOptions="Center" />
+                                        <Label Grid.Column="1"
+                                               Text="Reddedilen Rapor"
+                                               TextColor="#cbd5e1"
+                                               FontSize="12" />
+                                        <Label Grid.Column="2"
+                                               Text="{Binding RejectedReportLegendText}"
+                                               TextColor="White"
+                                               FontSize="12"
+                                               FontAttributes="Bold" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Grid>
                         </VerticalStackLayout>
                     </Border>
                 </Grid>

@@ -28,12 +28,16 @@ public abstract partial class PageViewModelBase(
     protected const string GenericConnectionErrorMessage = "Su anda islem gerceklestirilemiyor. Lutfen tekrar deneyin.";
     protected const string GenericLoadErrorMessage = "Veriler su anda yuklenemiyor. Lutfen tekrar deneyin.";
     protected const string SessionExpiredMessage = "Oturumunuz sona erdi. Lutfen yeniden giris yapin.";
+    protected const string AccessDeniedMessage = "Bu islem icin aktif abonelik veya yetkiniz bulunmuyor.";
 
     protected static string ResolveApiErrorMessage(ApiException exception, string defaultMessage)
     {
-        return exception.StatusCode is 401 or 403
-            ? SessionExpiredMessage
-            : defaultMessage;
+        return exception.StatusCode switch
+        {
+            401 => SessionExpiredMessage,
+            403 => AccessDeniedMessage,
+            _ => defaultMessage
+        };
     }
 
     [RelayCommand]
