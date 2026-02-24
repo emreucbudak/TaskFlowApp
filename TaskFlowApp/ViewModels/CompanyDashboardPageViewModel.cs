@@ -52,6 +52,30 @@ public partial class CompanyDashboardPageViewModel(
     [ObservableProperty]
     private int availablePlanCount;
 
+    [ObservableProperty]
+    private int completedTaskPercentage;
+
+    [ObservableProperty]
+    private int overdueTaskPercentage;
+
+    [ObservableProperty]
+    private int resolvedReportPercentage;
+
+    [ObservableProperty]
+    private int rejectedReportPercentage;
+
+    [ObservableProperty]
+    private string completedTaskLegendText = "0 (%0)";
+
+    [ObservableProperty]
+    private string overdueTaskLegendText = "0 (%0)";
+
+    [ObservableProperty]
+    private string resolvedReportLegendText = "0 (%0)";
+
+    [ObservableProperty]
+    private string rejectedReportLegendText = "0 (%0)";
+
     [RelayCommand]
     private async Task LoadAsync()
     {
@@ -119,6 +143,8 @@ public partial class CompanyDashboardPageViewModel(
             ResolvedReportCount = companyReports.Count(item => IsResolvedReportStatus(item.ReportStatusId));
             RejectedReportCount = companyReports.Count(item => IsRejectedReportStatus(item.ReportStatusId));
             AvailablePlanCount = plans.Count;
+            UpdateTaskDistribution();
+            UpdateReportDistribution();
 
             StatusText = $"Ekip: {TotalTeamCount} | Calisan: {TotalWorkerCount} | Gorev: {TotalTaskCount}";
         }
@@ -160,6 +186,48 @@ public partial class CompanyDashboardPageViewModel(
             || normalizedStatus.Contains("complete")
             || normalizedStatus.Contains("done")
             || normalizedStatus.Contains("closed");
+    }
+
+    private void UpdateTaskDistribution()
+    {
+        var total = CompletedTaskCount + OverdueTaskCount;
+        if (total <= 0)
+        {
+            CompletedTaskPercentage = 0;
+            OverdueTaskPercentage = 0;
+            CompletedTaskLegendText = "0 (%0)";
+            OverdueTaskLegendText = "0 (%0)";
+            return;
+        }
+
+        CompletedTaskPercentage = (int)Math.Round(
+            CompletedTaskCount * 100d / total,
+            MidpointRounding.AwayFromZero);
+        OverdueTaskPercentage = Math.Max(0, 100 - CompletedTaskPercentage);
+
+        CompletedTaskLegendText = $"{CompletedTaskCount} (%{CompletedTaskPercentage})";
+        OverdueTaskLegendText = $"{OverdueTaskCount} (%{OverdueTaskPercentage})";
+    }
+
+    private void UpdateReportDistribution()
+    {
+        var total = ResolvedReportCount + RejectedReportCount;
+        if (total <= 0)
+        {
+            ResolvedReportPercentage = 0;
+            RejectedReportPercentage = 0;
+            ResolvedReportLegendText = "0 (%0)";
+            RejectedReportLegendText = "0 (%0)";
+            return;
+        }
+
+        ResolvedReportPercentage = (int)Math.Round(
+            ResolvedReportCount * 100d / total,
+            MidpointRounding.AwayFromZero);
+        RejectedReportPercentage = Math.Max(0, 100 - ResolvedReportPercentage);
+
+        ResolvedReportLegendText = $"{ResolvedReportCount} (%{ResolvedReportPercentage})";
+        RejectedReportLegendText = $"{RejectedReportCount} (%{RejectedReportPercentage})";
     }
 
     private async Task<List<Models.ProjectManagement.CompanyTaskDto>> LoadAllCompanyTasksAsync(Guid companyId)
