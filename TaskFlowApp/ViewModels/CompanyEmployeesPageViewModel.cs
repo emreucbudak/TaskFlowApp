@@ -175,6 +175,7 @@ public partial class CompanyEmployeesPageViewModel(
             var companyId = UserSession.CompanyId.Value;
             await RefreshGroupsAsync(companyId);
             _ = await TryRefreshDepartmentsAsync(companyId);
+            _ = await TryRefreshUsersAsync(companyId);
 
             WorkerNameInput = string.Empty;
             WorkerEmailInput = string.Empty;
@@ -313,12 +314,20 @@ public partial class CompanyEmployeesPageViewModel(
             await identityApiClient.AddDepartmentCommandRequestAsync(new
             {
                 Name = departmentName,
-                companyId = UserSession.CompanyId.Value
+                CompanyId = UserSession.CompanyId.Value
             });
 
             var companyId = UserSession.CompanyId.Value;
             await RefreshGroupsAsync(companyId);
-            _ = await TryRefreshDepartmentsAsync(companyId);
+            var departmentsRefreshed = await TryRefreshDepartmentsAsync(companyId);
+            var departmentVisible = Departments.Any(item =>
+                string.Equals(item.Name, departmentName, StringComparison.OrdinalIgnoreCase));
+
+            if (!departmentsRefreshed || !departmentVisible)
+            {
+                ErrorMessage = "Departman kaydi alindi ancak liste guncellenemedi. Lutfen sayfayi yenileyip tekrar deneyin.";
+                return;
+            }
 
             DepartmentNameInput = string.Empty;
             FormMessage = "Departman basariyla eklendi.";
