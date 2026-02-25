@@ -168,7 +168,7 @@
                                FontSize="20"
                                FontAttributes="Bold"
                                TextColor="White" />
-                        <Button Text="Abonelik Iptal Talebi Olustur"
+                        <Button Text="Aboneliği İptal Et"
                                 Command="{Binding CancelSubscriptionCommand}"
                                 BackgroundColor="#B91C1C"
                                 TextColor="White"
