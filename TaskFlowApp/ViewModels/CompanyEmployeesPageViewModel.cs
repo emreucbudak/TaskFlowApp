@@ -533,6 +533,7 @@ public partial class CompanyEmployeesPageViewModel(
     {
         return groups
             .Where(group => !string.IsNullOrWhiteSpace(group.GroupName))
+            .Where(group => !group.GroupName.Trim().StartsWith("ATF", StringComparison.OrdinalIgnoreCase))
             .GroupBy(group => group.GroupName.Trim(), StringComparer.OrdinalIgnoreCase)
             .Select(grouped => new CompanyGroupDto
             {

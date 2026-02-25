@@ -14,7 +14,8 @@ public partial class CompanyTasksPageViewModel(
     INavigationService navigationService,
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
-    ProjectManagementApiClient projectManagementApiClient)
+    ProjectManagementApiClient projectManagementApiClient,
+    IdentityApiClient identityApiClient)
     : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     private const int TasksPageSize = 100;
@@ -52,7 +53,15 @@ public partial class CompanyTasksPageViewModel(
             IsBusy = true;
             ErrorMessage = string.Empty;
 
-            var items = await LoadAllCompanyTasksAsync(UserSession.CompanyId.Value);
+            var companyId = UserSession.CompanyId.Value;
+            var groupedTasksTask = LoadAllCompanyTasksAsync(companyId);
+            var individualTasksTask = LoadAllCompanyIndividualTasksAsync(companyId);
+
+            await Task.WhenAll(groupedTasksTask, individualTasksTask);
+
+            var items = (await groupedTasksTask)
+                .Concat(await individualTasksTask)
+                .ToList();
 
             Tasks.Clear();
             IndividualTasks.Clear();
@@ -164,5 +173,80 @@ public partial class CompanyTasksPageViewModel(
         }
 
         return allTasks;
+    }
+
+    private async Task<List<CompanyTaskDto>> LoadAllCompanyIndividualTasksAsync(Guid companyId)
+    {
+        var users = await identityApiClient.GetAllCompanyUsersAsync(companyId) ?? [];
+        if (users.Count == 0)
+        {
+            return [];
+        }
+
+        var loadTasksByUserJobs = users
+            .Where(user => user.Id != Guid.Empty)
+            .Select(user => LoadIndividualTasksByUserIdSafeAsync(user.Id))
+            .ToList();
+
+        var tasksByUser = await Task.WhenAll(loadTasksByUserJobs);
+        return tasksByUser
+            .SelectMany(tasks => tasks)
+            .GroupBy(task => $"{task.TaskName}|{task.Description}|{task.DeadlineTime}", StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .ToList();
+    }
+
+    private async Task<List<CompanyTaskDto>> LoadIndividualTasksByUserIdSafeAsync(Guid userId)
+    {
+        try
+        {
+            var firstPage = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(userId, 1, TasksPageSize);
+            var allTasks = firstPage?.Items?.ToList() ?? [];
+            var totalCount = firstPage?.TotalCount > 0 ? firstPage.TotalCount : allTasks.Count;
+
+            if (allTasks.Count < totalCount)
+            {
+                var effectivePageSize = firstPage?.PageSize > 0 ? firstPage.PageSize : TasksPageSize;
+                var totalPages = (int)Math.Ceiling(totalCount / (double)Math.Max(1, effectivePageSize));
+
+                for (var page = 2; page <= totalPages; page++)
+                {
+                    var pageResult = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(userId, page, effectivePageSize);
+                    var pageItems = pageResult?.Items ?? [];
+                    if (pageItems.Count == 0)
+                    {
+                        break;
+                    }
+
+                    allTasks.AddRange(pageItems);
+                }
+            }
+
+            return allTasks.Select(MapIndividualTask).ToList();
+        }
+        catch (ApiException)
+        {
+            return [];
+        }
+        catch (HttpRequestException)
+        {
+            return [];
+        }
+        catch (TaskCanceledException)
+        {
+            return [];
+        }
+    }
+
+    private static CompanyTaskDto MapIndividualTask(IndividualTaskDto task)
+    {
+        return new CompanyTaskDto
+        {
+            TaskName = task.TaskTitle,
+            Description = task.Description,
+            DeadlineTime = task.Deadline,
+            StatusName = "Acik",
+            CategoryName = "Bireysel"
+        };
     }
 }
