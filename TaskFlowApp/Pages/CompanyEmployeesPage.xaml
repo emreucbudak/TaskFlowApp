@@ -77,14 +77,22 @@
         <ScrollView Grid.Row="2">
             <VerticalStackLayout Padding="16,14,16,24" Spacing="12">
 
-                <ActivityIndicator
-                    IsRunning="{Binding IsBusy}"
-                    IsVisible="{Binding IsBusy}"
-                    Color="#2196F3" />
+                <Grid HeightRequest="22">
+                    <ActivityIndicator
+                        IsRunning="{Binding IsBusy}"
+                        IsVisible="{Binding IsBusy}"
+                        Color="#2196F3"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" />
+                </Grid>
 
                 <Label Text="{Binding ErrorMessage}"
                        TextColor="#f87171"
-                       FontSize="12" />
+                       FontSize="12"
+                       HeightRequest="18"
+                       VerticalTextAlignment="Center"
+                       LineBreakMode="TailTruncation"
+                       MaxLines="1" />
 
                 <!-- Groups List -->
                 <CollectionView ItemsSource="{Binding Groups}">
@@ -186,7 +194,11 @@
                 <!-- Form mesajı -->
                 <Label Text="{Binding FormMessage}"
                        TextColor="#86efac"
-                       FontSize="12" />
+                       FontSize="12"
+                       HeightRequest="18"
+                       VerticalTextAlignment="Center"
+                       LineBreakMode="TailTruncation"
+                       MaxLines="1" />
 
                 <!-- Çalışan Ekle -->
                 <Border BackgroundColor="#162030"
