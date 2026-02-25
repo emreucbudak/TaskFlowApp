@@ -386,10 +386,6 @@
                             </Grid>
                         </Border>
 
-                        <Label Text="Ayni anda departman secmesini istiyorsan alttaki kaydi kullan."
-                               FontSize="12"
-                               TextColor="#94a3b8" />
-
                         <Button Text="Calisan Transfer Et"
                                 Command="{Binding TransferUserCommand}"
                                 BackgroundColor="#2196F3"

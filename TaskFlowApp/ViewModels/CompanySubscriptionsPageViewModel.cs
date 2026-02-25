@@ -34,6 +34,18 @@ public partial class CompanySubscriptionsPageViewModel(
     [ObservableProperty]
     private string internalReportingText = "Ic raporlama durumu bilinmiyor.";
 
+    [ObservableProperty]
+    private bool isSubscriptionCancelled;
+
+    [ObservableProperty]
+    private string subscriptionActionTitle = "Abonelik Iptali";
+
+    [ObservableProperty]
+    private string subscriptionActionButtonText = "Aboneliği İptal Et";
+
+    [ObservableProperty]
+    private string subscriptionActionButtonColor = "#B91C1C";
+
     [RelayCommand]
     private async Task LoadAsync()
     {
@@ -112,7 +124,18 @@ public partial class CompanySubscriptionsPageViewModel(
     private Task CancelSubscriptionAsync()
     {
         ErrorMessage = string.Empty;
-        StatusText = "Abonelik iptal talebiniz alindi. Islem icin yonetici onayi gereklidir.";
+
+        if (!IsSubscriptionCancelled)
+        {
+            IsSubscriptionCancelled = true;
+            StatusText = "Abonelik iptal talebiniz alindi. Islem icin yonetici onayi gereklidir.";
+        }
+        else
+        {
+            IsSubscriptionCancelled = false;
+            StatusText = "Aboneliginiz devam edecek sekilde guncellendi.";
+        }
+
         return Task.CompletedTask;
     }
 
@@ -223,6 +246,13 @@ public partial class CompanySubscriptionsPageViewModel(
         return category.Contains("grup", StringComparison.OrdinalIgnoreCase)
             || category.Contains("group", StringComparison.OrdinalIgnoreCase)
             || category.Contains("team", StringComparison.OrdinalIgnoreCase);
+    }
+
+    partial void OnIsSubscriptionCancelledChanged(bool value)
+    {
+        SubscriptionActionTitle = value ? "Aboneligi Devam Ettir" : "Abonelik Iptali";
+        SubscriptionActionButtonText = value ? "Aboneliğinizi devam ettirin" : "Aboneliği İptal Et";
+        SubscriptionActionButtonColor = value ? "#16A34A" : "#B91C1C";
     }
 }
 

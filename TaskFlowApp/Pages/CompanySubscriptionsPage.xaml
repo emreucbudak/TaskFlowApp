@@ -164,13 +164,13 @@
                         StrokeShape="RoundRectangle 16"
                         Padding="18">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="Abonelik Iptali"
+                        <Label Text="{Binding SubscriptionActionTitle}"
                                FontSize="20"
                                FontAttributes="Bold"
                                TextColor="White" />
-                        <Button Text="Aboneliği İptal Et"
+                        <Button Text="{Binding SubscriptionActionButtonText}"
                                 Command="{Binding CancelSubscriptionCommand}"
-                                BackgroundColor="#B91C1C"
+                                BackgroundColor="{Binding SubscriptionActionButtonColor}"
                                 TextColor="White"
                                 CornerRadius="10"
                                 HeightRequest="42" />
