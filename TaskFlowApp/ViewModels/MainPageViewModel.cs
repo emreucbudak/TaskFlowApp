@@ -27,6 +27,29 @@ public partial class MainPageViewModel(
     [ObservableProperty]
     private string errorMessage = string.Empty;
 
+    [ObservableProperty]
+    private bool isPasswordHidden = true;
+
+    [ObservableProperty]
+    private string passwordVisibilityIcon = "😌";
+
+    [RelayCommand]
+    private void TogglePasswordVisibility()
+    {
+        IsPasswordHidden = !IsPasswordHidden;
+    }
+
+    [RelayCommand]
+    private void ForgotPassword()
+    {
+        ErrorMessage = "Sifre sifirlama icin yoneticiyle iletisime gecin.";
+    }
+
+    partial void OnIsPasswordHiddenChanged(bool value)
+    {
+        PasswordVisibilityIcon = value ? "😌" : "🙂";
+    }
+
     [RelayCommand]
     private async Task LoginAsync()
     {

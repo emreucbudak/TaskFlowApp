@@ -75,125 +75,16 @@
 
         <!-- SCROLL CONTENT -->
         <ScrollView Grid.Row="2">
-            <VerticalStackLayout Padding="16,14,16,24" Spacing="12">
+            <VerticalStackLayout Padding="16,6,16,24" Spacing="10">
 
-                <Grid HeightRequest="22">
-                    <ActivityIndicator
-                        IsRunning="{Binding IsBusy}"
-                        IsVisible="{Binding IsBusy}"
-                        Color="#2196F3"
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center" />
-                </Grid>
+                <ActivityIndicator
+                    IsRunning="{Binding IsBusy}"
+                    IsVisible="{Binding IsBusy}"
+                    Color="#2196F3"
+                    HorizontalOptions="Center" />
 
                 <Label Text="{Binding ErrorMessage}"
                        TextColor="#f87171"
-                       FontSize="12"
-                       HeightRequest="18"
-                       VerticalTextAlignment="Center"
-                       LineBreakMode="TailTruncation"
-                       MaxLines="1" />
-
-                <!-- Groups List -->
-                <CollectionView ItemsSource="{Binding Groups}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Border BackgroundColor="#162030"
-                                    Stroke="Transparent"
-                                    StrokeShape="RoundRectangle 12"
-                                    Margin="0,0,0,10"
-                                    Padding="16,14">
-                                <VerticalStackLayout Spacing="10">
-
-                                    <!-- Grup başlığı + çalışan sayısı yan yana -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <Label Grid.Column="0"
-                                               Text="{Binding GroupName}"
-                                               FontSize="16"
-                                               FontAttributes="Bold"
-                                               TextColor="White"
-                                               VerticalOptions="Center" />
-                                        <Border Grid.Column="1"
-                                                BackgroundColor="#1A3A5C"
-                                                StrokeShape="RoundRectangle 8"
-                                                Stroke="Transparent"
-                                                Padding="8,3"
-                                                VerticalOptions="Center">
-                                            <Label Text="{Binding WorkerName.Count, StringFormat='Calisan sayisi: {0}'}"
-                                                   FontSize="11"
-                                                   TextColor="#94a3b8" />
-                                        </Border>
-                                    </Grid>
-
-                                    <BoxView Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
-
-                                    <!-- Çalışanlar -->
-                                    <VerticalStackLayout Spacing="6">
-                                        <Label Text="Calisanlar"
-                                               FontSize="11"
-                                               FontAttributes="Bold"
-                                               TextColor="#cbd5e1"
-                                               CharacterSpacing="0.5" />
-                                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding WorkerName}" Spacing="3">
-                                            <BindableLayout.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid ColumnDefinitions="Auto,*">
-                                                        <BoxView Grid.Column="0"
-                                                                 WidthRequest="4"
-                                                                 HeightRequest="4"
-                                                                 Color="#94a3b8"
-                                                                 CornerRadius="2"
-                                                                 VerticalOptions="Center"
-                                                                 Margin="0,0,8,0" />
-                                                        <Label Grid.Column="1"
-                                                               Text="{Binding .}"
-                                                               FontSize="13"
-                                                               TextColor="#94a3b8"
-                                                               VerticalOptions="Center" />
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </BindableLayout.ItemTemplate>
-                                        </VerticalStackLayout>
-                                    </VerticalStackLayout>
-
-                                    <!-- Departmanlar -->
-                                    <VerticalStackLayout Spacing="6">
-                                        <Label Text="Departmanlar"
-                                               FontSize="11"
-                                               FontAttributes="Bold"
-                                               TextColor="#cbd5e1"
-                                               CharacterSpacing="0.5" />
-                                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding DepartmenName}" Spacing="3">
-                                            <BindableLayout.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid ColumnDefinitions="Auto,*">
-                                                        <BoxView Grid.Column="0"
-                                                                 WidthRequest="4"
-                                                                 HeightRequest="4"
-                                                                 Color="#94a3b8"
-                                                                 CornerRadius="2"
-                                                                 VerticalOptions="Center"
-                                                                 Margin="0,0,8,0" />
-                                                        <Label Grid.Column="1"
-                                                               Text="{Binding .}"
-                                                               FontSize="13"
-                                                               TextColor="#94a3b8"
-                                                               VerticalOptions="Center" />
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </BindableLayout.ItemTemplate>
-                                        </VerticalStackLayout>
-                                    </VerticalStackLayout>
-
-                                </VerticalStackLayout>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-
-                <!-- Form mesajı -->
-                <Label Text="{Binding FormMessage}"
-                       TextColor="#86efac"
                        FontSize="12"
                        HeightRequest="18"
                        VerticalTextAlignment="Center"
@@ -395,6 +286,112 @@
                                 FontAttributes="Bold" />
                     </VerticalStackLayout>
                 </Border>
+
+                <!-- Form mesajı -->
+                <Label Text="{Binding FormMessage}"
+                       TextColor="#86efac"
+                       FontSize="12"
+                       HeightRequest="18"
+                       VerticalTextAlignment="Center"
+                       LineBreakMode="TailTruncation"
+                       MaxLines="1" />
+
+                <!-- Groups List -->
+                <CollectionView ItemsSource="{Binding Groups}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="#162030"
+                                    Stroke="Transparent"
+                                    StrokeShape="RoundRectangle 12"
+                                    Margin="0,0,0,10"
+                                    Padding="16,14">
+                                <VerticalStackLayout Spacing="10">
+
+                                    <!-- Grup başlığı + çalışan sayısı yan yana -->
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Grid.Column="0"
+                                               Text="{Binding GroupName}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="White"
+                                               VerticalOptions="Center" />
+                                        <Border Grid.Column="1"
+                                                BackgroundColor="#1A3A5C"
+                                                StrokeShape="RoundRectangle 8"
+                                                Stroke="Transparent"
+                                                Padding="8,3"
+                                                VerticalOptions="Center">
+                                            <Label Text="{Binding WorkerName.Count, StringFormat='Calisan sayisi: {0}'}"
+                                                   FontSize="11"
+                                                   TextColor="#94a3b8" />
+                                        </Border>
+                                    </Grid>
+
+                                    <BoxView Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
+
+                                    <!-- Çalışanlar -->
+                                    <VerticalStackLayout Spacing="6">
+                                        <Label Text="Calisanlar"
+                                               FontSize="11"
+                                               FontAttributes="Bold"
+                                               TextColor="#cbd5e1"
+                                               CharacterSpacing="0.5" />
+                                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding WorkerName}" Spacing="3">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid ColumnDefinitions="Auto,*">
+                                                        <BoxView Grid.Column="0"
+                                                                 WidthRequest="4"
+                                                                 HeightRequest="4"
+                                                                 Color="#94a3b8"
+                                                                 CornerRadius="2"
+                                                                 VerticalOptions="Center"
+                                                                 Margin="0,0,8,0" />
+                                                        <Label Grid.Column="1"
+                                                               Text="{Binding .}"
+                                                               FontSize="13"
+                                                               TextColor="#94a3b8"
+                                                               VerticalOptions="Center" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </VerticalStackLayout>
+                                    </VerticalStackLayout>
+
+                                    <!-- Departmanlar -->
+                                    <VerticalStackLayout Spacing="6">
+                                        <Label Text="Departmanlar"
+                                               FontSize="11"
+                                               FontAttributes="Bold"
+                                               TextColor="#cbd5e1"
+                                               CharacterSpacing="0.5" />
+                                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding DepartmenName}" Spacing="3">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid ColumnDefinitions="Auto,*">
+                                                        <BoxView Grid.Column="0"
+                                                                 WidthRequest="4"
+                                                                 HeightRequest="4"
+                                                                 Color="#94a3b8"
+                                                                 CornerRadius="2"
+                                                                 VerticalOptions="Center"
+                                                                 Margin="0,0,8,0" />
+                                                        <Label Grid.Column="1"
+                                                               Text="{Binding .}"
+                                                               FontSize="13"
+                                                               TextColor="#94a3b8"
+                                                               VerticalOptions="Center" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </VerticalStackLayout>
+                                    </VerticalStackLayout>
+
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
             </VerticalStackLayout>
         </ScrollView>
