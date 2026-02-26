@@ -38,13 +38,13 @@ public partial class CompanyEmployeesPageViewModel(
     private DepartmentDto? selectedDepartment;
 
     [ObservableProperty]
-    private string selectedDepartmentDisplayText = "Departman Secin";
+    private string selectedDepartmentDisplayText = "Departman Seçin";
 
     [ObservableProperty]
     private DepartmentDto? selectedTransferDepartment;
 
     [ObservableProperty]
-    private string selectedTransferDepartmentDisplayText = "Transfer Departman Secin";
+    private string selectedTransferDepartmentDisplayText = "Transfer Departmanı Seçin";
 
     [ObservableProperty]
     private CompanyUserDto? selectedUser;
@@ -65,7 +65,7 @@ public partial class CompanyEmployeesPageViewModel(
 
         if (UserSession.CompanyId is null)
         {
-            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
@@ -108,7 +108,7 @@ public partial class CompanyEmployeesPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -126,7 +126,7 @@ public partial class CompanyEmployeesPageViewModel(
 
         if (UserSession.CompanyId is null)
         {
-            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
@@ -134,25 +134,25 @@ public partial class CompanyEmployeesPageViewModel(
             string.IsNullOrWhiteSpace(WorkerEmailInput) ||
             string.IsNullOrWhiteSpace(WorkerPasswordInput))
         {
-            ErrorMessage = "Calisan eklemek icin ad, e-posta ve sifre zorunludur.";
+            ErrorMessage = "Çalışan eklemek için ad, e-posta ve şifre zorunludur.";
             return;
         }
 
         if (SelectedDepartment is null)
         {
-            ErrorMessage = "Calisan eklemek icin departman secin.";
+            ErrorMessage = "Çalışan eklemek için departman seçin.";
             return;
         }
 
         if (!IsValidEmail(WorkerEmailInput))
         {
-            ErrorMessage = "Gecerli bir e-posta girin.";
+            ErrorMessage = "Geçerli bir e-posta girin.";
             return;
         }
 
         if (!IsValidPassword(WorkerPasswordInput))
         {
-            ErrorMessage = "Sifre en az 8 karakter olmali ve buyuk harf, kucuk harf, rakam icermelidir.";
+            ErrorMessage = "Şifre en az 8 karakter olmalı ve büyük harf, küçük harf, rakam içermelidir.";
             return;
         }
 
@@ -181,19 +181,19 @@ public partial class CompanyEmployeesPageViewModel(
             WorkerEmailInput = string.Empty;
             WorkerPasswordInput = string.Empty;
             SelectedDepartment = null;
-            FormMessage = "Calisan basariyla eklendi.";
+            FormMessage = "Çalışan başarıyla eklendi.";
         }
         catch (ApiException ex) when (ex.StatusCode == 409)
         {
-            ErrorMessage = "Bu e-posta adresi zaten kullaniliyor.";
+            ErrorMessage = "Bu e-posta adresi zaten kullanılıyor.";
         }
         catch (ApiException ex) when (ex.StatusCode == 400)
         {
-            ErrorMessage = "Calisan eklenemedi. Alanlari kontrol edip tekrar deneyin.";
+            ErrorMessage = "Çalışan eklenemedi. Alanları kontrol edip tekrar deneyin.";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = ResolveApiErrorMessage(ex, "Calisan eklenemedi. Lutfen tekrar deneyin.");
+            ErrorMessage = ResolveApiErrorMessage(ex, "Çalışan eklenemedi. Lütfen tekrar deneyin.");
         }
         catch (HttpRequestException)
         {
@@ -205,7 +205,7 @@ public partial class CompanyEmployeesPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -223,19 +223,19 @@ public partial class CompanyEmployeesPageViewModel(
 
         if (UserSession.CompanyId is null)
         {
-            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
         if (SelectedUser is null)
         {
-            ErrorMessage = "Transfer icin bir calisan secin.";
+            ErrorMessage = "Transfer için bir çalışan seçin.";
             return;
         }
 
         if (SelectedTransferDepartment is null)
         {
-            ErrorMessage = "Transfer edilecek departmani secin.";
+            ErrorMessage = "Transfer edilecek departmanı seçin.";
             return;
         }
 
@@ -256,15 +256,15 @@ public partial class CompanyEmployeesPageViewModel(
             await RefreshGroupsAsync(companyId);
             _ = await TryRefreshUsersAsync(companyId);
 
-            FormMessage = "Calisan basariyla departmana transfer edildi.";
+            FormMessage = "Çalışan başarıyla departmana transfer edildi.";
         }
         catch (ApiException ex) when (ex.StatusCode == 400)
         {
-            ErrorMessage = "Transfer islemi basarisiz. Bilgileri kontrol edip tekrar deneyin.";
+            ErrorMessage = "Transfer işlemi başarısız. Bilgileri kontrol edip tekrar deneyin.";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = ResolveApiErrorMessage(ex, "Transfer islemi basarisiz. Lutfen tekrar deneyin.");
+            ErrorMessage = ResolveApiErrorMessage(ex, "Transfer işlemi başarısız. Lütfen tekrar deneyin.");
         }
         catch (HttpRequestException)
         {
@@ -276,7 +276,7 @@ public partial class CompanyEmployeesPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -294,14 +294,14 @@ public partial class CompanyEmployeesPageViewModel(
 
         if (UserSession.CompanyId is null)
         {
-            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
         var departmentName = DepartmentNameInput?.Trim() ?? string.Empty;
         if (departmentName.Length < 2 || departmentName.Length > 10)
         {
-            ErrorMessage = "Departman adi 2 ile 10 karakter arasinda olmalidir.";
+            ErrorMessage = "Departman adı 2 ile 10 karakter arasında olmalıdır.";
             return;
         }
 
@@ -325,20 +325,20 @@ public partial class CompanyEmployeesPageViewModel(
 
             if (!departmentsRefreshed || !departmentVisible)
             {
-                ErrorMessage = "Departman kaydi alindi ancak liste guncellenemedi. Lutfen sayfayi yenileyip tekrar deneyin.";
+                ErrorMessage = "Departman kaydı alındı ancak liste güncellenemedi. Lütfen sayfayı yenileyip tekrar deneyin.";
                 return;
             }
 
             DepartmentNameInput = string.Empty;
-            FormMessage = "Departman basariyla eklendi.";
+            FormMessage = "Departman başarıyla eklendi.";
         }
         catch (ApiException ex) when (ex.StatusCode == 400)
         {
-            ErrorMessage = "Departman eklenemedi. Alanlari kontrol edip tekrar deneyin.";
+            ErrorMessage = "Departman eklenemedi. Alanları kontrol edip tekrar deneyin.";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = ResolveApiErrorMessage(ex, "Departman eklenemedi. Lutfen tekrar deneyin.");
+            ErrorMessage = ResolveApiErrorMessage(ex, "Departman eklenemedi. Lütfen tekrar deneyin.");
         }
         catch (HttpRequestException)
         {
@@ -350,7 +350,7 @@ public partial class CompanyEmployeesPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -516,12 +516,12 @@ public partial class CompanyEmployeesPageViewModel(
 
     partial void OnSelectedDepartmentChanged(DepartmentDto? value)
     {
-        SelectedDepartmentDisplayText = value?.Name ?? "Departman Secin";
+        SelectedDepartmentDisplayText = value?.Name ?? "Departman Seçin";
     }
 
     partial void OnSelectedTransferDepartmentChanged(DepartmentDto? value)
     {
-        SelectedTransferDepartmentDisplayText = value?.Name ?? "Transfer Departman Secin";
+        SelectedTransferDepartmentDisplayText = value?.Name ?? "Transfer Departmanı Seçin";
     }
 
     partial void OnSelectedUserChanged(CompanyUserDto? value)

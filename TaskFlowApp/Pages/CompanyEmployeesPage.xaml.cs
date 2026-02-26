@@ -25,13 +25,13 @@ public partial class CompanyEmployeesPage : ContentPage
         var departments = ViewModel.Departments.ToList();
         if (departments.Count == 0)
         {
-            await DisplayAlertAsync("Bilgi", "Departman listesi su anda alinamadi.", "Tamam");
+            await DisplayAlertAsync("Bilgi", "Departman listesi şu anda alınamadı.", "Tamam");
             return;
         }
 
-        var cancelText = "Iptal";
+        var cancelText = "İptal";
         var selectedName = await DisplayActionSheetAsync(
-            "Departman Secin",
+            "Departman Seçin",
             cancelText,
             null,
             departments.Select(item => item.Name).ToArray());
@@ -55,13 +55,13 @@ public partial class CompanyEmployeesPage : ContentPage
         var departments = ViewModel.Departments.ToList();
         if (departments.Count == 0)
         {
-            await DisplayAlertAsync("Bilgi", "Departman listesi su anda alinamadi.", "Tamam");
+            await DisplayAlertAsync("Bilgi", "Departman listesi şu anda alınamadı.", "Tamam");
             return;
         }
 
-        var cancelText = "Iptal";
+        var cancelText = "İptal";
         var selectedName = await DisplayActionSheetAsync(
-            "Transfer Departman Secin",
+            "Transfer Departmanı Seçin",
             cancelText,
             null,
             departments.Select(item => item.Name).ToArray());
@@ -85,13 +85,13 @@ public partial class CompanyEmployeesPage : ContentPage
         var users = ViewModel.CompanyUsers.ToList();
         if (users.Count == 0)
         {
-            await DisplayAlertAsync("Bilgi", "Calisanlar listesi su anda alinamadi.", "Tamam");
+            await DisplayAlertAsync("Bilgi", "Çalışanlar listesi şu anda alınamadı.", "Tamam");
             return;
         }
 
-        var cancelText = "Iptal";
+        var cancelText = "İptal";
         var selectedName = await DisplayActionSheetAsync(
-            "Kullanici Secin",
+            "Kullanıcı Seçin",
             cancelText,
             null,
             users.Select(item => item.Name).ToArray());

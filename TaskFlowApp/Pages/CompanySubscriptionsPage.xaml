@@ -19,7 +19,7 @@
                    VerticalOptions="Center" />
 
             <Label Grid.Column="1"
-                   Text="Abonelik Islemleri"
+                   Text="Abonelik İşlemleri"
                    FontSize="16"
                    FontAttributes="Bold"
                    TextColor="White"
@@ -85,21 +85,21 @@
                         StrokeShape="RoundRectangle 16"
                         Padding="18">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="Aktif Plan ve Kullanim"
+                        <Label Text="Aktif Plan ve Kullanım"
                                FontSize="20"
                                FontAttributes="Bold"
                                TextColor="White" />
                         <Label Text="{Binding ActivePlanName, StringFormat='Aktif plan: {0}'}"
                                FontSize="13"
                                TextColor="#94a3b8" />
-                        <Label Text="{Binding ActivePlanPriceText, StringFormat='Plan ucreti: {0}'}"
+                        <Label Text="{Binding ActivePlanPriceText, StringFormat='Plan ücreti: {0}'}"
                                FontSize="13"
                                TextColor="#94a3b8" />
 
                         <Grid ColumnDefinitions="2*,*,*,*"
                               Padding="0,4,0,2">
                             <Label Grid.Column="0"
-                                   Text="Ozellik"
+                                   Text="Özellik"
                                    FontSize="12"
                                    FontAttributes="Bold"
                                    TextColor="#e2e8f0" />
@@ -110,7 +110,7 @@
                                    TextColor="#e2e8f0"
                                    HorizontalTextAlignment="Center" />
                             <Label Grid.Column="2"
-                                   Text="Kullanim"
+                                   Text="Kullanım"
                                    FontSize="12"
                                    FontAttributes="Bold"
                                    TextColor="#e2e8f0"

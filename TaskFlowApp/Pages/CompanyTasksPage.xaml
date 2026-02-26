@@ -19,7 +19,7 @@
                    VerticalOptions="Center" />
 
             <Label Grid.Column="1"
-                   Text="&#350;irket G&#246;rev Y&#246;netimi"
+                   Text="Şirket Görev Yönetimi"
                    FontSize="16"
                    FontAttributes="Bold"
                    TextColor="White"
@@ -80,7 +80,7 @@
                     TextColor="#f87171"
                     FontSize="12" />
 
-                <Label Text="Bireysel G&#246;revler"
+                <Label Text="Bireysel Görevler"
                        FontSize="20"
                        FontAttributes="Bold"
                        TextColor="White"
@@ -88,7 +88,7 @@
                 <CollectionView ItemsSource="{Binding IndividualTasks}"
                                 SelectionMode="None">
                     <CollectionView.EmptyView>
-                        <Label Text="Bireysel g&#246;rev bulunamad&#305;."
+                        <Label Text="Bireysel görev bulunamadı."
                                FontSize="12"
                                TextColor="#94a3b8"
                                HorizontalTextAlignment="Center"
@@ -125,7 +125,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <Label Text="Grup G&#246;revleri"
+                <Label Text="Grup Görevleri"
                        FontSize="20"
                        FontAttributes="Bold"
                        TextColor="White"
@@ -133,7 +133,7 @@
                 <CollectionView ItemsSource="{Binding GroupTasks}"
                                 SelectionMode="None">
                     <CollectionView.EmptyView>
-                        <Label Text="Grup g&#246;rev bulunamad&#305;."
+                        <Label Text="Grup görev bulunamadı."
                                FontSize="12"
                                TextColor="#94a3b8"
                                HorizontalTextAlignment="Center"

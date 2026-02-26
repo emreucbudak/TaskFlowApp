@@ -143,7 +143,7 @@ public partial class CompanyReportsPageViewModel(
             CanGoPrevious = CurrentPage > 1;
             CanGoNext = CurrentPage < TotalPageCount;
             PageInfoText = $"Sayfa {CurrentPage} / {TotalPageCount}";
-            StatusText = $"Toplam rapor: {TotalReportCount} | Gosterilen: {Reports.Count} | Sayfa boyutu: {PageSize}";
+            StatusText = $"Toplam rapor: {TotalReportCount} | Gösterilen: {Reports.Count} | Sayfa boyutu: {PageSize}";
         }
         catch (ApiException ex)
         {
@@ -159,7 +159,7 @@ public partial class CompanyReportsPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {

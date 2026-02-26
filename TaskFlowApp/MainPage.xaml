@@ -167,7 +167,7 @@
                             FontAttributes="Bold"
                             TextColor="White"
                             HeightRequest="52"
-                            CornerRadius="10"
+                            CornerRadius="24"
                             Margin="0,14,0,0"
                             HorizontalOptions="Fill"
                             Command="{Binding LoginCommand}">

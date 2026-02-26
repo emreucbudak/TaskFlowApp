@@ -44,7 +44,7 @@ public partial class CompanyTasksPageViewModel(
 
         if (UserSession.CompanyId is null)
         {
-            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
@@ -84,7 +84,7 @@ public partial class CompanyTasksPageViewModel(
             OpenTaskCount = items.Count(item => !IsCompletedStatus(item.StatusName));
             OverdueTaskCount = items.Count(item => item.DeadlineTime < now && !IsCompletedStatus(item.StatusName));
 
-            StatusText = $"Toplam: {TotalTaskCount} | Acik: {OpenTaskCount} | Geciken: {OverdueTaskCount}";
+            StatusText = $"Toplam: {TotalTaskCount} | Açık: {OpenTaskCount} | Geciken: {OverdueTaskCount}";
         }
         catch (ApiException ex)
         {
@@ -100,7 +100,7 @@ public partial class CompanyTasksPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -245,7 +245,7 @@ public partial class CompanyTasksPageViewModel(
             TaskName = task.TaskTitle,
             Description = task.Description,
             DeadlineTime = task.Deadline,
-            StatusName = "Acik",
+            StatusName = "Açık",
             CategoryName = "Bireysel"
         };
     }
