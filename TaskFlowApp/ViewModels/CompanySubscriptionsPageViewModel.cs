@@ -24,15 +24,13 @@ public partial class CompanySubscriptionsPageViewModel(
     private const int TasksPageSize = 100;
 
     public ObservableCollection<PlanUsageRow> PlanUsageRows { get; } = [];
+    public ObservableCollection<PlanSelectionRow> PlanSelectionRows { get; } = [];
 
     [ObservableProperty]
     private string activePlanName = "Bilinmiyor";
 
     [ObservableProperty]
     private string activePlanPriceText = "-";
-
-    [ObservableProperty]
-    private string internalReportingText = "İç raporlama durumu bilinmiyor.";
 
     [ObservableProperty]
     private bool isSubscriptionCancelled;
@@ -94,8 +92,9 @@ public partial class CompanySubscriptionsPageViewModel(
                 .Count();
             var usedIndividualTaskCount = tasks.Count(task => !IsGroupTask(task));
 
-            var activePlan = ResolveActivePlan(plans, usedUserCount, usedTeamCount, usedIndividualTaskCount);
-            BuildPlanSummary(activePlan, usedUserCount, usedTeamCount, usedIndividualTaskCount);
+            var orderedPlans = OrderPlans(plans);
+            var activePlan = ResolveActivePlan(orderedPlans, usedUserCount, usedTeamCount, usedIndividualTaskCount);
+            BuildPlanSummary(activePlan, orderedPlans, usedUserCount, usedTeamCount, usedIndividualTaskCount);
             StatusText = "Abonelik plan ve kullanım bilgileri güncellendi.";
         }
         catch (ApiException ex)
@@ -139,6 +138,26 @@ public partial class CompanySubscriptionsPageViewModel(
         return Task.CompletedTask;
     }
 
+    [RelayCommand]
+    private Task SelectPlanAsync(PlanSelectionRow? selectedPlan)
+    {
+        if (selectedPlan is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        ErrorMessage = string.Empty;
+
+        if (!selectedPlan.IsSelectable)
+        {
+            StatusText = $"{selectedPlan.PlanName} zaten mevcut planınız.";
+            return Task.CompletedTask;
+        }
+
+        StatusText = $"{selectedPlan.PlanName} planı seçildi.";
+        return Task.CompletedTask;
+    }
+
     private async Task<List<CompanyTaskDto>> LoadAllCompanyTasksAsync(Guid companyId)
     {
         var firstPage = await projectManagementApiClient.GetAllTasksByCompanyIdAsync(companyId, 1, TasksPageSize);
@@ -168,15 +187,17 @@ public partial class CompanySubscriptionsPageViewModel(
         return allTasks;
     }
 
-    private void BuildPlanSummary(CompanyPlanDto activePlan, int usedUserCount, int usedTeamCount, int usedIndividualTaskCount)
+    private void BuildPlanSummary(
+        CompanyPlanDto activePlan,
+        IReadOnlyCollection<CompanyPlanDto> orderedPlans,
+        int usedUserCount,
+        int usedTeamCount,
+        int usedIndividualTaskCount)
     {
-        ActivePlanName = string.IsNullOrWhiteSpace(activePlan.PlanName) ? "Bilinmiyor" : activePlan.PlanName;
+        ActivePlanName = NormalizePlanName(activePlan.PlanName);
         ActivePlanPriceText = activePlan.PlanPrice <= 0
             ? "Ücretsiz"
             : string.Format(CultureInfo.GetCultureInfo("tr-TR"), "{0:N0} TL / ay", activePlan.PlanPrice);
-        InternalReportingText = activePlan.PlanProperties.IsInternalReportingEnabled
-            ? "İç raporlama: Aktif"
-            : "İç raporlama: Kapalı";
 
         PlanUsageRows.Clear();
         PlanUsageRows.Add(new PlanUsageRow(
@@ -194,6 +215,45 @@ public partial class CompanySubscriptionsPageViewModel(
             activePlan.PlanProperties.IndividualTaskLimit.ToString(CultureInfo.InvariantCulture),
             usedIndividualTaskCount.ToString(CultureInfo.InvariantCulture),
             FormatRemaining(activePlan.PlanProperties.IndividualTaskLimit, usedIndividualTaskCount)));
+
+        var internalReportingMark = activePlan.PlanProperties.IsInternalReportingEnabled ? "✓" : "-";
+        PlanUsageRows.Add(new PlanUsageRow(
+            "İç Raporlama",
+            internalReportingMark,
+            internalReportingMark,
+            internalReportingMark));
+
+        PlanSelectionRows.Clear();
+        foreach (var plan in orderedPlans)
+        {
+            var isCurrentPlan = IsSamePlan(plan, activePlan);
+            var isSelectable = !isCurrentPlan;
+            var priceText = plan.PlanPrice <= 0
+                ? "Ücretsiz"
+                : string.Format(CultureInfo.GetCultureInfo("tr-TR"), "{0:N0} TL", plan.PlanPrice);
+
+            PlanSelectionRows.Add(new PlanSelectionRow(
+                NormalizePlanName(plan.PlanName),
+                priceText,
+                plan.PlanProperties.PeopleAddedLimit.ToString(CultureInfo.InvariantCulture),
+                plan.PlanProperties.TeamLimit.ToString(CultureInfo.InvariantCulture),
+                plan.PlanProperties.IndividualTaskLimit.ToString(CultureInfo.InvariantCulture),
+                plan.PlanProperties.IsInternalReportingEnabled ? "✓" : "-",
+                isSelectable ? "Plan Seç" : "Mevcut Plan",
+                isSelectable,
+                isSelectable ? "#2563EB" : "#334155"));
+        }
+    }
+
+    private static List<CompanyPlanDto> OrderPlans(IEnumerable<CompanyPlanDto> plans)
+    {
+        return plans
+            .OrderBy(plan => plan.PlanPrice)
+            .ThenBy(plan => plan.PlanProperties.PeopleAddedLimit)
+            .ThenBy(plan => plan.PlanProperties.TeamLimit)
+            .ThenBy(plan => plan.PlanProperties.IndividualTaskLimit)
+            .ThenBy(plan => plan.PlanName, StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 
     private static CompanyPlanDto ResolveActivePlan(
@@ -227,6 +287,21 @@ public partial class CompanySubscriptionsPageViewModel(
         return orderedPlans[^1];
     }
 
+    private static string NormalizePlanName(string? planName)
+    {
+        return string.IsNullOrWhiteSpace(planName) ? "Bilinmiyor" : planName.Trim();
+    }
+
+    private static bool IsSamePlan(CompanyPlanDto left, CompanyPlanDto right)
+    {
+        return string.Equals(NormalizePlanName(left.PlanName), NormalizePlanName(right.PlanName), StringComparison.OrdinalIgnoreCase)
+            && left.PlanPrice == right.PlanPrice
+            && left.PlanProperties.PeopleAddedLimit == right.PlanProperties.PeopleAddedLimit
+            && left.PlanProperties.TeamLimit == right.PlanProperties.TeamLimit
+            && left.PlanProperties.IndividualTaskLimit == right.PlanProperties.IndividualTaskLimit
+            && left.PlanProperties.IsInternalReportingEnabled == right.PlanProperties.IsInternalReportingEnabled;
+    }
+
     private static string FormatRemaining(int limit, int usage)
     {
         var remaining = limit - usage;
@@ -257,3 +332,13 @@ public partial class CompanySubscriptionsPageViewModel(
 }
 
 public sealed record PlanUsageRow(string Feature, string Limit, string Usage, string Remaining);
+public sealed record PlanSelectionRow(
+    string PlanName,
+    string Price,
+    string UserLimit,
+    string TeamLimit,
+    string IndividualTaskLimit,
+    string InternalReporting,
+    string ActionButtonText,
+    bool IsSelectable,
+    string ActionButtonColor);

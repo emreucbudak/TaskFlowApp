@@ -17,10 +17,9 @@ public partial class CompanyReportsPageViewModel(
     ReportApiClient reportApiClient)
     : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
-    private const int DefaultPageSize = 10;
-    private const int MaxPageSize = 100;
+    private const int FixedPageSize = 5;
 
-    public ObservableCollection<ReportDto> Reports { get; } = [];
+    public ObservableCollection<CompanyReportCardItem> Reports { get; } = [];
 
     [ObservableProperty]
     private int totalReportCount;
@@ -30,9 +29,6 @@ public partial class CompanyReportsPageViewModel(
 
     [ObservableProperty]
     private int currentPage = 1;
-
-    [ObservableProperty]
-    private int pageSize = DefaultPageSize;
 
     [ObservableProperty]
     private int totalPageCount = 1;
@@ -82,24 +78,6 @@ public partial class CompanyReportsPageViewModel(
         await LoadReportsInternalAsync();
     }
 
-    [RelayCommand]
-    private async Task SetPageSizeAsync(string? requestedPageSizeText)
-    {
-        if (IsBusy || string.IsNullOrWhiteSpace(requestedPageSizeText))
-        {
-            return;
-        }
-
-        if (!int.TryParse(requestedPageSizeText, out var requestedPageSize) || requestedPageSize <= 0)
-        {
-            return;
-        }
-
-        PageSize = Math.Min(MaxPageSize, requestedPageSize);
-        CurrentPage = 1;
-        await LoadReportsInternalAsync();
-    }
-
     private async Task LoadReportsInternalAsync()
     {
         if (IsBusy)
@@ -113,13 +91,11 @@ public partial class CompanyReportsPageViewModel(
             ErrorMessage = string.Empty;
 
             var safePage = Math.Max(1, CurrentPage);
-            var safePageSize = Math.Clamp(PageSize, 1, MaxPageSize);
-            var pageResult = await reportApiClient.GetAllReportsAsync(safePage, safePageSize);
+            var pageResult = await reportApiClient.GetAllReportsAsync(safePage, FixedPageSize);
             var items = pageResult?.Items?.ToList() ?? [];
             var totalCount = pageResult?.TotalCount > 0 ? pageResult.TotalCount : items.Count;
-            var effectivePageSize = pageResult?.PageSize > 0 ? pageResult.PageSize : safePageSize;
             var resolvedTotalPageCount = totalCount > 0
-                ? (int)Math.Ceiling(totalCount / (double)Math.Max(1, effectivePageSize))
+                ? (int)Math.Ceiling(totalCount / (double)FixedPageSize)
                 : 1;
             var resolvedPage = pageResult?.Page > 0
                 ? Math.Min(pageResult.Page, resolvedTotalPageCount)
@@ -128,7 +104,7 @@ public partial class CompanyReportsPageViewModel(
             Reports.Clear();
             foreach (var report in items)
             {
-                Reports.Add(report);
+                Reports.Add(MapReport(report));
             }
 
             var now = DateTime.UtcNow;
@@ -138,12 +114,11 @@ public partial class CompanyReportsPageViewModel(
                 report.CreatedAt.Month == now.Month);
 
             CurrentPage = resolvedPage;
-            PageSize = effectivePageSize;
             TotalPageCount = Math.Max(1, resolvedTotalPageCount);
             CanGoPrevious = CurrentPage > 1;
             CanGoNext = CurrentPage < TotalPageCount;
             PageInfoText = $"Sayfa {CurrentPage} / {TotalPageCount}";
-            StatusText = $"Toplam rapor: {TotalReportCount} | Gösterilen: {Reports.Count} | Sayfa boyutu: {PageSize}";
+            StatusText = $"Toplam rapor: {TotalReportCount} | Gösterilen: {Reports.Count}";
         }
         catch (ApiException ex)
         {
@@ -166,4 +141,48 @@ public partial class CompanyReportsPageViewModel(
             IsBusy = false;
         }
     }
+
+    private static CompanyReportCardItem MapReport(ReportDto report)
+    {
+        return new CompanyReportCardItem
+        {
+            Title = report.Title,
+            Description = report.Description,
+            ReportTopicName = ResolveTopicName(report.ReportTopicId),
+            ReportStatusName = ResolveStatusName(report.ReportStatusId),
+            CreatedAt = report.CreatedAt
+        };
+    }
+
+    private static string ResolveTopicName(int reportTopicId)
+    {
+        return reportTopicId switch
+        {
+            1 => "Hata Bildirimi",
+            2 => "Geri Bildirim",
+            3 => "Diğer",
+            _ => $"Konu #{reportTopicId}"
+        };
+    }
+
+    private static string ResolveStatusName(int reportStatusId)
+    {
+        return reportStatusId switch
+        {
+            1 => "Bildirildi",
+            2 => "İşleme Alındı",
+            3 => "Çözüldü",
+            4 => "Reddedildi",
+            _ => $"Durum #{reportStatusId}"
+        };
+    }
+}
+
+public sealed record CompanyReportCardItem
+{
+    public string Title { get; init; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
+    public string ReportTopicName { get; init; } = string.Empty;
+    public string ReportStatusName { get; init; } = string.Empty;
+    public DateTime CreatedAt { get; init; }
 }

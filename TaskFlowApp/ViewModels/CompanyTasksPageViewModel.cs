@@ -20,6 +20,12 @@ public partial class CompanyTasksPageViewModel(
 {
     private const int TasksPageSize = 100;
     private const int MaxPageTraversal = 200;
+    private const int PreviewTaskCount = 4;
+
+    private readonly List<CompanyTaskDto> allIndividualTasks = [];
+    private readonly List<CompanyTaskDto> allGroupTasks = [];
+    private bool isShowingAllIndividualTasks;
+    private bool isShowingAllGroupTasks;
 
     public ObservableCollection<CompanyTaskDto> Tasks { get; } = [];
     public ObservableCollection<CompanyTaskDto> IndividualTasks { get; } = [];
@@ -33,6 +39,12 @@ public partial class CompanyTasksPageViewModel(
 
     [ObservableProperty]
     private int overdueTaskCount;
+
+    [ObservableProperty]
+    private bool canShowAllIndividualTasks;
+
+    [ObservableProperty]
+    private bool canShowAllGroupTasks;
 
     [RelayCommand]
     private async Task LoadAsync()
@@ -64,20 +76,26 @@ public partial class CompanyTasksPageViewModel(
                 .ToList();
 
             Tasks.Clear();
-            IndividualTasks.Clear();
-            GroupTasks.Clear();
+            allIndividualTasks.Clear();
+            allGroupTasks.Clear();
             foreach (var item in items)
             {
                 Tasks.Add(item);
                 if (IsGroupTask(item))
                 {
-                    GroupTasks.Add(item);
+                    allGroupTasks.Add(item);
                 }
                 else
                 {
-                    IndividualTasks.Add(item);
+                    allIndividualTasks.Add(item);
                 }
             }
+
+            isShowingAllIndividualTasks = false;
+            isShowingAllGroupTasks = false;
+            CanShowAllIndividualTasks = allIndividualTasks.Count > PreviewTaskCount;
+            CanShowAllGroupTasks = allGroupTasks.Count > PreviewTaskCount;
+            RefreshVisibleTaskCollections();
 
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
             TotalTaskCount = items.Count;
@@ -106,6 +124,34 @@ public partial class CompanyTasksPageViewModel(
         {
             IsBusy = false;
         }
+    }
+
+    [RelayCommand]
+    private Task ShowAllIndividualTasksAsync()
+    {
+        if (!CanShowAllIndividualTasks)
+        {
+            return Task.CompletedTask;
+        }
+
+        isShowingAllIndividualTasks = true;
+        CanShowAllIndividualTasks = false;
+        RefreshVisibleTaskCollections();
+        return Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    private Task ShowAllGroupTasksAsync()
+    {
+        if (!CanShowAllGroupTasks)
+        {
+            return Task.CompletedTask;
+        }
+
+        isShowingAllGroupTasks = true;
+        CanShowAllGroupTasks = false;
+        RefreshVisibleTaskCollections();
+        return Task.CompletedTask;
     }
 
     private static bool IsCompletedStatus(string? statusName)
@@ -191,7 +237,9 @@ public partial class CompanyTasksPageViewModel(
         var tasksByUser = await Task.WhenAll(loadTasksByUserJobs);
         return tasksByUser
             .SelectMany(tasks => tasks)
-            .GroupBy(task => $"{task.TaskName}|{task.Description}|{task.DeadlineTime}", StringComparer.OrdinalIgnoreCase)
+            .GroupBy(
+                task => $"{task.TaskName}|{task.Description}|{task.DeadlineTime}|{task.StatusName}|{task.CategoryName}|{task.TaskPriorityName}",
+                StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First())
             .ToList();
     }
@@ -240,13 +288,42 @@ public partial class CompanyTasksPageViewModel(
 
     private static CompanyTaskDto MapIndividualTask(IndividualTaskDto task)
     {
+        var statusName = string.IsNullOrWhiteSpace(task.StatusName) ? "Açık" : task.StatusName;
+        var categoryName = string.IsNullOrWhiteSpace(task.CategoryName) ? "Bireysel" : task.CategoryName;
+        var priorityName = string.IsNullOrWhiteSpace(task.TaskPriorityName) ? "Belirtilmedi" : task.TaskPriorityName;
+
         return new CompanyTaskDto
         {
             TaskName = task.TaskTitle,
             Description = task.Description,
             DeadlineTime = task.Deadline,
-            StatusName = "Açık",
-            CategoryName = "Bireysel"
+            StatusName = statusName,
+            CategoryName = categoryName,
+            TaskPriorityName = priorityName
         };
+    }
+
+    private void RefreshVisibleTaskCollections()
+    {
+        IndividualTasks.Clear();
+        GroupTasks.Clear();
+
+        var individualSource = isShowingAllIndividualTasks
+            ? allIndividualTasks
+            : allIndividualTasks.Take(PreviewTaskCount);
+
+        var groupSource = isShowingAllGroupTasks
+            ? allGroupTasks
+            : allGroupTasks.Take(PreviewTaskCount);
+
+        foreach (var task in individualSource)
+        {
+            IndividualTasks.Add(task);
+        }
+
+        foreach (var task in groupSource)
+        {
+            GroupTasks.Add(task);
+        }
     }
 }
