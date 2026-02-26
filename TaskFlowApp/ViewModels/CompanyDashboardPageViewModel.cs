@@ -129,10 +129,13 @@ public partial class CompanyDashboardPageViewModel(
                 !IsCompletedStatus(task.StatusName));
             var completedFromTasks = tasks.Count(task => IsCompletedStatus(task.StatusName));
             var totalTasksFromStats = companyStats.Sum(item => item.TotalTasksAssigned);
+            var individualTaskCount = totalTasksFromStats > 0
+                ? totalTasksFromStats
+                : await LoadAllCompanyIndividualTaskCountAsync(users);
 
             TotalTeamCount = normalizedGroups.Count;
             TotalWorkerCount = companyUserIds.Count;
-            TotalTaskCount = totalTasksFromStats > 0 ? totalTasksFromStats : tasks.Count;
+            TotalTaskCount = tasks.Count + individualTaskCount;
             TotalReportCount = companyReports.Count;
             CompletedTaskCount = companyStats.Count > 0
                 ? companyStats.Sum(item => item.TotalTasksCompleted)
@@ -256,6 +259,48 @@ public partial class CompanyDashboardPageViewModel(
         }
 
         return allTasks;
+    }
+
+    private async Task<int> LoadAllCompanyIndividualTaskCountAsync(IEnumerable<CompanyUserDto> users)
+    {
+        var userIds = users
+            .Select(user => user.Id)
+            .Where(id => id != Guid.Empty)
+            .Distinct()
+            .ToList();
+
+        if (userIds.Count == 0)
+        {
+            return 0;
+        }
+
+        var countJobs = userIds
+            .Select(LoadIndividualTaskCountByUserIdSafeAsync)
+            .ToList();
+        var counts = await Task.WhenAll(countJobs);
+        return counts.Sum();
+    }
+
+    private async Task<int> LoadIndividualTaskCountByUserIdSafeAsync(Guid userId)
+    {
+        try
+        {
+            var firstPage = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(userId, 1, TasksPageSize);
+            var pageItemsCount = firstPage?.Items?.Count ?? 0;
+            return firstPage?.TotalCount > 0 ? firstPage.TotalCount : pageItemsCount;
+        }
+        catch (ApiException)
+        {
+            return 0;
+        }
+        catch (HttpRequestException)
+        {
+            return 0;
+        }
+        catch (TaskCanceledException)
+        {
+            return 0;
+        }
     }
 
     private async Task<List<Models.Report.ReportDto>> LoadAllReportsAsync()

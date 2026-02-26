@@ -37,6 +37,9 @@ public sealed class IdentityApiClient(IApiClient apiClient) : ControllerApiClien
     public Task DeleteUserFromDepartmentCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("DeleteUserFromDepartmentCommandRequest", request, cancellationToken: cancellationToken);
 
+    public Task DeleteWorkerCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
+        PostAsync("DeleteWorkerCommandRequest", request, cancellationToken: cancellationToken);
+
     public Task<PagedResultDto<JsonElement>> GetAllCompaniesQueriesRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostForResultAsync<PagedResultDto<JsonElement>>("GetAllCompaniesQueriesRequest", request, cancellationToken: cancellationToken);
 

@@ -53,6 +53,12 @@ public partial class CompanyEmployeesPageViewModel(
     private string selectedUserDisplayText = "Kullanıcı Seçin";
 
     [ObservableProperty]
+    private CompanyUserDto? selectedDeleteUser;
+
+    [ObservableProperty]
+    private string selectedDeleteUserDisplayText = "Çalışan Seçin";
+
+    [ObservableProperty]
     private string formMessage = string.Empty;
 
     [RelayCommand]
@@ -87,6 +93,21 @@ public partial class CompanyEmployeesPageViewModel(
             if (SelectedDepartment is not null && Departments.All(item => item.Id != SelectedDepartment.Id))
             {
                 SelectedDepartment = null;
+            }
+
+            if (SelectedTransferDepartment is not null && Departments.All(item => item.Id != SelectedTransferDepartment.Id))
+            {
+                SelectedTransferDepartment = null;
+            }
+
+            if (SelectedUser is not null && CompanyUsers.All(item => item.Id != SelectedUser.Id))
+            {
+                SelectedUser = null;
+            }
+
+            if (SelectedDeleteUser is not null && CompanyUsers.All(item => item.Id != SelectedDeleteUser.Id))
+            {
+                SelectedDeleteUser = null;
             }
 
             if (string.IsNullOrWhiteSpace(FormMessage))
@@ -358,6 +379,74 @@ public partial class CompanyEmployeesPageViewModel(
         }
     }
 
+    [RelayCommand]
+    private async Task RemoveWorkerAsync()
+    {
+        if (IsBusy)
+        {
+            return;
+        }
+
+        if (UserSession.CompanyId is null)
+        {
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
+            return;
+        }
+
+        if (SelectedDeleteUser is null)
+        {
+            ErrorMessage = "Silmek için bir çalışan seçin.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            ErrorMessage = string.Empty;
+            FormMessage = string.Empty;
+
+            await identityApiClient.DeleteWorkerCommandRequestAsync(new
+            {
+                UserId = SelectedDeleteUser.Id
+            });
+
+            var companyId = UserSession.CompanyId.Value;
+            await RefreshGroupsAsync(companyId);
+            _ = await TryRefreshUsersAsync(companyId);
+
+            SelectedDeleteUser = null;
+            FormMessage = "Çalışan başarıyla silindi.";
+        }
+        catch (ApiException ex) when (ex.StatusCode == 401)
+        {
+            ErrorMessage = "Bu kullanıcı silinemiyor.";
+        }
+        catch (ApiException ex) when (ex.StatusCode == 404)
+        {
+            ErrorMessage = "Çalışan bulunamadı.";
+        }
+        catch (ApiException ex)
+        {
+            ErrorMessage = ResolveApiErrorMessage(ex, "Çalışan silinemedi. Lütfen tekrar deneyin.");
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
+        }
+        catch (TaskCanceledException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     private async Task RefreshGroupsAsync(Guid companyId)
     {
         var response = await identityApiClient.GetAllCompanyGroupsAsync(companyId);
@@ -527,6 +616,11 @@ public partial class CompanyEmployeesPageViewModel(
     partial void OnSelectedUserChanged(CompanyUserDto? value)
     {
         SelectedUserDisplayText = value?.Name ?? "Kullanıcı Seçin";
+    }
+
+    partial void OnSelectedDeleteUserChanged(CompanyUserDto? value)
+    {
+        SelectedDeleteUserDisplayText = value?.Name ?? "Çalışan Seçin";
     }
 
     private static List<CompanyGroupDto> NormalizeGroups(IEnumerable<CompanyGroupDto> groups)

@@ -110,6 +110,36 @@ public partial class CompanyEmployeesPage : ContentPage
         }
     }
 
+    private async void OnDeleteUserSelectTapped(object? sender, TappedEventArgs e)
+    {
+        var users = ViewModel.CompanyUsers.ToList();
+        if (users.Count == 0)
+        {
+            await DisplayAlertAsync("Bilgi", "Çalışanlar listesi şu anda alınamadı.", "Tamam");
+            return;
+        }
+
+        var cancelText = "İptal";
+        var selectedName = await DisplayActionSheetAsync(
+            "Silinecek Çalışanı Seçin",
+            cancelText,
+            null,
+            users.Select(item => item.Name).ToArray());
+
+        if (string.IsNullOrWhiteSpace(selectedName) || selectedName == cancelText)
+        {
+            return;
+        }
+
+        var selectedUser = users.FirstOrDefault(item =>
+            string.Equals(item.Name, selectedName, StringComparison.Ordinal));
+
+        if (selectedUser is not null)
+        {
+            ViewModel.SelectedDeleteUser = selectedUser;
+        }
+    }
+
     private async void OnHomeTapped(object? sender, TappedEventArgs e) => await ViewModel.NavigateHomeCommand.ExecuteAsync(null);
     private async void OnReportsTapped(object? sender, TappedEventArgs e) => await ViewModel.NavigateReportsCommand.ExecuteAsync(null);
     private async void OnTasksTapped(object? sender, TappedEventArgs e) => await ViewModel.NavigateTasksCommand.ExecuteAsync(null);
