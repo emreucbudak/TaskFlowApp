@@ -6,7 +6,7 @@
              BackgroundColor="#0D1B2A"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto,Auto">
         <Grid Grid.Row="0"
               Padding="20,16,20,10"
               ColumnDefinitions="Auto,*,Auto"
@@ -72,15 +72,24 @@
                     TextColor="#f87171"
                     FontSize="12" />
 
-                <CollectionView ItemsSource="{Binding Reports}">
+                <CollectionView ItemsSource="{Binding Reports}"
+                                SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="Rapor bulunamadı."
+                               FontSize="12"
+                               TextColor="#94a3b8"
+                               HorizontalTextAlignment="Center"
+                               Margin="0,10,0,0" />
+                    </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border BackgroundColor="#162030"
-                                    Stroke="Transparent"
-                                    StrokeShape="RoundRectangle 12"
+                            <Border BackgroundColor="#0F2338"
+                                    Stroke="#2E4A67"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
                                     Margin="0,0,0,10"
                                     Padding="12">
-                                <VerticalStackLayout Spacing="4">
+                                <VerticalStackLayout Spacing="8">
                                     <Label Text="{Binding Title}"
                                            TextColor="White"
                                            FontSize="15"
@@ -88,92 +97,127 @@
                                     <Label Text="{Binding Description}"
                                            TextColor="#94a3b8"
                                            FontSize="12"
-                                           LineBreakMode="WordWrap" />
-                                    <Label Text="{Binding ReportTopicId, StringFormat='Konu ID: {0}'}"
-                                           TextColor="#94a3b8"
-                                           FontSize="12" />
-                                    <Label Text="{Binding ReportStatusId, StringFormat='Durum ID: {0}'}"
-                                           TextColor="#94a3b8"
-                                           FontSize="12" />
-                                    <Label Text="{Binding CreatedAt, StringFormat='Oluşturma: {0:dd.MM.yyyy HH:mm}'}"
-                                           TextColor="#cbd5e1"
-                                           FontSize="12" />
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="2"
+                                           Margin="0,0,0,10" />
+
+                                    <FlexLayout Wrap="Wrap"
+                                                Direction="Row"
+                                                AlignItems="Center"
+                                                JustifyContent="Start">
+                                        <Border BackgroundColor="#0F2D46"
+                                                Stroke="#3b82f6"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="6,4"
+                                                Margin="0,0,6,6">
+                                            <Grid ColumnDefinitions="Auto,*"
+                                                  ColumnSpacing="4">
+                                                <Image Grid.Column="0"
+                                                       Source="{mi:MaterialOutlined Icon=AccessTime}"
+                                                       WidthRequest="12"
+                                                       HeightRequest="12"
+                                                       Aspect="AspectFit"
+                                                       VerticalOptions="Center" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding CreatedAt, StringFormat='Oluşturma: {0:dd.MM.yyyy HH:mm}'}"
+                                                       TextColor="#bfdbfe"
+                                                       FontSize="11" />
+                                            </Grid>
+                                        </Border>
+
+                                        <Border BackgroundColor="#102D22"
+                                                Stroke="#22c55e"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="6,4"
+                                                Margin="0,0,6,6">
+                                            <Grid ColumnDefinitions="Auto,*"
+                                                  ColumnSpacing="4">
+                                                <Image Grid.Column="0"
+                                                       Source="{mi:MaterialOutlined Icon=Info}"
+                                                       WidthRequest="12"
+                                                       HeightRequest="12"
+                                                       Aspect="AspectFit"
+                                                       VerticalOptions="Center" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding ReportStatusName, StringFormat='Durum: {0}'}"
+                                                       TextColor="#bbf7d0"
+                                                       FontSize="11" />
+                                            </Grid>
+                                        </Border>
+
+                                        <Border BackgroundColor="#30230E"
+                                                Stroke="#f59e0b"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="6,4"
+                                                Margin="0,0,6,6">
+                                            <Grid ColumnDefinitions="Auto,*"
+                                                  ColumnSpacing="4">
+                                                <Image Grid.Column="0"
+                                                       Source="{mi:MaterialOutlined Icon=Category}"
+                                                       WidthRequest="12"
+                                                       HeightRequest="12"
+                                                       Aspect="AspectFit"
+                                                       VerticalOptions="Center" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding ReportTopicName, StringFormat='Konu: {0}'}"
+                                                       TextColor="#fde68a"
+                                                       FontSize="11" />
+                                            </Grid>
+                                        </Border>
+                                    </FlexLayout>
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-
-                <Border BackgroundColor="#162030"
-                        Stroke="Transparent"
-                        StrokeShape="RoundRectangle 12"
-                        Padding="12">
-                    <VerticalStackLayout Spacing="10">
-                        <Grid ColumnDefinitions="Auto,*"
-                              ColumnSpacing="10">
-                            <Label Grid.Column="0"
-                                   Text="Sayfa Boyutu"
-                                   TextColor="#cbd5e1"
-                                   FontSize="12"
-                                   VerticalOptions="Center" />
-                            <Border Grid.Column="1"
-                                    BackgroundColor="#1E2E3E"
-                                    Stroke="Transparent"
-                                    StrokeShape="RoundRectangle 8"
-                                    Padding="8,0">
-                                <Picker
-                                    SelectedItem="{Binding PageSize, Mode=TwoWay}"
-                                    SelectedIndexChanged="OnPageSizePickerChanged"
-                                    TextColor="White"
-                                    TitleColor="#94a3b8"
-                                    BackgroundColor="Transparent"
-                                    HeightRequest="34">
-                                    <Picker.ItemsSource>
-                                        <x:Array Type="{x:Type x:Int32}">
-                                            <x:Int32>10</x:Int32>
-                                            <x:Int32>20</x:Int32>
-                                            <x:Int32>50</x:Int32>
-                                            <x:Int32>100</x:Int32>
-                                        </x:Array>
-                                    </Picker.ItemsSource>
-                                </Picker>
-                            </Border>
-                        </Grid>
-
-                        <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Button Grid.Column="0"
-                                    Text="Önceki"
-                                    Command="{Binding PreviousPageCommand}"
-                                    IsEnabled="{Binding CanGoPrevious}"
-                                    BackgroundColor="#1E2E3E"
-                                    TextColor="White"
-                                    CornerRadius="8"
-                                    HeightRequest="36"
-                                    Padding="12,4" />
-                            <Label Grid.Column="1"
-                                   Text="{Binding PageInfoText}"
-                                   HorizontalTextAlignment="Center"
-                                   VerticalTextAlignment="Center"
-                                   TextColor="#cbd5e1"
-                                   FontSize="13" />
-                            <Button Grid.Column="2"
-                                    Text="Sonraki"
-                                    Command="{Binding NextPageCommand}"
-                                    IsEnabled="{Binding CanGoNext}"
-                                    BackgroundColor="#1E2E3E"
-                                    TextColor="White"
-                                    CornerRadius="8"
-                                    HeightRequest="36"
-                                    Padding="12,4" />
-                        </Grid>
-                    </VerticalStackLayout>
-                </Border>
             </VerticalStackLayout>
         </ScrollView>
 
-        <BoxView Grid.Row="3" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
+        <Border Grid.Row="3"
+                Margin="20,8,20,8"
+                BackgroundColor="#0F2338"
+                Stroke="#2E4A67"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 12"
+                Padding="12">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Grid.Column="0"
+                        Text=""
+                        ImageSource="{mi:MaterialOutlined Icon=ArrowBack}"
+                        Command="{Binding PreviousPageCommand}"
+                        IsEnabled="{Binding CanGoPrevious}"
+                        BackgroundColor="#1A3A5C"
+                        TextColor="White"
+                        CornerRadius="8"
+                        HeightRequest="36"
+                        WidthRequest="44"
+                        Padding="0" />
+                <Label Grid.Column="1"
+                       Text="{Binding PageInfoText}"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"
+                       TextColor="#cbd5e1"
+                       FontSize="13" />
+                <Button Grid.Column="2"
+                        Text=""
+                        ImageSource="{mi:MaterialOutlined Icon=ArrowForward}"
+                        Command="{Binding NextPageCommand}"
+                        IsEnabled="{Binding CanGoNext}"
+                        BackgroundColor="#1A3A5C"
+                        TextColor="White"
+                        CornerRadius="8"
+                        HeightRequest="36"
+                        WidthRequest="44"
+                        Padding="0" />
+            </Grid>
+        </Border>
 
-        <Grid Grid.Row="4"
+        <BoxView Grid.Row="4" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
+
+        <Grid Grid.Row="5"
               ColumnDefinitions="*,*,*,*,*,*"
               BackgroundColor="#0F1E2D"
               Padding="0,6,0,18">

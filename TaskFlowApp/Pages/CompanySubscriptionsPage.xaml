@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             x:Name="SubscriptionsPage"
              x:Class="TaskFlowApp.Pages.CompanySubscriptionsPage"
              BackgroundColor="#0D1B2A"
              Shell.NavBarIsVisible="False">
@@ -72,10 +73,11 @@
                     TextColor="#f87171"
                     FontSize="12" />
 
-                <Border BackgroundColor="#162030"
-                        Stroke="Transparent"
-                        StrokeShape="RoundRectangle 16"
-                        Padding="18">
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#2E4A67"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="16,14">
                     <VerticalStackLayout Spacing="10">
                         <Label Text="Aktif Plan ve Kullanım"
                                FontSize="20"
@@ -87,9 +89,21 @@
                         <Label Text="{Binding ActivePlanPriceText, StringFormat='Plan ücreti: {0}'}"
                                FontSize="13"
                                TextColor="#94a3b8" />
+                    </VerticalStackLayout>
+                </Border>
 
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#2E4A67"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="16,14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Plan Hakları ve Kalan Kullanım"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="White" />
                         <Grid ColumnDefinitions="2*,*,*,*"
-                              Padding="0,4,0,2">
+                              Padding="0,2,0,2">
                             <Label Grid.Column="0"
                                    Text="Özellik"
                                    FontSize="12"
@@ -129,32 +143,171 @@
                                                Text="{Binding Limit}"
                                                FontSize="12"
                                                TextColor="#cbd5e1"
-                                               HorizontalTextAlignment="Center" />
+                                               HorizontalTextAlignment="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label"
+                                                             Binding="{Binding Limit}"
+                                                             Value="✓">
+                                                    <Setter Property="TextColor"
+                                                            Value="#22c55e" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
                                         <Label Grid.Column="2"
                                                Text="{Binding Usage}"
                                                FontSize="12"
                                                TextColor="#cbd5e1"
-                                               HorizontalTextAlignment="Center" />
+                                               HorizontalTextAlignment="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label"
+                                                             Binding="{Binding Usage}"
+                                                             Value="✓">
+                                                    <Setter Property="TextColor"
+                                                            Value="#22c55e" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
                                         <Label Grid.Column="3"
                                                Text="{Binding Remaining}"
                                                FontSize="12"
                                                TextColor="#cbd5e1"
-                                               HorizontalTextAlignment="Center" />
+                                               HorizontalTextAlignment="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label"
+                                                             Binding="{Binding Remaining}"
+                                                             Value="✓">
+                                                    <Setter Property="TextColor"
+                                                            Value="#22c55e" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
                                     </Grid>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
-
-                        <Label Text="{Binding InternalReportingText}"
-                               FontSize="12"
-                               TextColor="#94a3b8" />
                     </VerticalStackLayout>
                 </Border>
 
-                <Border BackgroundColor="#162030"
-                        Stroke="Transparent"
-                        StrokeShape="RoundRectangle 16"
-                        Padding="18">
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#2E4A67"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="16,14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Plan Değiştir"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+
+                        <ScrollView Orientation="Horizontal"
+                                    HorizontalScrollBarVisibility="Never">
+                            <VerticalStackLayout Spacing="6">
+                                <Grid ColumnDefinitions="1.7*,1.2*,1*,1*,1.4*,1.1*,1.2*"
+                                      MinimumWidthRequest="760"
+                                      Padding="0,2,0,2">
+                                    <Label Grid.Column="0"
+                                           Text="Plan"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#e2e8f0" />
+                                    <Label Grid.Column="1"
+                                           Text="Ücret"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#e2e8f0"
+                                           HorizontalTextAlignment="Center" />
+                                    <Label Grid.Column="2"
+                                           Text="Kullanıcı"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#e2e8f0"
+                                           HorizontalTextAlignment="Center" />
+                                    <Label Grid.Column="3"
+                                           Text="Takım"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#e2e8f0"
+                                           HorizontalTextAlignment="Center" />
+                                    <Label Grid.Column="4"
+                                           Text="Bireysel Görev"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#e2e8f0"
+                                           HorizontalTextAlignment="Center" />
+                                    <Label Grid.Column="5"
+                                           Text="İç Raporlama"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#e2e8f0"
+                                           HorizontalTextAlignment="Center" />
+                                    <Label Grid.Column="6"
+                                           Text="İşlem"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#e2e8f0"
+                                           HorizontalTextAlignment="Center" />
+                                </Grid>
+
+                                <VerticalStackLayout BindableLayout.ItemsSource="{Binding PlanSelectionRows}"
+                                                     Spacing="4">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="1.7*,1.2*,1*,1*,1.4*,1.1*,1.2*"
+                                                  MinimumWidthRequest="760"
+                                                  Padding="0,6,0,6">
+                                                <Label Grid.Column="0"
+                                                       Text="{Binding PlanName}"
+                                                       FontSize="12"
+                                                       TextColor="#cbd5e1" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding Price}"
+                                                       FontSize="12"
+                                                       TextColor="#cbd5e1"
+                                                       HorizontalTextAlignment="Center" />
+                                                <Label Grid.Column="2"
+                                                       Text="{Binding UserLimit}"
+                                                       FontSize="12"
+                                                       TextColor="#cbd5e1"
+                                                       HorizontalTextAlignment="Center" />
+                                                <Label Grid.Column="3"
+                                                       Text="{Binding TeamLimit}"
+                                                       FontSize="12"
+                                                       TextColor="#cbd5e1"
+                                                       HorizontalTextAlignment="Center" />
+                                                <Label Grid.Column="4"
+                                                       Text="{Binding IndividualTaskLimit}"
+                                                       FontSize="12"
+                                                       TextColor="#cbd5e1"
+                                                       HorizontalTextAlignment="Center" />
+                                                <Label Grid.Column="5"
+                                                       Text="{Binding InternalReporting}"
+                                                       FontSize="12"
+                                                       TextColor="#22c55e"
+                                                       HorizontalTextAlignment="Center" />
+                                                <Button Grid.Column="6"
+                                                        Text="{Binding ActionButtonText}"
+                                                        Command="{Binding BindingContext.SelectPlanCommand, Source={x:Reference SubscriptionsPage}}"
+                                                        CommandParameter="{Binding .}"
+                                                        IsEnabled="{Binding IsSelectable}"
+                                                        BackgroundColor="{Binding ActionButtonColor}"
+                                                        TextColor="White"
+                                                        CornerRadius="8"
+                                                        HeightRequest="34"
+                                                        FontSize="12" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </ScrollView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#2E4A67"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="16,14">
                     <VerticalStackLayout Spacing="10">
                         <Label Text="{Binding SubscriptionActionTitle}"
                                FontSize="20"

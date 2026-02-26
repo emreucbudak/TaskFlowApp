@@ -7,4 +7,5 @@ public sealed record CompanyTaskDto
     public DateOnly DeadlineTime { get; init; }
     public string StatusName { get; init; } = string.Empty;
     public string CategoryName { get; init; } = string.Empty;
+    public string TaskPriorityName { get; init; } = string.Empty;
 }

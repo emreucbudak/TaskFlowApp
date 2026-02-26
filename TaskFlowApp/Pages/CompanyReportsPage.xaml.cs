@@ -25,14 +25,4 @@ public partial class CompanyReportsPage : ContentPage
     private async void OnMessagesTapped(object? sender, TappedEventArgs e) => await ViewModel.NavigateMessagesCommand.ExecuteAsync(null);
     private async void OnNotificationsTapped(object? sender, TappedEventArgs e) => await ViewModel.NavigateNotificationsCommand.ExecuteAsync(null);
     private async void OnLogoutTapped(object? sender, TappedEventArgs e) => await ViewModel.LogoutCommand.ExecuteAsync(null);
-
-    private async void OnPageSizePickerChanged(object? sender, EventArgs e)
-    {
-        if (sender is not Picker picker || picker.SelectedItem is null)
-        {
-            return;
-        }
-
-        await ViewModel.SetPageSizeCommand.ExecuteAsync(picker.SelectedItem.ToString());
-    }
 }

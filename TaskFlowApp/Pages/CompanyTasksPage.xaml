@@ -72,13 +72,33 @@
                     TextColor="#f87171"
                     FontSize="12" />
 
-                <Label Text="Bireysel Görevler"
-                       FontSize="20"
-                       FontAttributes="Bold"
-                       TextColor="White"
-                       Margin="0,8,0,4" />
+                <Grid ColumnDefinitions="*,Auto"
+                      Margin="0,8,0,4">
+                    <Label Grid.Column="0"
+                           Text="Bireysel Görevler"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           VerticalOptions="Center" />
+                    <Button Grid.Column="1"
+                            Text="Tamamını Gör"
+                            Command="{Binding ShowAllIndividualTasksCommand}"
+                            IsEnabled="{Binding CanShowAllIndividualTasks}"
+                            BackgroundColor="#1A3A5C"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="34"
+                            Padding="12,4"
+                            FontSize="12" />
+                </Grid>
                 <CollectionView ItemsSource="{Binding IndividualTasks}"
                                 SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical"
+                                         Span="2"
+                                         VerticalItemSpacing="10"
+                                         HorizontalItemSpacing="10" />
+                    </CollectionView.ItemsLayout>
                     <CollectionView.EmptyView>
                         <Label Text="Bireysel görev bulunamadı."
                                FontSize="12"
@@ -88,12 +108,13 @@
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border BackgroundColor="#162030"
-                                    Stroke="Transparent"
-                                    StrokeShape="RoundRectangle 12"
-                                    Margin="0,0,0,10"
+                            <Border BackgroundColor="#0F2338"
+                                    Stroke="#2E4A67"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Margin="0"
                                     Padding="12">
-                                <VerticalStackLayout Spacing="4">
+                                <VerticalStackLayout Spacing="8">
                                     <Label Text="{Binding TaskName}"
                                            TextColor="White"
                                            FontSize="15"
@@ -101,29 +122,131 @@
                                     <Label Text="{Binding Description}"
                                            TextColor="#94a3b8"
                                            FontSize="12"
-                                           LineBreakMode="WordWrap" />
-                                    <Label Text="{Binding DeadlineTime, StringFormat='Teslim: {0}'}"
-                                           TextColor="#cbd5e1"
-                                           FontSize="12" />
-                                    <Label Text="{Binding StatusName, StringFormat='Durum: {0}'}"
-                                           TextColor="#94a3b8"
-                                           FontSize="12" />
-                                    <Label Text="{Binding CategoryName, StringFormat='Kategori: {0}'}"
-                                           TextColor="#94a3b8"
-                                           FontSize="12" />
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="2"
+                                           Margin="0,0,0,10" />
+
+                                    <FlexLayout Wrap="Wrap"
+                                                Direction="Row"
+                                                AlignItems="Center"
+                                                JustifyContent="Start">
+                                        <Border BackgroundColor="#0F2D46"
+                                                Stroke="#3b82f6"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="6,4"
+                                                Margin="0,0,6,6">
+                                            <Grid ColumnDefinitions="Auto,*"
+                                                  ColumnSpacing="4">
+                                                <Image Grid.Column="0"
+                                                       Source="{mi:MaterialOutlined Icon=AccessTime}"
+                                                       WidthRequest="12"
+                                                       HeightRequest="12"
+                                                       Aspect="AspectFit"
+                                                       VerticalOptions="Center" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding DeadlineTime, StringFormat='Teslim: {0:dd.MM.yyyy}'}"
+                                                       TextColor="#bfdbfe"
+                                                       FontSize="11" />
+                                            </Grid>
+                                        </Border>
+
+                                        <Border BackgroundColor="#102D22"
+                                                Stroke="#22c55e"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="6,4"
+                                                Margin="0,0,6,6">
+                                            <Grid ColumnDefinitions="Auto,*"
+                                                  ColumnSpacing="4">
+                                                <Image Grid.Column="0"
+                                                       Source="{mi:MaterialOutlined Icon=Info}"
+                                                       WidthRequest="12"
+                                                       HeightRequest="12"
+                                                       Aspect="AspectFit"
+                                                       VerticalOptions="Center" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding StatusName, StringFormat='Durum: {0}'}"
+                                                       TextColor="#bbf7d0"
+                                                       FontSize="11" />
+                                            </Grid>
+                                        </Border>
+
+                                        <Border BackgroundColor="#30230E"
+                                                Stroke="#f59e0b"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="6,4"
+                                                Margin="0,0,6,6">
+                                            <Grid ColumnDefinitions="Auto,*"
+                                                  ColumnSpacing="4">
+                                                <Image Grid.Column="0"
+                                                       Source="{mi:MaterialOutlined Icon=Category}"
+                                                       WidthRequest="12"
+                                                       HeightRequest="12"
+                                                       Aspect="AspectFit"
+                                                       VerticalOptions="Center" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding CategoryName, StringFormat='Kategori: {0}'}"
+                                                       TextColor="#fde68a"
+                                                       FontSize="11" />
+                                            </Grid>
+                                        </Border>
+
+                                        <Border BackgroundColor="#30142A"
+                                                Stroke="#ec4899"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="6,4"
+                                                Margin="0,0,6,6">
+                                            <Grid ColumnDefinitions="Auto,*"
+                                                  ColumnSpacing="4">
+                                                <Image Grid.Column="0"
+                                                       Source="{mi:MaterialOutlined Icon=Flag}"
+                                                       WidthRequest="12"
+                                                       HeightRequest="12"
+                                                       Aspect="AspectFit"
+                                                       VerticalOptions="Center" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding TaskPriorityName, StringFormat='Öncelik: {0}'}"
+                                                       TextColor="#fbcfe8"
+                                                       FontSize="11" />
+                                            </Grid>
+                                        </Border>
+                                    </FlexLayout>
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <Label Text="Grup Görevleri"
-                       FontSize="20"
-                       FontAttributes="Bold"
-                       TextColor="White"
-                       Margin="0,12,0,4" />
+                <Grid ColumnDefinitions="*,Auto"
+                      Margin="0,12,0,4">
+                    <Label Grid.Column="0"
+                           Text="Grup Görevleri"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           VerticalOptions="Center" />
+                    <Button Grid.Column="1"
+                            Text="Tamamını Gör"
+                            Command="{Binding ShowAllGroupTasksCommand}"
+                            IsEnabled="{Binding CanShowAllGroupTasks}"
+                            BackgroundColor="#1A3A5C"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="34"
+                            Padding="12,4"
+                            FontSize="12" />
+                </Grid>
                 <CollectionView ItemsSource="{Binding GroupTasks}"
                                 SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical"
+                                         Span="2"
+                                         VerticalItemSpacing="10"
+                                         HorizontalItemSpacing="10" />
+                    </CollectionView.ItemsLayout>
                     <CollectionView.EmptyView>
                         <Label Text="Grup görev bulunamadı."
                                FontSize="12"
@@ -133,12 +256,13 @@
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border BackgroundColor="#162030"
-                                    Stroke="Transparent"
-                                    StrokeShape="RoundRectangle 12"
-                                    Margin="0,0,0,10"
+                            <Border BackgroundColor="#0F2338"
+                                    Stroke="#2E4A67"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Margin="0"
                                     Padding="12">
-                                <VerticalStackLayout Spacing="4">
+                                <VerticalStackLayout Spacing="8">
                                     <Label Text="{Binding TaskName}"
                                            TextColor="White"
                                            FontSize="15"
@@ -146,16 +270,98 @@
                                     <Label Text="{Binding Description}"
                                            TextColor="#94a3b8"
                                            FontSize="12"
-                                           LineBreakMode="WordWrap" />
-                                    <Label Text="{Binding DeadlineTime, StringFormat='Teslim: {0}'}"
-                                           TextColor="#cbd5e1"
-                                           FontSize="12" />
-                                    <Label Text="{Binding StatusName, StringFormat='Durum: {0}'}"
-                                           TextColor="#94a3b8"
-                                           FontSize="12" />
-                                    <Label Text="{Binding CategoryName, StringFormat='Kategori: {0}'}"
-                                           TextColor="#94a3b8"
-                                           FontSize="12" />
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="2"
+                                           Margin="0,0,0,10" />
+
+                                    <FlexLayout Wrap="Wrap"
+                                                Direction="Row"
+                                                AlignItems="Center"
+                                                JustifyContent="Start">
+                                        <Border BackgroundColor="#0F2D46"
+                                                Stroke="#3b82f6"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="6,4"
+                                                Margin="0,0,6,6">
+                                            <Grid ColumnDefinitions="Auto,*"
+                                                  ColumnSpacing="4">
+                                                <Image Grid.Column="0"
+                                                       Source="{mi:MaterialOutlined Icon=AccessTime}"
+                                                       WidthRequest="12"
+                                                       HeightRequest="12"
+                                                       Aspect="AspectFit"
+                                                       VerticalOptions="Center" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding DeadlineTime, StringFormat='Teslim: {0:dd.MM.yyyy}'}"
+                                                       TextColor="#bfdbfe"
+                                                       FontSize="11" />
+                                            </Grid>
+                                        </Border>
+
+                                        <Border BackgroundColor="#102D22"
+                                                Stroke="#22c55e"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="6,4"
+                                                Margin="0,0,6,6">
+                                            <Grid ColumnDefinitions="Auto,*"
+                                                  ColumnSpacing="4">
+                                                <Image Grid.Column="0"
+                                                       Source="{mi:MaterialOutlined Icon=Info}"
+                                                       WidthRequest="12"
+                                                       HeightRequest="12"
+                                                       Aspect="AspectFit"
+                                                       VerticalOptions="Center" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding StatusName, StringFormat='Durum: {0}'}"
+                                                       TextColor="#bbf7d0"
+                                                       FontSize="11" />
+                                            </Grid>
+                                        </Border>
+
+                                        <Border BackgroundColor="#30230E"
+                                                Stroke="#f59e0b"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="6,4"
+                                                Margin="0,0,6,6">
+                                            <Grid ColumnDefinitions="Auto,*"
+                                                  ColumnSpacing="4">
+                                                <Image Grid.Column="0"
+                                                       Source="{mi:MaterialOutlined Icon=Category}"
+                                                       WidthRequest="12"
+                                                       HeightRequest="12"
+                                                       Aspect="AspectFit"
+                                                       VerticalOptions="Center" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding CategoryName, StringFormat='Kategori: {0}'}"
+                                                       TextColor="#fde68a"
+                                                       FontSize="11" />
+                                            </Grid>
+                                        </Border>
+
+                                        <Border BackgroundColor="#30142A"
+                                                Stroke="#ec4899"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="6,4"
+                                                Margin="0,0,6,6">
+                                            <Grid ColumnDefinitions="Auto,*"
+                                                  ColumnSpacing="4">
+                                                <Image Grid.Column="0"
+                                                       Source="{mi:MaterialOutlined Icon=Flag}"
+                                                       WidthRequest="12"
+                                                       HeightRequest="12"
+                                                       Aspect="AspectFit"
+                                                       VerticalOptions="Center" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding TaskPriorityName, StringFormat='Öncelik: {0}'}"
+                                                       TextColor="#fbcfe8"
+                                                       FontSize="11" />
+                                            </Grid>
+                                        </Border>
+                                    </FlexLayout>
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
