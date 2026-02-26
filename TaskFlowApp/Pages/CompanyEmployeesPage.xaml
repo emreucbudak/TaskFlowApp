@@ -21,15 +21,6 @@
                    Aspect="AspectFit"
                    VerticalOptions="Center" />
 
-            <!-- Sayfa başlığı ortada -->
-            <Label Grid.Column="1"
-                   Text="Ekip Yonetimi"
-                   FontSize="16"
-                   FontAttributes="Bold"
-                   TextColor="White"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center" />
-
             <!-- Avatar -->
             <Grid Grid.Column="2"
                   WidthRequest="44"
@@ -92,12 +83,13 @@
                        MaxLines="1" />
 
                 <!-- Çalışan Ekle -->
-                <Border BackgroundColor="#162030"
-                        Stroke="Transparent"
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#2E4A67"
+                        StrokeThickness="1"
                         StrokeShape="RoundRectangle 14"
                         Padding="16,14">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="Calisan Ekle"
+                        <Label Text="Çalışan Ekle"
                                FontSize="15"
                                FontAttributes="Bold"
                                TextColor="White" />
@@ -133,7 +125,7 @@
                                 StrokeShape="RoundRectangle 8"
                                 Stroke="Transparent"
                                 Padding="4,0">
-                            <Entry Placeholder="Sifre"
+                            <Entry Placeholder="Şifre"
                                    Text="{Binding WorkerPasswordInput}"
                                    IsPassword="True"
                                    TextColor="White"
@@ -168,7 +160,7 @@
                             </Grid>
                         </Border>
 
-                        <Button Text="Calisan Ekle"
+                        <Button Text="Çalışan Ekle"
                                 Command="{Binding AddWorkerCommand}"
                                 BackgroundColor="#2196F3"
                                 TextColor="White"
@@ -179,8 +171,9 @@
                 </Border>
 
                 <!-- Departman Ekle -->
-                <Border BackgroundColor="#162030"
-                        Stroke="Transparent"
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#2E4A67"
+                        StrokeThickness="1"
                         StrokeShape="RoundRectangle 14"
                         Padding="16,14">
                     <VerticalStackLayout Spacing="10">
@@ -195,7 +188,7 @@
                                 StrokeShape="RoundRectangle 8"
                                 Stroke="Transparent"
                                 Padding="4,0">
-                            <Entry Placeholder="Departman Adi (2-10 karakter)"
+                            <Entry Placeholder="Departman Adı (2-10 karakter)"
                                    Text="{Binding DepartmentNameInput}"
                                    TextColor="White"
                                    PlaceholderColor="#64748b"
@@ -213,12 +206,13 @@
                     </VerticalStackLayout>
                 </Border>
                 
-                <Border BackgroundColor="#162030"
-                        Stroke="Transparent"
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#2E4A67"
+                        StrokeThickness="1"
                         StrokeShape="RoundRectangle 14"
                         Padding="16,14">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="Calisan Transfer Et"
+                        <Label Text="Çalışan Transfer Et"
                                FontSize="15"
                                FontAttributes="Bold"
                                TextColor="White" />
@@ -277,7 +271,7 @@
                             </Grid>
                         </Border>
 
-                        <Button Text="Calisan Transfer Et"
+                        <Button Text="Çalışan Transfer Et"
                                 Command="{Binding TransferUserCommand}"
                                 BackgroundColor="#2196F3"
                                 TextColor="White"
@@ -321,7 +315,7 @@
                                                 Stroke="Transparent"
                                                 Padding="8,3"
                                                 VerticalOptions="Center">
-                                            <Label Text="{Binding WorkerName.Count, StringFormat='Calisan sayisi: {0}'}"
+                                            <Label Text="{Binding WorkerName.Count, StringFormat='Çalışan sayısı: {0}'}"
                                                    FontSize="11"
                                                    TextColor="#94a3b8" />
                                         </Border>
@@ -331,7 +325,7 @@
 
                                     <!-- Çalışanlar -->
                                     <VerticalStackLayout Spacing="6">
-                                        <Label Text="Calisanlar"
+                                        <Label Text="Çalışanlar"
                                                FontSize="11"
                                                FontAttributes="Bold"
                                                TextColor="#cbd5e1"

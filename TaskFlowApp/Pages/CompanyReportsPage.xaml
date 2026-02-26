@@ -19,7 +19,7 @@
                    VerticalOptions="Center" />
 
             <Label Grid.Column="1"
-                   Text="&#350;irket Rapor Y&#246;netimi"
+                   Text="Şirket Rapor Yönetimi"
                    FontSize="16"
                    FontAttributes="Bold"
                    TextColor="White"
@@ -97,13 +97,13 @@
                                            TextColor="#94a3b8"
                                            FontSize="12"
                                            LineBreakMode="WordWrap" />
-                                    <Label Text="{Binding ReportTopicId, StringFormat='Konu Id: {0}'}"
+                                    <Label Text="{Binding ReportTopicId, StringFormat='Konu ID: {0}'}"
                                            TextColor="#94a3b8"
                                            FontSize="12" />
-                                    <Label Text="{Binding ReportStatusId, StringFormat='Durum Id: {0}'}"
+                                    <Label Text="{Binding ReportStatusId, StringFormat='Durum ID: {0}'}"
                                            TextColor="#94a3b8"
                                            FontSize="12" />
-                                    <Label Text="{Binding CreatedAt, StringFormat='Olusturma: {0:dd.MM.yyyy HH:mm}'}"
+                                    <Label Text="{Binding CreatedAt, StringFormat='Oluşturma: {0:dd.MM.yyyy HH:mm}'}"
                                            TextColor="#cbd5e1"
                                            FontSize="12" />
                                 </VerticalStackLayout>
@@ -150,7 +150,7 @@
 
                         <Grid ColumnDefinitions="Auto,*,Auto">
                             <Button Grid.Column="0"
-                                    Text="Onceki"
+                                    Text="Önceki"
                                     Command="{Binding PreviousPageCommand}"
                                     IsEnabled="{Binding CanGoPrevious}"
                                     BackgroundColor="#1E2E3E"

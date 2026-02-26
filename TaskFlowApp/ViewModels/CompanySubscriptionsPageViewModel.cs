@@ -32,13 +32,13 @@ public partial class CompanySubscriptionsPageViewModel(
     private string activePlanPriceText = "-";
 
     [ObservableProperty]
-    private string internalReportingText = "Ic raporlama durumu bilinmiyor.";
+    private string internalReportingText = "İç raporlama durumu bilinmiyor.";
 
     [ObservableProperty]
     private bool isSubscriptionCancelled;
 
     [ObservableProperty]
-    private string subscriptionActionTitle = "Abonelik Iptali";
+    private string subscriptionActionTitle = "Abonelik İptali";
 
     [ObservableProperty]
     private string subscriptionActionButtonText = "Aboneliği İptal Et";
@@ -56,7 +56,7 @@ public partial class CompanySubscriptionsPageViewModel(
 
         if (UserSession.CompanyId is null)
         {
-            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
@@ -96,7 +96,7 @@ public partial class CompanySubscriptionsPageViewModel(
 
             var activePlan = ResolveActivePlan(plans, usedUserCount, usedTeamCount, usedIndividualTaskCount);
             BuildPlanSummary(activePlan, usedUserCount, usedTeamCount, usedIndividualTaskCount);
-            StatusText = "Abonelik plan ve kullanim bilgileri guncellendi.";
+            StatusText = "Abonelik plan ve kullanım bilgileri güncellendi.";
         }
         catch (ApiException ex)
         {
@@ -112,7 +112,7 @@ public partial class CompanySubscriptionsPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -128,12 +128,12 @@ public partial class CompanySubscriptionsPageViewModel(
         if (!IsSubscriptionCancelled)
         {
             IsSubscriptionCancelled = true;
-            StatusText = "Abonelik iptal talebiniz alindi. Islem icin yonetici onayi gereklidir.";
+            StatusText = "Abonelik iptal talebiniz alındı. İşlem için yönetici onayı gereklidir.";
         }
         else
         {
             IsSubscriptionCancelled = false;
-            StatusText = "Aboneliginiz devam edecek sekilde guncellendi.";
+            StatusText = "Aboneliğiniz devam edecek şekilde güncellendi.";
         }
 
         return Task.CompletedTask;
@@ -172,25 +172,25 @@ public partial class CompanySubscriptionsPageViewModel(
     {
         ActivePlanName = string.IsNullOrWhiteSpace(activePlan.PlanName) ? "Bilinmiyor" : activePlan.PlanName;
         ActivePlanPriceText = activePlan.PlanPrice <= 0
-            ? "Ucretsiz"
+            ? "Ücretsiz"
             : string.Format(CultureInfo.GetCultureInfo("tr-TR"), "{0:N0} TL / ay", activePlan.PlanPrice);
         InternalReportingText = activePlan.PlanProperties.IsInternalReportingEnabled
-            ? "Ic raporlama: Aktif"
-            : "Ic raporlama: Kapali";
+            ? "İç raporlama: Aktif"
+            : "İç raporlama: Kapalı";
 
         PlanUsageRows.Clear();
         PlanUsageRows.Add(new PlanUsageRow(
-            "Kullanici Limiti",
+            "Kullanıcı Limiti",
             activePlan.PlanProperties.PeopleAddedLimit.ToString(CultureInfo.InvariantCulture),
             usedUserCount.ToString(CultureInfo.InvariantCulture),
             FormatRemaining(activePlan.PlanProperties.PeopleAddedLimit, usedUserCount)));
         PlanUsageRows.Add(new PlanUsageRow(
-            "Takim Limiti",
+            "Takım Limiti",
             activePlan.PlanProperties.TeamLimit.ToString(CultureInfo.InvariantCulture),
             usedTeamCount.ToString(CultureInfo.InvariantCulture),
             FormatRemaining(activePlan.PlanProperties.TeamLimit, usedTeamCount)));
         PlanUsageRows.Add(new PlanUsageRow(
-            "Bireysel Gorev Limiti",
+            "Bireysel Görev Limiti",
             activePlan.PlanProperties.IndividualTaskLimit.ToString(CultureInfo.InvariantCulture),
             usedIndividualTaskCount.ToString(CultureInfo.InvariantCulture),
             FormatRemaining(activePlan.PlanProperties.IndividualTaskLimit, usedIndividualTaskCount)));
@@ -250,7 +250,7 @@ public partial class CompanySubscriptionsPageViewModel(
 
     partial void OnIsSubscriptionCancelledChanged(bool value)
     {
-        SubscriptionActionTitle = value ? "Aboneligi Devam Ettir" : "Abonelik Iptali";
+        SubscriptionActionTitle = value ? "Aboneliği Devam Ettir" : "Abonelik İptali";
         SubscriptionActionButtonText = value ? "Aboneliğinizi devam ettirin" : "Aboneliği İptal Et";
         SubscriptionActionButtonColor = value ? "#16A34A" : "#B91C1C";
     }

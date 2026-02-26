@@ -86,7 +86,7 @@ public partial class CompanyDashboardPageViewModel(
 
         if (UserSession.CompanyId is null)
         {
-            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
@@ -146,7 +146,7 @@ public partial class CompanyDashboardPageViewModel(
             UpdateTaskDistribution();
             UpdateReportDistribution();
 
-            StatusText = $"Ekip: {TotalTeamCount} | Calisan: {TotalWorkerCount} | Gorev: {TotalTaskCount}";
+            StatusText = $"Ekip: {TotalTeamCount} | Çalışan: {TotalWorkerCount} | Görev: {TotalTaskCount}";
         }
         catch (ApiException ex)
         {
@@ -162,7 +162,7 @@ public partial class CompanyDashboardPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
