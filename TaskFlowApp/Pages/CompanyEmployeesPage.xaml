@@ -85,7 +85,7 @@
                 <Grid ColumnDefinitions="*,*"
                       RowDefinitions="Auto,Auto"
                       ColumnSpacing="10"
-                      RowSpacing="10">
+                      RowSpacing="4">
                     <Border Grid.Row="0"
                             Grid.Column="0"
                             BackgroundColor="#0F2338"
@@ -159,12 +159,17 @@
                                                TextColor="White"
                                                VerticalOptions="Center"
                                                FontSize="13" />
-                                        <Label Grid.Column="1"
-                                               Text="v"
-                                               TextColor="#94a3b8"
-                                               VerticalOptions="Center"
-                                               FontSize="13"
-                                               Margin="8,0,0,0" />
+                                        <Path Grid.Column="1"
+                                              Data="M 2 4 L 7 9 L 12 4"
+                                              Stroke="#94a3b8"
+                                              StrokeThickness="2"
+                                              StrokeLineCap="Round"
+                                              StrokeLineJoin="Round"
+                                              WidthRequest="14"
+                                              HeightRequest="10"
+                                              HorizontalOptions="End"
+                                              VerticalOptions="Center"
+                                              Margin="8,0,0,0" />
                                     </Grid>
                                 </Grid>
                             </Border>
@@ -180,84 +185,195 @@
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border Grid.Row="0"
-                            Grid.Column="1"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="12,10"
-                            VerticalOptions="Start">
-                        <VerticalStackLayout Spacing="8">
-                            <Label Text="Çalışan Transfer Et"
-                                   FontSize="14"
-                                   FontAttributes="Bold"
-                                   TextColor="White" />
+                    <Grid Grid.Row="0"
+                          Grid.RowSpan="2"
+                          Grid.Column="1"
+                          RowDefinitions="Auto,Auto,Auto"
+                          RowSpacing="4">
+                        <Border Grid.Row="0"
+                                BackgroundColor="#0F2338"
+                                Stroke="#2E4A67"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 14"
+                                Padding="12,10"
+                                VerticalOptions="Start">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Çalışan Transfer Et"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       TextColor="White" />
 
-                            <BoxView Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
+                                <BoxView Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
 
-                            <Border BackgroundColor="#0F1E2D"
-                                    StrokeShape="RoundRectangle 8"
-                                    Stroke="Transparent"
-                                    Padding="8,0">
-                                <Grid HeightRequest="40"
-                                      VerticalOptions="Center">
-                                    <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnUserSelectTapped" />
-                                    </Grid.GestureRecognizers>
-                                    <Grid ColumnDefinitions="*,Auto"
+                                <Border BackgroundColor="#0F1E2D"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="Transparent"
+                                        Padding="8,0">
+                                    <Grid HeightRequest="40"
                                           VerticalOptions="Center">
-                                        <Label Grid.Column="0"
-                                               Text="{Binding SelectedUserDisplayText}"
-                                               TextColor="White"
-                                               VerticalOptions="Center"
-                                               FontSize="13" />
-                                        <Label Grid.Column="1"
-                                               Text="v"
-                                               TextColor="#94a3b8"
-                                               VerticalOptions="Center"
-                                               FontSize="13"
-                                               Margin="8,0,0,0" />
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnUserSelectTapped" />
+                                        </Grid.GestureRecognizers>
+                                        <Grid ColumnDefinitions="*,Auto"
+                                              VerticalOptions="Center">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding SelectedUserDisplayText}"
+                                                   TextColor="White"
+                                                   VerticalOptions="Center"
+                                                   FontSize="13" />
+                                            <Path Grid.Column="1"
+                                                  Data="M 2 4 L 7 9 L 12 4"
+                                                  Stroke="#94a3b8"
+                                                  StrokeThickness="2"
+                                                  StrokeLineCap="Round"
+                                                  StrokeLineJoin="Round"
+                                                  WidthRequest="14"
+                                                  HeightRequest="10"
+                                                  HorizontalOptions="End"
+                                                  VerticalOptions="Center"
+                                                  Margin="8,0,0,0" />
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-                            </Border>
+                                </Border>
 
-                            <Border BackgroundColor="#0F1E2D"
-                                    StrokeShape="RoundRectangle 8"
-                                    Stroke="Transparent"
-                                    Padding="8,0">
-                                <Grid HeightRequest="40"
-                                      VerticalOptions="Center">
-                                    <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnTransferDepartmentSelectTapped" />
-                                    </Grid.GestureRecognizers>
-                                    <Grid ColumnDefinitions="*,Auto"
+                                <Border BackgroundColor="#0F1E2D"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="Transparent"
+                                        Padding="8,0">
+                                    <Grid HeightRequest="40"
                                           VerticalOptions="Center">
-                                        <Label Grid.Column="0"
-                                               Text="{Binding SelectedTransferDepartmentDisplayText}"
-                                               TextColor="White"
-                                               VerticalOptions="Center"
-                                               FontSize="13" />
-                                        <Label Grid.Column="1"
-                                               Text="v"
-                                               TextColor="#94a3b8"
-                                               VerticalOptions="Center"
-                                               FontSize="13"
-                                               Margin="8,0,0,0" />
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnTransferDepartmentSelectTapped" />
+                                        </Grid.GestureRecognizers>
+                                        <Grid ColumnDefinitions="*,Auto"
+                                              VerticalOptions="Center">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding SelectedTransferDepartmentDisplayText}"
+                                                   TextColor="White"
+                                                   VerticalOptions="Center"
+                                                   FontSize="13" />
+                                            <Path Grid.Column="1"
+                                                  Data="M 2 4 L 7 9 L 12 4"
+                                                  Stroke="#94a3b8"
+                                                  StrokeThickness="2"
+                                                  StrokeLineCap="Round"
+                                                  StrokeLineJoin="Round"
+                                                  WidthRequest="14"
+                                                  HeightRequest="10"
+                                                  HorizontalOptions="End"
+                                                  VerticalOptions="Center"
+                                                  Margin="8,0,0,0" />
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-                            </Border>
+                                </Border>
 
-                            <Button Text="Transfer Et"
-                                    Command="{Binding TransferUserCommand}"
-                                    BackgroundColor="#2196F3"
-                                    TextColor="White"
-                                    CornerRadius="10"
-                                    HeightRequest="40"
-                                    FontSize="13"
-                                    FontAttributes="Bold" />
-                        </VerticalStackLayout>
-                    </Border>
+                                <Button Text="Transfer Et"
+                                        Command="{Binding TransferUserCommand}"
+                                        BackgroundColor="#2196F3"
+                                        TextColor="White"
+                                        CornerRadius="10"
+                                        HeightRequest="40"
+                                        FontSize="13"
+                                        FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border Grid.Row="1"
+                                BackgroundColor="#0F2338"
+                                Stroke="#2E4A67"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 14"
+                                Padding="12,10"
+                                VerticalOptions="Start">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Departman Ekle"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       TextColor="White" />
+
+                                <BoxView Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
+
+                                <Border BackgroundColor="#0F1E2D"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="Transparent"
+                                        Padding="4,0">
+                                    <Entry Placeholder="Departman Adı (2-10)"
+                                           Text="{Binding DepartmentNameInput}"
+                                           TextColor="White"
+                                           PlaceholderColor="#64748b"
+                                           BackgroundColor="Transparent"
+                                           FontSize="13"
+                                           HeightRequest="40" />
+                                </Border>
+
+                                <Button Text="Departman Ekle"
+                                        Command="{Binding AddDepartmentCommand}"
+                                        BackgroundColor="#2196F3"
+                                        TextColor="White"
+                                        CornerRadius="10"
+                                        HeightRequest="40"
+                                        FontSize="13"
+                                        FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border Grid.Row="2"
+                                BackgroundColor="#0F2338"
+                                Stroke="#2E4A67"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 14"
+                                Padding="12,10"
+                                VerticalOptions="Start">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Çalışan Sil"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       TextColor="White" />
+
+                                <BoxView Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
+
+                                <Border BackgroundColor="#0F1E2D"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="Transparent"
+                                        Padding="8,0">
+                                    <Grid HeightRequest="40"
+                                          VerticalOptions="Center">
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnDeleteUserSelectTapped" />
+                                        </Grid.GestureRecognizers>
+                                        <Grid ColumnDefinitions="*,Auto"
+                                              VerticalOptions="Center">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding SelectedDeleteUserDisplayText}"
+                                                   TextColor="White"
+                                                   VerticalOptions="Center"
+                                                   FontSize="13" />
+                                            <Path Grid.Column="1"
+                                                  Data="M 2 4 L 7 9 L 12 4"
+                                                  Stroke="#94a3b8"
+                                                  StrokeThickness="2"
+                                                  StrokeLineCap="Round"
+                                                  StrokeLineJoin="Round"
+                                                  WidthRequest="14"
+                                                  HeightRequest="10"
+                                                  HorizontalOptions="End"
+                                                  VerticalOptions="Center"
+                                                  Margin="8,0,0,0" />
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+
+                                <Button Text="Çalışan Sil"
+                                        Command="{Binding RemoveWorkerCommand}"
+                                        BackgroundColor="#ef4444"
+                                        TextColor="White"
+                                        CornerRadius="10"
+                                        HeightRequest="40"
+                                        FontSize="13"
+                                        FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
 
                     <Border Grid.Row="1"
                             Grid.Column="0"
@@ -268,47 +384,7 @@
                             Padding="12,10"
                             VerticalOptions="Start">
                         <VerticalStackLayout Spacing="8">
-                            <Label Text="Departman Ekle"
-                                   FontSize="14"
-                                   FontAttributes="Bold"
-                                   TextColor="White" />
-
-                            <BoxView Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
-
-                            <Border BackgroundColor="#0F1E2D"
-                                    StrokeShape="RoundRectangle 8"
-                                    Stroke="Transparent"
-                                    Padding="4,0">
-                                <Entry Placeholder="Departman Adı (2-10)"
-                                       Text="{Binding DepartmentNameInput}"
-                                       TextColor="White"
-                                       PlaceholderColor="#64748b"
-                                       BackgroundColor="Transparent"
-                                       FontSize="13"
-                                       HeightRequest="40" />
-                            </Border>
-
-                            <Button Text="Departman Ekle"
-                                    Command="{Binding AddDepartmentCommand}"
-                                    BackgroundColor="#2196F3"
-                                    TextColor="White"
-                                    CornerRadius="10"
-                                    HeightRequest="40"
-                                    FontSize="13"
-                                    FontAttributes="Bold" />
-                        </VerticalStackLayout>
-                    </Border>
-
-                    <Border Grid.Row="1"
-                            Grid.Column="1"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="12,10"
-                            VerticalOptions="Start">
-                        <VerticalStackLayout Spacing="8">
-                            <Label Text="Çalışan Sil"
+                            <Label Text="Çalışan Şifresi Değiştir"
                                    FontSize="14"
                                    FontAttributes="Bold"
                                    TextColor="White" />
@@ -322,28 +398,51 @@
                                 <Grid HeightRequest="40"
                                       VerticalOptions="Center">
                                     <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnDeleteUserSelectTapped" />
+                                        <TapGestureRecognizer Tapped="OnPasswordUserSelectTapped" />
                                     </Grid.GestureRecognizers>
                                     <Grid ColumnDefinitions="*,Auto"
                                           VerticalOptions="Center">
                                         <Label Grid.Column="0"
-                                               Text="{Binding SelectedDeleteUserDisplayText}"
+                                               Text="{Binding SelectedPasswordUserDisplayText}"
                                                TextColor="White"
                                                VerticalOptions="Center"
                                                FontSize="13" />
-                                        <Label Grid.Column="1"
-                                               Text="v"
-                                               TextColor="#94a3b8"
-                                               VerticalOptions="Center"
-                                               FontSize="13"
-                                               Margin="8,0,0,0" />
+                                        <Path Grid.Column="1"
+                                              Data="M 2 4 L 7 9 L 12 4"
+                                              Stroke="#94a3b8"
+                                              StrokeThickness="2"
+                                              StrokeLineCap="Round"
+                                              StrokeLineJoin="Round"
+                                              WidthRequest="14"
+                                              HeightRequest="10"
+                                              HorizontalOptions="End"
+                                              VerticalOptions="Center"
+                                              Margin="8,0,0,0" />
                                     </Grid>
                                 </Grid>
                             </Border>
 
-                            <Button Text="Çalışan Sil"
-                                    Command="{Binding RemoveWorkerCommand}"
-                                    BackgroundColor="#ef4444"
+                            <Border BackgroundColor="#0F1E2D"
+                                    StrokeShape="RoundRectangle 8"
+                                    Stroke="Transparent"
+                                    Padding="4,0">
+                                <Entry Placeholder="Yeni Şifre"
+                                       Text="{Binding NewPasswordInput}"
+                                       IsPassword="True"
+                                       TextColor="White"
+                                       PlaceholderColor="#64748b"
+                                       BackgroundColor="Transparent"
+                                       FontSize="13"
+                                       HeightRequest="40" />
+                            </Border>
+
+                            <Label Text="Şifre: en az 8 karakter, büyük harf, küçük harf ve rakam içermeli."
+                                   FontSize="12"
+                                   TextColor="#94a3b8" />
+
+                            <Button Text="Şifreyi Güncelle"
+                                    Command="{Binding ChangeWorkerPasswordCommand}"
+                                    BackgroundColor="#2196F3"
                                     TextColor="White"
                                     CornerRadius="10"
                                     HeightRequest="40"

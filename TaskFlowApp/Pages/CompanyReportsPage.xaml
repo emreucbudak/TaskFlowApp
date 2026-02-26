@@ -18,14 +18,6 @@
                    Aspect="AspectFit"
                    VerticalOptions="Center" />
 
-            <Label Grid.Column="1"
-                   Text="Şirket Rapor Yönetimi"
-                   FontSize="16"
-                   FontAttributes="Bold"
-                   TextColor="White"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center" />
-
             <Grid Grid.Column="2"
                   WidthRequest="44"
                   HeightRequest="44"

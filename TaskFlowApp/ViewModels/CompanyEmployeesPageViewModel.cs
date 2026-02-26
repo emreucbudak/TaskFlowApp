@@ -59,6 +59,15 @@ public partial class CompanyEmployeesPageViewModel(
     private string selectedDeleteUserDisplayText = "Çalışan Seçin";
 
     [ObservableProperty]
+    private CompanyUserDto? selectedPasswordUser;
+
+    [ObservableProperty]
+    private string selectedPasswordUserDisplayText = "Çalışan Seçin";
+
+    [ObservableProperty]
+    private string newPasswordInput = string.Empty;
+
+    [ObservableProperty]
     private string formMessage = string.Empty;
 
     [RelayCommand]
@@ -108,6 +117,11 @@ public partial class CompanyEmployeesPageViewModel(
             if (SelectedDeleteUser is not null && CompanyUsers.All(item => item.Id != SelectedDeleteUser.Id))
             {
                 SelectedDeleteUser = null;
+            }
+
+            if (SelectedPasswordUser is not null && CompanyUsers.All(item => item.Id != SelectedPasswordUser.Id))
+            {
+                SelectedPasswordUser = null;
             }
 
             if (string.IsNullOrWhiteSpace(FormMessage))
@@ -447,6 +461,87 @@ public partial class CompanyEmployeesPageViewModel(
         }
     }
 
+    [RelayCommand]
+    private async Task ChangeWorkerPasswordAsync()
+    {
+        if (IsBusy)
+        {
+            return;
+        }
+
+        if (UserSession.CompanyId is null)
+        {
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
+            return;
+        }
+
+        if (SelectedPasswordUser is null)
+        {
+            ErrorMessage = "Şifresini değiştirmek için bir çalışan seçin.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(NewPasswordInput))
+        {
+            ErrorMessage = "Yeni şifre alanı zorunludur.";
+            return;
+        }
+
+        if (!IsValidPassword(NewPasswordInput))
+        {
+            ErrorMessage = "Şifre en az 8 karakter olmalı ve büyük harf, küçük harf, rakam içermelidir.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            ErrorMessage = string.Empty;
+            FormMessage = string.Empty;
+
+            await identityApiClient.ChangeUserPasswordCommandRequestAsync(new
+            {
+                UserId = SelectedPasswordUser.Id,
+                NewPassword = NewPasswordInput
+            });
+
+            NewPasswordInput = string.Empty;
+            FormMessage = "Çalışan şifresi başarıyla güncellendi.";
+        }
+        catch (ApiException ex) when (ex.StatusCode == 400)
+        {
+            ErrorMessage = "Yeni şifre API şifre kurallarına uymuyor. En az 8 karakter, büyük harf, küçük harf ve rakam kullanın.";
+        }
+        catch (ApiException ex) when (ex.StatusCode == 404)
+        {
+            ErrorMessage = "Çalışan bulunamadı.";
+        }
+        catch (ApiException ex) when (ex.StatusCode == 401)
+        {
+            ErrorMessage = "Bu çalışanın şifresi değiştirilemiyor.";
+        }
+        catch (ApiException ex)
+        {
+            ErrorMessage = ResolveApiErrorMessage(ex, "Şifre güncellenemedi. Lütfen tekrar deneyin.");
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
+        }
+        catch (TaskCanceledException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     private async Task RefreshGroupsAsync(Guid companyId)
     {
         var response = await identityApiClient.GetAllCompanyGroupsAsync(companyId);
@@ -621,6 +716,11 @@ public partial class CompanyEmployeesPageViewModel(
     partial void OnSelectedDeleteUserChanged(CompanyUserDto? value)
     {
         SelectedDeleteUserDisplayText = value?.Name ?? "Çalışan Seçin";
+    }
+
+    partial void OnSelectedPasswordUserChanged(CompanyUserDto? value)
+    {
+        SelectedPasswordUserDisplayText = value?.Name ?? "Çalışan Seçin";
     }
 
     private static List<CompanyGroupDto> NormalizeGroups(IEnumerable<CompanyGroupDto> groups)
