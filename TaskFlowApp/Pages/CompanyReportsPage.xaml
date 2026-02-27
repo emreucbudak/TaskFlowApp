@@ -74,6 +74,9 @@
 
                 <CollectionView ItemsSource="{Binding Reports}"
                                 SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+                    </CollectionView.ItemsLayout>
                     <CollectionView.EmptyView>
                         <Label Text="Rapor bulunamadı."
                                FontSize="12"
@@ -87,7 +90,7 @@
                                     Stroke="#2E4A67"
                                     StrokeThickness="1"
                                     StrokeShape="RoundRectangle 14"
-                                    Margin="0,0,0,10"
+                                    Margin="0,0,0,0"
                                     Padding="12">
                                 <VerticalStackLayout Spacing="8">
                                     <Label Text="{Binding Title}"

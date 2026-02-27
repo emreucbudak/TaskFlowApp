@@ -40,7 +40,7 @@ public partial class CompanyReportsPageViewModel(
     private bool canGoNext;
 
     [ObservableProperty]
-    private string pageInfoText = "Sayfa 1 / 1";
+    private string pageInfoText = "Sayfa 1";
 
     [RelayCommand]
     private async Task LoadAsync()
@@ -117,7 +117,7 @@ public partial class CompanyReportsPageViewModel(
             TotalPageCount = Math.Max(1, resolvedTotalPageCount);
             CanGoPrevious = CurrentPage > 1;
             CanGoNext = CurrentPage < TotalPageCount;
-            PageInfoText = $"Sayfa {CurrentPage} / {TotalPageCount}";
+            PageInfoText = $"Sayfa {CurrentPage}";
             StatusText = $"Toplam rapor: {TotalReportCount} | Gösterilen: {Reports.Count}";
         }
         catch (ApiException ex)
