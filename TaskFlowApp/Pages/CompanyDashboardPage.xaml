@@ -311,9 +311,6 @@
                                    TextColor="White"
                                    FontSize="15"
                                    FontAttributes="Bold" />
-                            <Label Text="Performans verileri tamamlandığında bu alanda gösterilecek."
-                                   TextColor="#cbd5e1"
-                                   FontSize="12" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
@@ -330,7 +327,6 @@
                         </Border>
                         <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                             <Label Text="Henüz belirlenmedi" TextColor="White" FontSize="15" FontAttributes="Bold" />
-                            <Label Text="Gelişim desteği gereken çalışan bu alanda gösterilecek." TextColor="#cbd5e1" FontSize="12" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>

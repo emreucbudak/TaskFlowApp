@@ -43,7 +43,7 @@ public sealed class ProjectManagementApiClient(IApiClient apiClient) : Controlle
     public Task<PagedResultDto<CompanyTaskDto>> GetAllTasksByCompanyIdAsync(Guid companyId, int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default) =>
         PostForResultAsync<PagedResultDto<CompanyTaskDto>>(
             "GetAllTasksQueriesRequest",
-            new { CompanyId = companyId, pageNumber, pageSize },
+            new { CompanyId = companyId, PageNumber = pageNumber, PageSize = pageSize },
             cancellationToken: cancellationToken);
 
     public Task<JsonElement> GetIndividualTaskByIdQueryRequestAsync(object request, CancellationToken cancellationToken = default) =>

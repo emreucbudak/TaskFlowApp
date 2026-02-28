@@ -100,7 +100,7 @@ public partial class CompanyDashboardPageViewModel(
 
             var usersTask = identityApiClient.GetAllCompanyUsersAsync(companyId);
             var groupsTask = identityApiClient.GetAllCompanyGroupsAsync(companyId);
-            var tasksTask = LoadAllCompanyTasksAsync(companyId);
+            var tasksTask = LoadAllCompanyTasksSafeAsync(companyId);
             var reportsTask = LoadAllReportsAsync();
             var statsTask = LoadAllStatsByPeriodAsync(period);
             var plansTask = tenantApiClient.GetCompanyPlansAsync();
@@ -259,6 +259,26 @@ public partial class CompanyDashboardPageViewModel(
         }
 
         return allTasks;
+    }
+
+    private async Task<List<Models.ProjectManagement.CompanyTaskDto>> LoadAllCompanyTasksSafeAsync(Guid companyId)
+    {
+        try
+        {
+            return await LoadAllCompanyTasksAsync(companyId);
+        }
+        catch (ApiException)
+        {
+            return [];
+        }
+        catch (HttpRequestException)
+        {
+            return [];
+        }
+        catch (TaskCanceledException)
+        {
+            return [];
+        }
     }
 
     private async Task<int> LoadAllCompanyIndividualTaskCountAsync(IEnumerable<CompanyUserDto> users)

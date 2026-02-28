@@ -79,7 +79,7 @@
                         StrokeShape="RoundRectangle 14"
                         Padding="16,14">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="Aktif Plan ve Kullanım"
+                        <Label Text="Aktif Plan"
                                FontSize="20"
                                FontAttributes="Bold"
                                TextColor="White" />
@@ -87,6 +87,9 @@
                                FontSize="13"
                                TextColor="#94a3b8" />
                         <Label Text="{Binding ActivePlanPriceText, StringFormat='Plan ücreti: {0}'}"
+                               FontSize="13"
+                               TextColor="#94a3b8" />
+                        <Label Text="{Binding ActivePlanStartDateText, StringFormat='Güncel abonelik başlangıç tarihi: {0}'}"
                                FontSize="13"
                                TextColor="#94a3b8" />
                     </VerticalStackLayout>
@@ -198,6 +201,13 @@
                                FontSize="18"
                                FontAttributes="Bold"
                                TextColor="White" />
+                        <Label Text="Uyarı: Planınızı değiştirirseniz önceki verileriniz silinir."
+                               FontSize="12"
+                               TextColor="#fca5a5" />
+                        <Label Text="{Binding PendingPaymentPlanName, StringFormat='Ödeme doğrulaması bekleniyor: {0}'}"
+                               IsVisible="{Binding IsAwaitingPaymentConfirmation}"
+                               FontSize="12"
+                               TextColor="#93c5fd" />
 
                         <ScrollView Orientation="Horizontal"
                                     HorizontalScrollBarVisibility="Never">

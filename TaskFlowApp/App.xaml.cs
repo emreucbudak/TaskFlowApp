@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿#if WINDOWS
+using TaskFlowApp.Infrastructure.Windows;
+using TaskFlowApp.Infrastructure.Payments;
+#endif
 
 namespace TaskFlowApp
 {
@@ -7,6 +10,10 @@ namespace TaskFlowApp
         public App()
         {
             InitializeComponent();
+#if WINDOWS
+            DesktopProtocolRegistrar.EnsureRegistered();
+            PaymentReturnState.TryStoreFromCommandLine(Environment.GetCommandLineArgs());
+#endif
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
