@@ -66,29 +66,30 @@ public partial class CompanyTasksPageViewModel(
             ErrorMessage = string.Empty;
 
             var companyId = UserSession.CompanyId.Value;
-            var groupedTasksTask = LoadAllCompanyTasksAsync(companyId);
+            var groupedTasksTask = LoadAllCompanyGroupTasksSafeAsync(companyId);
             var individualTasksTask = LoadAllCompanyIndividualTasksAsync(companyId);
 
             await Task.WhenAll(groupedTasksTask, individualTasksTask);
 
-            var items = (await groupedTasksTask)
-                .Concat(await individualTasksTask)
+            var groupedItems = await groupedTasksTask;
+            var individualItems = await individualTasksTask;
+            var items = groupedItems
+                .Concat(individualItems)
                 .ToList();
 
             Tasks.Clear();
             allIndividualTasks.Clear();
             allGroupTasks.Clear();
-            foreach (var item in items)
+            foreach (var item in groupedItems)
             {
                 Tasks.Add(item);
-                if (IsGroupTask(item))
-                {
-                    allGroupTasks.Add(item);
-                }
-                else
-                {
-                    allIndividualTasks.Add(item);
-                }
+                allGroupTasks.Add(item);
+            }
+
+            foreach (var item in individualItems)
+            {
+                Tasks.Add(item);
+                allIndividualTasks.Add(item);
             }
 
             isShowingAllIndividualTasks = false;
@@ -168,32 +169,7 @@ public partial class CompanyTasksPageViewModel(
             || normalizedStatus.Contains("closed");
     }
 
-    private static bool IsGroupTask(CompanyTaskDto task)
-    {
-        if (task is null)
-        {
-            return false;
-        }
-
-        var category = task.CategoryName?.Trim() ?? string.Empty;
-        var taskName = task.TaskName?.Trim() ?? string.Empty;
-        var description = task.Description?.Trim() ?? string.Empty;
-
-        return category.Contains("grup", StringComparison.OrdinalIgnoreCase)
-            || category.Contains("group", StringComparison.OrdinalIgnoreCase)
-            || category.Contains("team", StringComparison.OrdinalIgnoreCase)
-            || category.Contains("ekip", StringComparison.OrdinalIgnoreCase)
-            || taskName.Contains("grup", StringComparison.OrdinalIgnoreCase)
-            || taskName.Contains("group", StringComparison.OrdinalIgnoreCase)
-            || taskName.Contains("team", StringComparison.OrdinalIgnoreCase)
-            || taskName.Contains("ekip", StringComparison.OrdinalIgnoreCase)
-            || description.Contains("grup", StringComparison.OrdinalIgnoreCase)
-            || description.Contains("group", StringComparison.OrdinalIgnoreCase)
-            || description.Contains("team", StringComparison.OrdinalIgnoreCase)
-            || description.Contains("ekip", StringComparison.OrdinalIgnoreCase);
-    }
-
-    private async Task<List<CompanyTaskDto>> LoadAllCompanyTasksAsync(Guid companyId)
+    private async Task<List<CompanyTaskDto>> LoadAllCompanyGroupTasksAsync(Guid companyId)
     {
         var allTasks = new List<CompanyTaskDto>();
         var pageNumber = 1;
@@ -218,7 +194,30 @@ public partial class CompanyTasksPageViewModel(
             pageNumber++;
         }
 
-        return allTasks;
+        return allTasks
+            .Select(NormalizeCategoryAndPriority)
+            .Select(task => task with { CategoryName = "Grup" })
+            .ToList();
+    }
+
+    private async Task<List<CompanyTaskDto>> LoadAllCompanyGroupTasksSafeAsync(Guid companyId)
+    {
+        try
+        {
+            return await LoadAllCompanyGroupTasksAsync(companyId);
+        }
+        catch (ApiException)
+        {
+            return [];
+        }
+        catch (HttpRequestException)
+        {
+            return [];
+        }
+        catch (TaskCanceledException)
+        {
+            return [];
+        }
     }
 
     private async Task<List<CompanyTaskDto>> LoadAllCompanyIndividualTasksAsync(Guid companyId)
@@ -291,13 +290,58 @@ public partial class CompanyTasksPageViewModel(
         var statusName = string.IsNullOrWhiteSpace(task.StatusName) ? "Açık" : task.StatusName;
         var categoryName = string.IsNullOrWhiteSpace(task.CategoryName) ? "Bireysel" : task.CategoryName;
         var priorityName = string.IsNullOrWhiteSpace(task.TaskPriorityName) ? "Belirtilmedi" : task.TaskPriorityName;
-
-        return new CompanyTaskDto
+        var mappedTask = new CompanyTaskDto
         {
             TaskName = task.TaskTitle,
             Description = task.Description,
             DeadlineTime = task.Deadline,
             StatusName = statusName,
+            CategoryName = categoryName,
+            TaskPriorityName = priorityName
+        };
+
+        return NormalizeCategoryAndPriority(mappedTask);
+    }
+
+    private static bool IsPriorityValue(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        return value.Trim().ToLowerInvariant() is "düşük"
+            or "dusuk"
+            or "orta"
+            or "yüksek"
+            or "yuksek"
+            or "low"
+            or "medium"
+            or "high";
+    }
+
+    private static CompanyTaskDto NormalizeCategoryAndPriority(CompanyTaskDto task)
+    {
+        var categoryName = string.IsNullOrWhiteSpace(task.CategoryName)
+            ? "Bireysel"
+            : task.CategoryName.Trim();
+
+        var priorityName = string.IsNullOrWhiteSpace(task.TaskPriorityName)
+            ? "Belirtilmedi"
+            : task.TaskPriorityName.Trim();
+
+        if (IsPriorityValue(categoryName))
+        {
+            if (!IsPriorityValue(priorityName))
+            {
+                priorityName = categoryName;
+            }
+
+            categoryName = "Bireysel";
+        }
+
+        return task with
+        {
             CategoryName = categoryName,
             TaskPriorityName = priorityName
         };
