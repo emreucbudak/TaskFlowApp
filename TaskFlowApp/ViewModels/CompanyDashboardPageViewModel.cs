@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Navigation;
@@ -76,6 +76,18 @@ public partial class CompanyDashboardPageViewModel(
     [ObservableProperty]
     private string rejectedReportLegendText = "0 (%0)";
 
+    [ObservableProperty]
+    private string bestWorkerName = "Henuz belirlenmedi";
+
+    [ObservableProperty]
+    private string bestWorkerScoreText = "0 puan";
+
+    [ObservableProperty]
+    private string worstWorkerName = "Henuz belirlenmedi";
+
+    [ObservableProperty]
+    private string worstWorkerScoreText = "0 puan";
+
     [RelayCommand]
     private async Task LoadAsync()
     {
@@ -86,7 +98,7 @@ public partial class CompanyDashboardPageViewModel(
 
         if (UserSession.CompanyId is null)
         {
-            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
+            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
             return;
         }
 
@@ -146,10 +158,12 @@ public partial class CompanyDashboardPageViewModel(
             ResolvedReportCount = companyReports.Count(item => IsResolvedReportStatus(item.ReportStatusId));
             RejectedReportCount = companyReports.Count(item => IsRejectedReportStatus(item.ReportStatusId));
             AvailablePlanCount = plans.Count;
+
+            UpdateEmployeeRanking(users, companyStats);
             UpdateTaskDistribution();
             UpdateReportDistribution();
 
-            StatusText = $"Ekip: {TotalTeamCount} | Çalışan: {TotalWorkerCount} | Görev: {TotalTaskCount}";
+            StatusText = $"Ekip: {TotalTeamCount} | Calisan: {TotalWorkerCount} | Gorev: {TotalTaskCount}";
         }
         catch (ApiException ex)
         {
@@ -165,7 +179,7 @@ public partial class CompanyDashboardPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
         }
         finally
         {
@@ -189,6 +203,59 @@ public partial class CompanyDashboardPageViewModel(
             || normalizedStatus.Contains("complete")
             || normalizedStatus.Contains("done")
             || normalizedStatus.Contains("closed");
+    }
+
+    private void UpdateEmployeeRanking(
+        IReadOnlyCollection<CompanyUserDto> users,
+        IReadOnlyCollection<Models.Stats.WorkerStatsDto> companyStats)
+    {
+        BestWorkerName = "Henuz belirlenmedi";
+        BestWorkerScoreText = "0 puan";
+        WorstWorkerName = "Henuz belirlenmedi";
+        WorstWorkerScoreText = "0 puan";
+
+        if (companyStats.Count == 0)
+        {
+            return;
+        }
+
+        var userNameMap = users
+            .Where(user => user.Id != Guid.Empty)
+            .GroupBy(user => user.Id)
+            .ToDictionary(
+                grouped => grouped.Key,
+                grouped =>
+                {
+                    var name = grouped.First().Name?.Trim();
+                    return string.IsNullOrWhiteSpace(name) ? "Bilinmeyen Calisan" : name;
+                });
+
+        var rankedStats = companyStats
+            .OrderByDescending(item => item.TotalPoints)
+            .ThenByDescending(item => item.TotalTasksCompleted)
+            .ThenBy(item => ResolveUserDisplayName(item.UserId, userNameMap), StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var best = rankedStats[0];
+        var worst = rankedStats[^1];
+
+        BestWorkerName = ResolveUserDisplayName(best.UserId, userNameMap);
+        BestWorkerScoreText = $"{best.TotalPoints} puan";
+
+        WorstWorkerName = ResolveUserDisplayName(worst.UserId, userNameMap);
+        WorstWorkerScoreText = $"{worst.TotalPoints} puan";
+    }
+
+    private static string ResolveUserDisplayName(Guid userId, IReadOnlyDictionary<Guid, string> userNameMap)
+    {
+        if (userId == Guid.Empty)
+        {
+            return "Bilinmeyen Calisan";
+        }
+
+        return userNameMap.TryGetValue(userId, out var name) && !string.IsNullOrWhiteSpace(name)
+            ? name
+            : "Bilinmeyen Calisan";
     }
 
     private void UpdateTaskDistribution()

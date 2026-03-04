@@ -1,4 +1,4 @@
-namespace TaskFlowApp.Models.Stats;
+﻿namespace TaskFlowApp.Models.Stats;
 
 public sealed record WorkerStatsDto
 {
@@ -9,4 +9,5 @@ public sealed record WorkerStatsDto
     public int TotalTasksCompleted { get; init; }
     public int TasksCompletedBeforeDeadline { get; init; }
     public int OverdueIncompleteTasksCount { get; init; }
+    public int TotalPoints { get; init; }
 }
