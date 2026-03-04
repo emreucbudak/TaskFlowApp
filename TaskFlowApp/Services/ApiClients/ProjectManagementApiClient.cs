@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Models.Common;
 using TaskFlowApp.Models.ProjectManagement;
@@ -18,6 +18,9 @@ public sealed class ProjectManagementApiClient(IApiClient apiClient) : Controlle
 
     public Task CreateTasksCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("CreateTasksCommandRequest", request, cancellationToken: cancellationToken);
+
+    public Task CompleteIndividualTaskCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
+        PostAsync("CompleteIndividualTaskCommandRequest", request, cancellationToken: cancellationToken);
 
     public Task DeleteIndividualTaskCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("DeleteIndividualTaskCommandRequest", request, cancellationToken: cancellationToken);
