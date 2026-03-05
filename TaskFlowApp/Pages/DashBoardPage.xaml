@@ -80,55 +80,86 @@
                     Color="#2196F3" />
 
                 <Label
-                    Text="{Binding StatusText}"
-                    TextColor="#cbd5e1"
-                    FontSize="13" />
-
-                <Label
                     Text="{Binding ErrorMessage}"
                     TextColor="#f87171"
                     FontSize="12" />
 
-                <Border BackgroundColor="#162030"
-                        StrokeShape="RoundRectangle 16"
-                        Stroke="Transparent"
-                        HeightRequest="170">
-                    <VerticalStackLayout Padding="16" Spacing="8">
-                        <Label Text="Kisisel Istatistikler" TextColor="White" FontAttributes="Bold" />
-                        <Label Text="{Binding TotalAssigned, StringFormat='Atanan gorev: {0}'}" TextColor="#94a3b8" />
-                        <Label Text="{Binding TotalCompleted, StringFormat='Tamamlanan gorev: {0}'}" TextColor="#94a3b8" />
-                        <Label Text="{Binding OverdueTasks, StringFormat='Geciken gorev: {0}'}" TextColor="#94a3b8" />
-                        <Label Text="{Binding UnreadMessageCount, StringFormat='Okunmamis mesaj: {0}'}" TextColor="#94a3b8" />
-                    </VerticalStackLayout>
-                </Border>
+                <Label Text="Kişisel İstatistikler"
+                       TextColor="White"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       Margin="2,0,0,0" />
 
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
-                    <Border Grid.Column="0"
-                            BackgroundColor="#162030"
-                            StrokeShape="RoundRectangle 16"
-                            Stroke="Transparent"
-                            HeightRequest="110">
-                        <VerticalStackLayout Padding="12" Spacing="6">
-                            <Label Text="Gorevlerim" TextColor="White" FontAttributes="Bold" FontSize="13" />
-                            <Label Text="{Binding MyTaskCount}" TextColor="#2196F3" FontAttributes="Bold" FontSize="22" />
+                <Grid ColumnDefinitions="*,*"
+                      RowDefinitions="Auto,Auto,Auto"
+                      ColumnSpacing="10"
+                      RowSpacing="10">
+                    <Border Grid.Row="0"
+                            Grid.Column="0"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Atanan Bireysel Görev" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="{Binding IndividualTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
                         </VerticalStackLayout>
                     </Border>
-                    <Border Grid.Column="1"
-                            BackgroundColor="#162030"
-                            StrokeShape="RoundRectangle 16"
-                            Stroke="Transparent"
-                            HeightRequest="110"/>
+
+                    <Border Grid.Row="0"
+                            Grid.Column="1"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Atanan Grupsal Görev" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="{Binding GroupTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="1"
+                            Grid.Column="0"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Tamamlanan Görev" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="{Binding TotalCompleted}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="1"
+                            Grid.Column="1"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Geciken Görev" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="{Binding OverdueTasks}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="2"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Okunmamış Mesaj" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="{Binding UnreadMessageCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
                 </Grid>
-
-                <BoxView Color="#162030"
-                         HeightRequest="12"
-                         CornerRadius="6"
-                         Margin="0,8,40,0"/>
-
-                <BoxView Color="#162030"
-                         HeightRequest="12"
-                         CornerRadius="6"
-                         Margin="0,0,100,0"/>
 
             </VerticalStackLayout>
         </ScrollView>

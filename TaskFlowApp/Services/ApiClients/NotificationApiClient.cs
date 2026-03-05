@@ -18,6 +18,15 @@ public sealed class NotificationApiClient(IApiClient apiClient) : ControllerApiC
     public Task<PagedResultDto<NotificationDto>> GetUserAllNotificationsAsync(Guid userId, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default) =>
         PostForResultAsync<PagedResultDto<NotificationDto>>(
             "GetUserAllNotificationsQueriesRequest",
-            new { userId = userId, PageNumber = pageNumber, PageSize = pageSize },
+            new { userId, PageNumber = pageNumber, PageSize = pageSize },
+            cancellationToken: cancellationToken);
+
+    public Task<int> MarkUserNotificationsAsReadCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<int>("MarkUserNotificationsAsReadCommandRequest", request, cancellationToken: cancellationToken);
+
+    public Task<int> MarkUserNotificationsAsReadAsync(Guid userId, int maxCount = 100, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<int>(
+            "MarkUserNotificationsAsReadCommandRequest",
+            new { userId, MaxCount = maxCount },
             cancellationToken: cancellationToken);
 }
