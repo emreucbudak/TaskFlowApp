@@ -161,6 +161,69 @@
                     </Border>
                 </Grid>
 
+                <Label Text="Grubun Son Aktivitileri"
+                       TextColor="White"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       Margin="2,6,0,0" />
+
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#2E4A67"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="{Binding CurrentGroupName, StringFormat='Grup: {0}'}"
+                               TextColor="#B8C6D6"
+                               FontSize="12"
+                               IsVisible="{Binding HasUserGroup}" />
+
+                        <Label Text="{Binding GroupActivityEmptyMessage}"
+                               TextColor="#B8C6D6"
+                               FontSize="13"
+                               IsVisible="{Binding HasNoGroupRecentActivities}" />
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding GroupRecentActivities}"
+                                             IsVisible="{Binding HasGroupRecentActivities}"
+                                             Spacing="8">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BackgroundColor="#122A41"
+                                            Stroke="#2E4A67"
+                                            StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 10"
+                                            Padding="10,8">
+                                        <Grid RowDefinitions="Auto,Auto"
+                                              ColumnDefinitions="*,Auto"
+                                              ColumnSpacing="8"
+                                              RowSpacing="2">
+                                            <Label Grid.Row="0"
+                                                   Grid.Column="0"
+                                                   Text="{Binding ActorName}"
+                                                   TextColor="White"
+                                                   FontSize="13"
+                                                   FontAttributes="Bold" />
+                                            <Label Grid.Row="0"
+                                                   Grid.Column="1"
+                                                   Text="{Binding OccurredAtText}"
+                                                   TextColor="#8FA6BE"
+                                                   FontSize="11" />
+                                            <Label Grid.Row="1"
+                                                   Grid.Column="0"
+                                                   Grid.ColumnSpan="2"
+                                                   Text="{Binding ActionText}"
+                                                   TextColor="#D4E2F0"
+                                                   FontSize="12"
+                                                   MaxLines="2"
+                                                   LineBreakMode="TailTruncation" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
             </VerticalStackLayout>
         </ScrollView>
 
@@ -308,4 +371,5 @@
         </Grid>
     </Grid>
 </ContentPage>
+
 
