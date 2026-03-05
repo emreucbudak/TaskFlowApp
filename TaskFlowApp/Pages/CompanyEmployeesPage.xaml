@@ -65,15 +65,9 @@
         <BoxView Grid.Row="1" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
 
         <!-- SCROLL CONTENT -->
-        <ScrollView Grid.Row="2">
-            <VerticalStackLayout Padding="16,6,16,24" Spacing="10">
-
-                <ActivityIndicator
-                    IsRunning="{Binding IsBusy}"
-                    IsVisible="{Binding IsBusy}"
-                    Color="#2196F3"
-                    HorizontalOptions="Center" />
-
+        <Grid Grid.Row="2">
+            <ScrollView>
+                <VerticalStackLayout Padding="16,6,16,24" Spacing="10">
                 <Label Text="{Binding ErrorMessage}"
                        TextColor="#f87171"
                        FontSize="12"
@@ -442,14 +436,6 @@
                         </Border>
                     </VerticalStackLayout>
                 </Grid>
-                <!-- Form mesajı -->
-                <Label Text="{Binding FormMessage}"
-                       TextColor="#86efac"
-                       FontSize="12"
-                       HeightRequest="18"
-                       VerticalTextAlignment="Center"
-                       LineBreakMode="TailTruncation"
-                       MaxLines="1" />
 
                 <!-- Groups List -->
                 <CollectionView ItemsSource="{Binding Groups}">
@@ -549,7 +535,16 @@
                 </CollectionView>
 
             </VerticalStackLayout>
-        </ScrollView>
+            </ScrollView>
+
+            <ActivityIndicator
+                Grid.ZIndex="1"
+                IsRunning="{Binding IsBusy}"
+                IsVisible="{Binding IsBusy}"
+                Color="#2196F3"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </Grid>
 
         <BoxView Grid.Row="3" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
 

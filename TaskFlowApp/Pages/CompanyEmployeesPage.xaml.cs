@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TaskFlowApp.Infrastructure;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.ViewModels;
@@ -7,6 +8,8 @@ namespace TaskFlowApp.Pages;
 public partial class CompanyEmployeesPage : ContentPage
 {
     private CompanyEmployeesPageViewModel ViewModel => (CompanyEmployeesPageViewModel)BindingContext;
+    private bool isShowingFormMessage;
+    private bool isViewModelSubscribed;
 
     public CompanyEmployeesPage()
     {
@@ -17,12 +20,19 @@ public partial class CompanyEmployeesPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        EnsureViewModelSubscription();
         await ViewModel.LoadCommand.ExecuteAsync(null);
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        RemoveViewModelSubscription();
     }
 
     private async void OnDepartmentSelectTapped(object? sender, TappedEventArgs e)
     {
-        var departments = ViewModel.Departments.ToList();
+        var departments = await EnsureDepartmentsLoadedAsync();
         if (departments.Count == 0)
         {
             await DisplayAlertAsync("Bilgi", "Departman listesi şu anda alınamadı.", "Tamam");
@@ -52,7 +62,7 @@ public partial class CompanyEmployeesPage : ContentPage
 
     private async void OnTransferDepartmentSelectTapped(object? sender, TappedEventArgs e)
     {
-        var departments = ViewModel.Departments.ToList();
+        var departments = await EnsureDepartmentsLoadedAsync();
         if (departments.Count == 0)
         {
             await DisplayAlertAsync("Bilgi", "Departman listesi şu anda alınamadı.", "Tamam");
@@ -78,6 +88,19 @@ public partial class CompanyEmployeesPage : ContentPage
         {
             ViewModel.SelectedTransferDepartment = selectedDepartment;
         }
+    }
+
+    private async Task<List<DepartmentDto>> EnsureDepartmentsLoadedAsync()
+    {
+        var departments = ViewModel.Departments.ToList();
+
+        if (departments.Count > 0 || ViewModel.IsBusy)
+        {
+            return departments;
+        }
+
+        await ViewModel.LoadCommand.ExecuteAsync(null);
+        return ViewModel.Departments.ToList();
     }
 
     private async void OnUserSelectTapped(object? sender, TappedEventArgs e)
@@ -167,6 +190,53 @@ public partial class CompanyEmployeesPage : ContentPage
         if (selectedUser is not null)
         {
             ViewModel.SelectedPasswordUser = selectedUser;
+        }
+    }
+
+    private void EnsureViewModelSubscription()
+    {
+        if (isViewModelSubscribed)
+        {
+            return;
+        }
+
+        ViewModel.PropertyChanged += OnViewModelPropertyChanged;
+        isViewModelSubscribed = true;
+    }
+
+    private void RemoveViewModelSubscription()
+    {
+        if (!isViewModelSubscribed)
+        {
+            return;
+        }
+
+        ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        isViewModelSubscribed = false;
+    }
+
+    private async void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(CompanyEmployeesPageViewModel.FormMessage) || isShowingFormMessage)
+        {
+            return;
+        }
+
+        var formMessage = ViewModel.FormMessage;
+        if (string.IsNullOrWhiteSpace(formMessage))
+        {
+            return;
+        }
+
+        isShowingFormMessage = true;
+        try
+        {
+            await DisplayAlertAsync("Bilgi", formMessage, "Tamam");
+            ViewModel.FormMessage = string.Empty;
+        }
+        finally
+        {
+            isShowingFormMessage = false;
         }
     }
 
