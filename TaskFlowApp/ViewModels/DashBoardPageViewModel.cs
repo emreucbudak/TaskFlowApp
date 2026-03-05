@@ -4,8 +4,8 @@ using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Stats;
-using TaskFlowApp.Services.Realtime;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Services.Realtime;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -27,7 +27,10 @@ public partial class DashBoardPageViewModel(
     private int overdueTasks;
 
     [ObservableProperty]
-    private int myTaskCount;
+    private int individualTaskCount;
+
+    [ObservableProperty]
+    private int groupTaskCount;
 
     [ObservableProperty]
     private int unreadMessageCount;
@@ -42,7 +45,7 @@ public partial class DashBoardPageViewModel(
 
         if (UserSession.UserId is null)
         {
-            ErrorMessage = "Oturum bilgisi eksik. Tekrar giris yapin.";
+            ErrorMessage = "Oturum bilgisi eksik. Tekrar giriş yapın.";
             return;
         }
 
@@ -72,14 +75,20 @@ public partial class DashBoardPageViewModel(
 
             var tasks = await tasksTask;
             var unread = await unreadTask;
+            var individualTasks = tasks?.TotalCount > 0
+                ? tasks.TotalCount
+                : tasks?.Items.Count ?? 0;
+            var assignedTasks = stats?.TotalTasksAssigned ?? individualTasks;
+            var groupedTasks = Math.Max(0, assignedTasks - individualTasks);
 
-            TotalAssigned = stats?.TotalTasksAssigned ?? 0;
+            TotalAssigned = assignedTasks;
             TotalCompleted = stats?.TotalTasksCompleted ?? 0;
             OverdueTasks = stats?.OverdueIncompleteTasksCount ?? 0;
-            MyTaskCount = tasks?.Items.Count ?? 0;
+            IndividualTaskCount = individualTasks;
+            GroupTaskCount = groupedTasks;
             UnreadMessageCount = unread;
 
-            StatusText = $"Atanan: {TotalAssigned} | Tamamlanan: {TotalCompleted} | Geciken: {OverdueTasks}";
+            StatusText = string.Empty;
         }
         catch (ApiException ex)
         {
@@ -95,7 +104,7 @@ public partial class DashBoardPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
