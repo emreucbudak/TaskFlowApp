@@ -80,7 +80,7 @@
                     TextColor="#f87171"
                     FontSize="12" />
 
-                <Label Text="SayÄ±sal Ã–zet"
+                <Label Text="Sayısal Özet"
                        TextColor="White"
                        FontSize="16"
                        FontAttributes="Bold"
@@ -98,7 +98,7 @@
                             StrokeShape="RoundRectangle 14"
                             Padding="14">
                         <VerticalStackLayout Spacing="4">
-                            <Label Text="Ekip SayÄ±sÄ±" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="Ekip Sayısı" TextColor="#B8C6D6" FontSize="12" />
                             <Label Text="{Binding TotalTeamCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
                         </VerticalStackLayout>
                     </Border>
@@ -111,7 +111,7 @@
                             StrokeShape="RoundRectangle 14"
                             Padding="14">
                         <VerticalStackLayout Spacing="4">
-                            <Label Text="Ã‡alÄ±ÅŸan SayÄ±sÄ±" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="Çalışan Sayısı" TextColor="#B8C6D6" FontSize="12" />
                             <Label Text="{Binding TotalWorkerCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
                         </VerticalStackLayout>
                     </Border>
@@ -124,7 +124,7 @@
                             StrokeShape="RoundRectangle 14"
                             Padding="14">
                         <VerticalStackLayout Spacing="4">
-                            <Label Text="Toplam GÃ¶rev" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="Toplam Görev" TextColor="#B8C6D6" FontSize="12" />
                             <Label Text="{Binding TotalTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
                         </VerticalStackLayout>
                     </Border>
@@ -143,7 +143,7 @@
                     </Border>
                 </Grid>
 
-                <Label Text="GÃ¶rev ve Rapor Ä°statistikleri"
+                <Label Text="Görev ve Rapor İstatistikleri"
                        TextColor="White"
                        FontSize="16"
                        FontAttributes="Bold"
@@ -156,7 +156,7 @@
                             StrokeShape="RoundRectangle 14"
                             Padding="14,14,14,10">
                         <VerticalStackLayout Spacing="10">
-                            <Label Text="GÃ¶rev DaÄŸÄ±lÄ±mÄ±"
+                            <Label Text="Görev Dağılımı"
                                    TextColor="White"
                                    FontSize="14"
                                    FontAttributes="Bold" />
@@ -182,7 +182,7 @@
                                                  Fill="#22c55e"
                                                  VerticalOptions="Center" />
                                         <Label Grid.Column="1"
-                                               Text="Tamamlanan GÃ¶rev"
+                                               Text="Tamamlanan Görev"
                                                TextColor="#cbd5e1"
                                                FontSize="12" />
                                         <Label Grid.Column="2"
@@ -199,7 +199,7 @@
                                                  Fill="#f97316"
                                                  VerticalOptions="Center" />
                                         <Label Grid.Column="1"
-                                               Text="Geciken GÃ¶rev"
+                                               Text="Geciken Görev"
                                                TextColor="#cbd5e1"
                                                FontSize="12" />
                                         <Label Grid.Column="2"
@@ -219,7 +219,7 @@
                             StrokeShape="RoundRectangle 14"
                             Padding="14,14,14,10">
                         <VerticalStackLayout Spacing="10">
-                            <Label Text="Rapor DaÄŸÄ±lÄ±mÄ±"
+                            <Label Text="Rapor Dağılımı"
                                    TextColor="White"
                                    FontSize="14"
                                    FontAttributes="Bold" />
@@ -245,7 +245,7 @@
                                                  Fill="#38bdf8"
                                                  VerticalOptions="Center" />
                                         <Label Grid.Column="1"
-                                               Text="Ã‡Ã¶zÃ¼len Rapor"
+                                               Text="Çözülen Rapor"
                                                TextColor="#cbd5e1"
                                                FontSize="12" />
                                         <Label Grid.Column="2"
@@ -276,12 +276,54 @@
                         </VerticalStackLayout>
                     </Border>
                 </VerticalStackLayout>
+                <Grid ColumnDefinitions="*,Auto"
+                      Margin="2,6,0,0"
+                      ColumnSpacing="10"
+                      VerticalOptions="Center">
+                    <Label Text="Ayın Çalışanı"
+                           TextColor="White"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center" />
 
-                <Label Text="AyÄ±n Ã‡alÄ±ÅŸanÄ±"
-                       TextColor="White"
-                       FontSize="16"
-                       FontAttributes="Bold"
-                       Margin="2,6,0,0" />
+                    <Border Grid.Column="1"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 10"
+                            Padding="10,4"
+                            WidthRequest="180"
+                            HeightRequest="42"
+                            VerticalOptions="Center">
+                        <Grid VerticalOptions="Fill">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPeriodSelectTapped" />
+                            </Grid.GestureRecognizers>
+                            <Grid ColumnDefinitions="*,Auto"
+                                  VerticalOptions="Center">
+                                <Label Grid.Column="0"
+                                       Text="{Binding SelectedMonthDisplayText}"
+                                       TextColor="White"
+                                       VerticalOptions="Center"
+                                       VerticalTextAlignment="Center"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1"
+                                       FontSize="13" />
+                                <Path Grid.Column="1"
+                                      Data="M 2 4 L 7 9 L 12 4"
+                                      Stroke="#94a3b8"
+                                      StrokeThickness="2"
+                                      StrokeLineCap="Round"
+                                      StrokeLineJoin="Round"
+                                      WidthRequest="14"
+                                      HeightRequest="10"
+                                      HorizontalOptions="End"
+                                      VerticalOptions="Center"
+                                      Margin="8,0,0,0" />
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
 
                 <Border BackgroundColor="#0F2338"
                         Stroke="#2E4A67"
@@ -297,7 +339,7 @@
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="22" />
                             </Border.StrokeShape>
-                            <Label Text="â˜…"
+                            <Label Text="★"
                                    TextColor="#facc15"
                                    HorizontalOptions="Center"
                                    VerticalOptions="Center"
@@ -312,13 +354,14 @@
                                    FontSize="15"
                                    FontAttributes="Bold" />
                             <Label Text="{Binding BestWorkerScoreText}"
+                                   IsVisible="{Binding HasBestWorkerScore}"
                                    TextColor="#B8C6D6"
                                    FontSize="12" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
 
-                <Label Text="AyÄ±n En KÃ¶tÃ¼ Ã‡alÄ±ÅŸanÄ±" TextColor="White" FontSize="16" FontAttributes="Bold" Margin="2,6,0,0" />
+                <Label Text="Ayın En Kötü Çalışanı" TextColor="White" FontSize="16" FontAttributes="Bold" Margin="2,6,0,0" />
 
                 <Border BackgroundColor="#0F2338" Stroke="#2E4A67" StrokeThickness="1" StrokeShape="RoundRectangle 14" Padding="14">
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
@@ -334,6 +377,7 @@
                                    FontSize="15"
                                    FontAttributes="Bold" />
                             <Label Text="{Binding WorstWorkerScoreText}"
+                                   IsVisible="{Binding HasWorstWorkerScore}"
                                    TextColor="#B8C6D6"
                                    FontSize="12" />
                         </VerticalStackLayout>
@@ -473,5 +517,6 @@
         </Grid>
     </Grid>
 </ContentPage>
+
 
 

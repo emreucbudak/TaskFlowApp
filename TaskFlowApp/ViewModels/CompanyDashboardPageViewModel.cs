@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Globalization;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
@@ -24,6 +25,11 @@ public partial class CompanyDashboardPageViewModel(
     private const int ReportsPageSize = 100;
     private const int StatsPageSize = 100;
     private const int MaxPageTraversal = 200;
+    private const int MonthSelectionCount = 12;
+    private static readonly CultureInfo TurkishCulture = new("tr-TR");
+
+    private List<CompanyUserDto> _companyUsers = [];
+    private bool _isInitializingMonthSelection;
 
     [ObservableProperty]
     private int totalTeamCount;
@@ -77,16 +83,31 @@ public partial class CompanyDashboardPageViewModel(
     private string rejectedReportLegendText = "0 (%0)";
 
     [ObservableProperty]
-    private string bestWorkerName = "Henuz belirlenmedi";
+    private string bestWorkerName = "Henüz belirlenmedi";
 
     [ObservableProperty]
-    private string bestWorkerScoreText = "0 puan";
+    private string bestWorkerScoreText = string.Empty;
 
     [ObservableProperty]
-    private string worstWorkerName = "Henuz belirlenmedi";
+    private string worstWorkerName = "Henüz belirlenmedi";
 
     [ObservableProperty]
-    private string worstWorkerScoreText = "0 puan";
+    private string worstWorkerScoreText = string.Empty;
+
+    [ObservableProperty]
+    private bool hasBestWorkerScore;
+
+    [ObservableProperty]
+    private bool hasWorstWorkerScore;
+
+    [ObservableProperty]
+    private IReadOnlyList<DashboardMonthOption> monthOptions = [];
+
+    [ObservableProperty]
+    private DashboardMonthOption? selectedMonthOption;
+
+    [ObservableProperty]
+    private string selectedMonthDisplayText = "Dönem Seçin";
 
     [RelayCommand]
     private async Task LoadAsync()
@@ -98,7 +119,7 @@ public partial class CompanyDashboardPageViewModel(
 
         if (UserSession.CompanyId is null)
         {
-            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
@@ -106,6 +127,7 @@ public partial class CompanyDashboardPageViewModel(
         {
             IsBusy = true;
             ErrorMessage = string.Empty;
+            EnsureMonthOptionsInitialized();
 
             var companyId = UserSession.CompanyId.Value;
             var period = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -125,6 +147,7 @@ public partial class CompanyDashboardPageViewModel(
             var reports = await reportsTask;
             var stats = await statsTask;
             var plans = await plansTask ?? [];
+            _companyUsers = users.ToList();
             var companyUserIds = users
                 .Select(user => user.Id)
                 .Where(id => id != Guid.Empty)
@@ -159,11 +182,11 @@ public partial class CompanyDashboardPageViewModel(
             RejectedReportCount = companyReports.Count(item => IsRejectedReportStatus(item.ReportStatusId));
             AvailablePlanCount = plans.Count;
 
-            UpdateEmployeeRanking(users, companyStats);
+            await RefreshEmployeeRankingAsync();
             UpdateTaskDistribution();
             UpdateReportDistribution();
 
-            StatusText = $"Ekip: {TotalTeamCount} | Calisan: {TotalWorkerCount} | Gorev: {TotalTaskCount}";
+            StatusText = $"Ekip: {TotalTeamCount} | Çalışan: {TotalWorkerCount} | Görev: {TotalTaskCount}";
         }
         catch (ApiException ex)
         {
@@ -179,7 +202,7 @@ public partial class CompanyDashboardPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -209,10 +232,12 @@ public partial class CompanyDashboardPageViewModel(
         IReadOnlyCollection<CompanyUserDto> users,
         IReadOnlyCollection<Models.Stats.WorkerStatsDto> companyStats)
     {
-        BestWorkerName = "Henuz belirlenmedi";
-        BestWorkerScoreText = "0 puan";
-        WorstWorkerName = "Henuz belirlenmedi";
-        WorstWorkerScoreText = "0 puan";
+        BestWorkerName = "Henüz belirlenmedi";
+        BestWorkerScoreText = string.Empty;
+        WorstWorkerName = "Henüz belirlenmedi";
+        WorstWorkerScoreText = string.Empty;
+        HasBestWorkerScore = false;
+        HasWorstWorkerScore = false;
 
         if (companyStats.Count == 0)
         {
@@ -227,7 +252,7 @@ public partial class CompanyDashboardPageViewModel(
                 grouped =>
                 {
                     var name = grouped.First().Name?.Trim();
-                    return string.IsNullOrWhiteSpace(name) ? "Bilinmeyen Calisan" : name;
+                    return string.IsNullOrWhiteSpace(name) ? "Bilinmeyen Çalışan" : name;
                 });
 
         var rankedStats = companyStats
@@ -240,22 +265,24 @@ public partial class CompanyDashboardPageViewModel(
         var worst = rankedStats[^1];
 
         BestWorkerName = ResolveUserDisplayName(best.UserId, userNameMap);
-        BestWorkerScoreText = $"{best.TotalPoints} puan";
+        HasBestWorkerScore = best.TotalPoints > 0;
+        BestWorkerScoreText = HasBestWorkerScore ? $"{best.TotalPoints} puan" : string.Empty;
 
         WorstWorkerName = ResolveUserDisplayName(worst.UserId, userNameMap);
-        WorstWorkerScoreText = $"{worst.TotalPoints} puan";
+        HasWorstWorkerScore = worst.TotalPoints > 0;
+        WorstWorkerScoreText = HasWorstWorkerScore ? $"{worst.TotalPoints} puan" : string.Empty;
     }
 
     private static string ResolveUserDisplayName(Guid userId, IReadOnlyDictionary<Guid, string> userNameMap)
     {
         if (userId == Guid.Empty)
         {
-            return "Bilinmeyen Calisan";
+            return "Bilinmeyen Çalışan";
         }
 
         return userNameMap.TryGetValue(userId, out var name) && !string.IsNullOrWhiteSpace(name)
             ? name
-            : "Bilinmeyen Calisan";
+            : "Bilinmeyen Çalışan";
     }
 
     private void UpdateTaskDistribution()
@@ -484,4 +511,76 @@ public partial class CompanyDashboardPageViewModel(
             .OrderBy(group => group.GroupName)
             .ToList();
     }
+    partial void OnSelectedMonthOptionChanged(DashboardMonthOption? value)
+    {
+        SelectedMonthDisplayText = value?.Label ?? "Dönem Seçin";
+
+        if (_isInitializingMonthSelection || value is null)
+        {
+            return;
+        }
+
+        _ = RefreshEmployeeRankingAsync();
+    }
+
+    private async Task RefreshEmployeeRankingAsync()
+    {
+        if (UserSession.CompanyId is null)
+        {
+            return;
+        }
+
+        if (_companyUsers.Count == 0)
+        {
+            UpdateEmployeeRanking([], []);
+            return;
+        }
+
+        var selectedPeriod = SelectedMonthOption?.Period ?? DateOnly.FromDateTime(DateTime.UtcNow);
+        var companyUserIds = _companyUsers
+            .Select(user => user.Id)
+            .Where(id => id != Guid.Empty)
+            .ToHashSet();
+
+        try
+        {
+            var stats = await LoadAllStatsByPeriodAsync(selectedPeriod);
+            var companyStats = stats
+                .Where(workerStat => companyUserIds.Contains(workerStat.UserId))
+                .ToList();
+            UpdateEmployeeRanking(_companyUsers, companyStats);
+        }
+        catch
+        {
+            UpdateEmployeeRanking(_companyUsers, []);
+        }
+    }
+
+    private void EnsureMonthOptionsInitialized()
+    {
+        if (MonthOptions.Count > 0)
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        var options = Enumerable
+            .Range(0, MonthSelectionCount)
+            .Select(offset =>
+            {
+                var date = now.AddMonths(-offset);
+                var monthName = TurkishCulture.DateTimeFormat.GetMonthName(date.Month);
+                var label = $"{char.ToUpper(monthName[0], TurkishCulture)}{monthName[1..]} {date.Year}";
+                return new DashboardMonthOption(label, new DateOnly(date.Year, date.Month, 1));
+            })
+            .ToList();
+
+        _isInitializingMonthSelection = true;
+        MonthOptions = options;
+        SelectedMonthOption = options[0];
+        _isInitializingMonthSelection = false;
+    }
+
+    public sealed record DashboardMonthOption(string Label, DateOnly Period);
 }
+
