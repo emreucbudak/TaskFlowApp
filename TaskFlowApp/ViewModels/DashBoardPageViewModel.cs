@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Api;
@@ -6,6 +6,7 @@ using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Chat;
 using TaskFlowApp.Models.Identity;
+using TaskFlowApp.Models.ProjectManagement;
 using TaskFlowApp.Models.Stats;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
@@ -22,8 +23,11 @@ public partial class DashBoardPageViewModel(
     IdentityApiClient identityApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     private const int GroupActivityPreviewCount = 5;
+    private const int GroupMessagesPageSize = 100;
+    private const int IndividualTasksPageSize = 100;
     private const string NoGroupMessage = "Üyesi olunan grup bulunamadı.";
     private const string NoActivityMessage = "Grupta henüz aktivite yok.";
+    private const string NoDailySummaryMessage = "Günün özeti bulunamadı.";
 
     public ObservableCollection<GroupRecentActivityItem> GroupRecentActivities { get; } = [];
 
@@ -46,10 +50,25 @@ public partial class DashBoardPageViewModel(
     private int unreadMessageCount;
 
     [ObservableProperty]
+    private int completedIndividualTaskCount;
+
+    [ObservableProperty]
+    private int completedGroupTaskCount;
+
+    [ObservableProperty]
+    private int overdueIndividualTaskCount;
+
+    [ObservableProperty]
+    private int overdueGroupTaskCount;
+
+    [ObservableProperty]
     private string groupActivityEmptyMessage = NoGroupMessage;
 
     [ObservableProperty]
     private string currentGroupName = string.Empty;
+
+    [ObservableProperty]
+    private string dailySummaryText = NoDailySummaryMessage;
 
     [ObservableProperty]
     private bool hasGroupRecentActivities;
@@ -85,16 +104,16 @@ public partial class DashBoardPageViewModel(
             ResetGroupActivitiesState();
 
             var userId = UserSession.UserId.Value;
-            var period = DateOnly.FromDateTime(DateTime.UtcNow);
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-            var tasksTask = projectManagementApiClient.GetIndividualTasksByUserIdAsync(userId, 1, 10);
+            var individualTasksTask = LoadAllIndividualTasksAsync(userId);
             var unreadTask = chatApiClient.GetUnreadMessageCountAsync(userId);
             var groupActivitiesTask = LoadGroupRecentActivitiesSafeAsync(userId);
 
             WorkerStatsDto? stats = null;
             try
             {
-                stats = await statsApiClient.GetWorkerStatsByUserAndPeriodAsync(userId, period);
+                stats = await statsApiClient.GetWorkerStatsByUserAndPeriodAsync(userId, today);
             }
             catch (ApiException ex) when (ex.StatusCode == 404)
             {
@@ -102,21 +121,29 @@ public partial class DashBoardPageViewModel(
                 stats = null;
             }
 
-            await Task.WhenAll(tasksTask, unreadTask, groupActivitiesTask);
+            await Task.WhenAll(individualTasksTask, unreadTask, groupActivitiesTask);
 
-            var tasks = await tasksTask;
+            var individualTasks = await individualTasksTask;
             var unread = await unreadTask;
-            var individualTasks = tasks?.TotalCount > 0
-                ? tasks.TotalCount
-                : tasks?.Items.Count ?? 0;
-            var assignedTasks = stats?.TotalTasksAssigned ?? individualTasks;
-            var groupedTasks = Math.Max(0, assignedTasks - individualTasks);
+            var individualTaskCount = individualTasks.Count;
+            var assignedTasks = stats?.TotalTasksAssigned ?? individualTaskCount;
+            var groupedTasks = Math.Max(0, assignedTasks - individualTaskCount);
+            var completedTasks = stats?.TotalTasksCompleted ?? 0;
+            var overdueTaskCount = stats?.OverdueIncompleteTasksCount ?? 0;
+            var completedIndividualTasks = individualTasks.Count(task => IsCompletedStatus(task.StatusName));
+            var overdueIndividualTasks = individualTasks.Count(task =>
+                task.Deadline < today &&
+                !IsCompletedStatus(task.StatusName));
 
             TotalAssigned = assignedTasks;
-            TotalCompleted = stats?.TotalTasksCompleted ?? 0;
-            OverdueTasks = stats?.OverdueIncompleteTasksCount ?? 0;
-            IndividualTaskCount = individualTasks;
+            TotalCompleted = completedTasks;
+            OverdueTasks = overdueTaskCount;
+            IndividualTaskCount = individualTaskCount;
             GroupTaskCount = groupedTasks;
+            CompletedIndividualTaskCount = completedIndividualTasks;
+            CompletedGroupTaskCount = Math.Max(0, completedTasks - completedIndividualTasks);
+            OverdueIndividualTaskCount = overdueIndividualTasks;
+            OverdueGroupTaskCount = Math.Max(0, overdueTaskCount - overdueIndividualTasks);
             UnreadMessageCount = unread;
 
             StatusText = string.Empty;
@@ -199,6 +226,7 @@ public partial class DashBoardPageViewModel(
         if (currentGroup.GroupId == Guid.Empty)
         {
             GroupActivityEmptyMessage = NoActivityMessage;
+            DailySummaryText = NoDailySummaryMessage;
             return;
         }
 
@@ -206,9 +234,11 @@ public partial class DashBoardPageViewModel(
         {
             CurrentUserId = userId,
             GroupId = currentGroup.GroupId,
-            PageSize = 30,
+            PageSize = GroupMessagesPageSize,
             Page = 1
         }) ?? [];
+
+        DailySummaryText = ResolveDailySummaryText(messages);
 
         var recentActivities = messages
             .Where(message => !message.IsDeleted)
@@ -238,6 +268,7 @@ public partial class DashBoardPageViewModel(
         HasGroupRecentActivities = false;
         HasUserGroup = false;
         CurrentGroupName = string.Empty;
+        DailySummaryText = NoDailySummaryMessage;
         GroupActivityEmptyMessage = NoGroupMessage;
     }
 
@@ -247,7 +278,38 @@ public partial class DashBoardPageViewModel(
         HasGroupRecentActivities = false;
         HasUserGroup = false;
         CurrentGroupName = string.Empty;
+        DailySummaryText = NoDailySummaryMessage;
         GroupActivityEmptyMessage = NoGroupMessage;
+    }
+
+    private async Task<List<IndividualTaskDto>> LoadAllIndividualTasksAsync(Guid userId)
+    {
+        var firstPage = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(
+            userId,
+            1,
+            IndividualTasksPageSize);
+
+        var allTasks = firstPage?.Items?.ToList() ?? [];
+        var totalCount = firstPage?.TotalCount > 0 ? firstPage.TotalCount : allTasks.Count;
+        var effectivePageSize = firstPage?.PageSize > 0 ? firstPage.PageSize : IndividualTasksPageSize;
+        var totalPages = (int)Math.Ceiling(totalCount / (double)Math.Max(1, effectivePageSize));
+
+        for (var page = 2; page <= totalPages; page++)
+        {
+            var pageResult = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(
+                userId,
+                page,
+                effectivePageSize);
+            var pageItems = pageResult?.Items ?? [];
+            if (pageItems.Count == 0)
+            {
+                break;
+            }
+
+            allTasks.AddRange(pageItems);
+        }
+
+        return allTasks;
     }
 
     private static bool IsGroupMember(CompanyGroupDto group, Guid userId, string? currentUserName)
@@ -319,14 +381,101 @@ public partial class DashBoardPageViewModel(
             : $"mesaj paylasti: {normalizedContent}";
     }
 
+    private static string ResolveDailySummaryText(IEnumerable<MessageDto> messages)
+    {
+        foreach (var message in messages
+                     .Where(message => !message.IsDeleted)
+                     .OrderByDescending(message => message.SendTime))
+        {
+            var summaryText = TryExtractDailySummaryText(message);
+            if (!string.IsNullOrWhiteSpace(summaryText))
+            {
+                return summaryText;
+            }
+        }
+
+        return NoDailySummaryMessage;
+    }
+
+    private static string? TryExtractDailySummaryText(MessageDto message)
+    {
+        var localTime = ConvertToLocalTime(message.SendTime);
+        if (localTime.Date != DateTime.Now.Date)
+        {
+            return null;
+        }
+
+        var content = message.Content?.Trim();
+        if (string.IsNullOrWhiteSpace(content) || !ContainsDailySummaryKeyword(content))
+        {
+            return null;
+        }
+
+        var prefixes = new[]
+        {
+            "Günün özeti:",
+            "Günün özeti",
+            "Gunun ozeti:",
+            "Gunun ozeti",
+            "Gün özeti:",
+            "Gün özeti",
+            "Gun ozeti:",
+            "Gun ozeti",
+            "Daily summary:",
+            "Daily summary"
+        };
+
+        foreach (var prefix in prefixes)
+        {
+            if (!content.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var trimmedSummary = content[prefix.Length..].TrimStart(' ', ':', '-', '–');
+            return string.IsNullOrWhiteSpace(trimmedSummary) ? content : trimmedSummary;
+        }
+
+        return content;
+    }
+
+    private static bool ContainsDailySummaryKeyword(string content)
+    {
+        var normalized = content.Trim().ToLowerInvariant();
+        return normalized.Contains("günün özeti")
+            || normalized.Contains("gunun ozeti")
+            || normalized.Contains("gün özeti")
+            || normalized.Contains("gun ozeti")
+            || normalized.Contains("daily summary");
+    }
+
+    private static bool IsCompletedStatus(string? statusName)
+    {
+        if (string.IsNullOrWhiteSpace(statusName))
+        {
+            return false;
+        }
+
+        var normalizedStatus = statusName.Trim().ToLowerInvariant();
+        return normalizedStatus.Contains("tamam")
+            || normalizedStatus.Contains("complete")
+            || normalizedStatus.Contains("done")
+            || normalizedStatus.Contains("closed");
+    }
+
+    private static DateTime ConvertToLocalTime(DateTime value)
+    {
+        return value.Kind switch
+        {
+            DateTimeKind.Utc => value.ToLocalTime(),
+            DateTimeKind.Local => value,
+            _ => DateTime.SpecifyKind(value, DateTimeKind.Utc).ToLocalTime()
+        };
+    }
+
     private static string FormatRelativeTime(DateTime sendTime)
     {
-        var localTime = sendTime.Kind switch
-        {
-            DateTimeKind.Utc => sendTime.ToLocalTime(),
-            DateTimeKind.Local => sendTime,
-            _ => DateTime.SpecifyKind(sendTime, DateTimeKind.Utc).ToLocalTime()
-        };
+        var localTime = ConvertToLocalTime(sendTime);
 
         var elapsed = DateTime.Now - localTime;
         if (elapsed < TimeSpan.Zero)
@@ -357,4 +506,3 @@ public partial class DashBoardPageViewModel(
         return localTime.ToString("dd.MM.yyyy HH:mm");
     }
 }
-

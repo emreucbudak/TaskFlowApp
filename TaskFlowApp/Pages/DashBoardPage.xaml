@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
@@ -7,33 +7,29 @@
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
-
-        <!-- TOP NAV BAR -->
         <Grid Grid.Row="0"
               Padding="20,16,20,10"
               ColumnDefinitions="Auto,*,Auto"
               BackgroundColor="#0D1B2A">
-
             <Image Grid.Column="0"
                    Source="https://www.logoai.com/uploads/icon/2021/08/06/732ca933-7df8-43e8-b085-69466243c919.png"
                    WidthRequest="32"
                    HeightRequest="32"
                    Aspect="AspectFit"
-                   VerticalOptions="Center"/>
+                   VerticalOptions="Center" />
 
-            <!-- Avatar + Online Dot -->
             <Grid Grid.Column="2"
                   WidthRequest="44"
                   HeightRequest="44"
                   HorizontalOptions="End"
                   VerticalOptions="Center">
-<Ellipse WidthRequest="44"
+                <Ellipse WidthRequest="44"
                          HeightRequest="44"
                          Stroke="#3A5068"
                          StrokeThickness="1.5"
                          Fill="#1A3A5C"
                          HorizontalOptions="Center"
-                         VerticalOptions="Center"/>
+                         VerticalOptions="Center" />
 
                 <Grid WidthRequest="44"
                       HeightRequest="44"
@@ -44,13 +40,13 @@
                              Fill="#5B8DB8"
                              HorizontalOptions="Center"
                              VerticalOptions="Start"
-                             Margin="0,10,0,0"/>
+                             Margin="0,10,0,0" />
                     <Ellipse WidthRequest="28"
                              HeightRequest="20"
                              Fill="#5B8DB8"
                              HorizontalOptions="Center"
                              VerticalOptions="End"
-                             Margin="0,0,0,2"/>
+                             Margin="0,0,0,2" />
                 </Grid>
 
                 <Ellipse WidthRequest="12"
@@ -60,18 +56,15 @@
                          StrokeThickness="2"
                          HorizontalOptions="End"
                          VerticalOptions="End"
-                         Margin="0,0,1,1"/>
+                         Margin="0,0,1,1" />
             </Grid>
-
         </Grid>
 
-        <!-- DIVIDER: NavBar / Content -->
         <BoxView Grid.Row="1"
                  Color="#1E2E3E"
                  HeightRequest="1"
-                 HorizontalOptions="Fill"/>
+                 HorizontalOptions="Fill" />
 
-        <!-- CONTENT AREA -->
         <ScrollView Grid.Row="2">
             <VerticalStackLayout Padding="20,14,20,20" Spacing="16">
                 <ActivityIndicator
@@ -91,7 +84,7 @@
                        Margin="2,0,0,0" />
 
                 <Grid ColumnDefinitions="*,*"
-                      RowDefinitions="Auto,Auto,Auto"
+                      RowDefinitions="Auto,Auto,Auto,Auto,Auto"
                       ColumnSpacing="10"
                       RowSpacing="10">
                     <Border Grid.Row="0"
@@ -115,7 +108,7 @@
                             StrokeShape="RoundRectangle 14"
                             Padding="14">
                         <VerticalStackLayout Spacing="4">
-                            <Label Text="Atanan Grupsal Görev" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="Atanan Grup Görevi" TextColor="#B8C6D6" FontSize="12" />
                             <Label Text="{Binding GroupTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
                         </VerticalStackLayout>
                     </Border>
@@ -128,7 +121,7 @@
                             StrokeShape="RoundRectangle 14"
                             Padding="14">
                         <VerticalStackLayout Spacing="4">
-                            <Label Text="Tamamlanan Görev" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="Toplam Tamamlanan Görev" TextColor="#B8C6D6" FontSize="12" />
                             <Label Text="{Binding TotalCompleted}" TextColor="White" FontSize="24" FontAttributes="Bold" />
                         </VerticalStackLayout>
                     </Border>
@@ -141,12 +134,64 @@
                             StrokeShape="RoundRectangle 14"
                             Padding="14">
                         <VerticalStackLayout Spacing="4">
-                            <Label Text="Geciken Görev" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="Toplam Geciken Görev" TextColor="#B8C6D6" FontSize="12" />
                             <Label Text="{Binding OverdueTasks}" TextColor="White" FontSize="24" FontAttributes="Bold" />
                         </VerticalStackLayout>
                     </Border>
 
                     <Border Grid.Row="2"
+                            Grid.Column="0"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Tamamlanan Bireysel Görev" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="{Binding CompletedIndividualTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="2"
+                            Grid.Column="1"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Tamamlanan Grup Görevi" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="{Binding CompletedGroupTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="3"
+                            Grid.Column="0"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Geciken Bireysel Görev" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="{Binding OverdueIndividualTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="3"
+                            Grid.Column="1"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Geciken Grup Görevi" TextColor="#B8C6D6" FontSize="12" />
+                            <Label Text="{Binding OverdueGroupTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="4"
                             Grid.Column="0"
                             Grid.ColumnSpan="2"
                             BackgroundColor="#0F2338"
@@ -224,22 +269,34 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <Label Text="Günün Özeti"
+                       TextColor="White"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       Margin="2,6,0,0" />
+
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#34506C"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="14">
+                    <Label Text="{Binding DailySummaryText}"
+                           TextColor="#D4E2F0"
+                           FontSize="12"
+                           LineBreakMode="WordWrap" />
+                </Border>
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- DIVIDER: Content / BottomBar -->
         <BoxView Grid.Row="3"
                  Color="#1E2E3E"
                  HeightRequest="1"
-                 HorizontalOptions="Fill"/>
+                 HorizontalOptions="Fill" />
 
-        <!-- BOTTOM TAB BAR -->
         <Grid Grid.Row="4"
               ColumnDefinitions="*,*,*,*,*,*"
               BackgroundColor="#0F1E2D"
               Padding="0,6,0,18">
-
-            <!-- Ana Sayfa (Active) -->
             <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnHomeTapped" />
@@ -256,16 +313,15 @@
                            HeightRequest="18"
                            Aspect="AspectFit"
                            HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
+                           VerticalOptions="Center" />
                 </Border>
                 <BoxView Color="#2196F3"
                          WidthRequest="4"
                          HeightRequest="3"
                          CornerRadius="1.5"
-                         HorizontalOptions="Center"/>
+                         HorizontalOptions="Center" />
             </VerticalStackLayout>
 
-            <!-- Raporlar -->
             <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnReportsTapped" />
@@ -282,11 +338,10 @@
                            HeightRequest="18"
                            Aspect="AspectFit"
                            HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
+                           VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
 
-            <!-- GÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬ÂÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¶revler -->
             <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTasksTapped" />
@@ -303,11 +358,10 @@
                            HeightRequest="18"
                            Aspect="AspectFit"
                            HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
+                           VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
 
-            <!-- Mesajlar -->
             <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnMessagesTapped" />
@@ -324,11 +378,10 @@
                            HeightRequest="18"
                            Aspect="AspectFit"
                            HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
+                           VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
 
-            <!-- Bildirimler -->
             <VerticalStackLayout Grid.Column="4" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnNotificationsTapped" />
@@ -345,10 +398,10 @@
                            HeightRequest="18"
                            Aspect="AspectFit"
                            HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
+                           VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
-            <!-- Cikis -->
+
             <VerticalStackLayout Grid.Column="5" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnLogoutTapped" />
@@ -365,11 +418,9 @@
                            HeightRequest="18"
                            Aspect="AspectFit"
                            HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
+                           VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
         </Grid>
     </Grid>
 </ContentPage>
-
-
