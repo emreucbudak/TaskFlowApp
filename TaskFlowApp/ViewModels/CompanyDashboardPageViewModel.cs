@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Globalization;
 using TaskFlowApp.Infrastructure.Api;
@@ -83,13 +83,13 @@ public partial class CompanyDashboardPageViewModel(
     private string rejectedReportLegendText = "0 (%0)";
 
     [ObservableProperty]
-    private string bestWorkerName = "Henüz belirlenmedi";
+    private string bestWorkerName = "Henuz belirlenmedi";
 
     [ObservableProperty]
     private string bestWorkerScoreText = string.Empty;
 
     [ObservableProperty]
-    private string worstWorkerName = "Henüz belirlenmedi";
+    private string worstWorkerName = "Henuz belirlenmedi";
 
     [ObservableProperty]
     private string worstWorkerScoreText = string.Empty;
@@ -107,7 +107,7 @@ public partial class CompanyDashboardPageViewModel(
     private DashboardMonthOption? selectedMonthOption;
 
     [ObservableProperty]
-    private string selectedMonthDisplayText = "Dönem Seçin";
+    private string selectedMonthDisplayText = "Donem Secin";
 
     [RelayCommand]
     private async Task LoadAsync()
@@ -119,7 +119,7 @@ public partial class CompanyDashboardPageViewModel(
 
         if (UserSession.CompanyId is null)
         {
-            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
+            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
             return;
         }
 
@@ -163,10 +163,13 @@ public partial class CompanyDashboardPageViewModel(
                 task.DeadlineTime < period &&
                 !IsCompletedStatus(task.StatusName));
             var completedFromTasks = tasks.Count(task => IsCompletedStatus(task.StatusName));
+            var individualTaskSnapshot = await LoadCompanyIndividualTaskSnapshotAsync(users, period);
             var totalTasksFromStats = companyStats.Sum(item => item.TotalTasksAssigned);
             var individualTaskCount = totalTasksFromStats > 0
-                ? totalTasksFromStats
-                : await LoadAllCompanyIndividualTaskCountAsync(users);
+                ? Math.Max(totalTasksFromStats, individualTaskSnapshot.TotalCount)
+                : individualTaskSnapshot.TotalCount;
+            var overdueIndividualTaskCount = individualTaskSnapshot.OverdueCount;
+            var overdueTasksFromStats = companyStats.Sum(item => item.OverdueIncompleteTasksCount);
 
             TotalTeamCount = normalizedGroups.Count;
             TotalWorkerCount = companyUserIds.Count;
@@ -175,9 +178,7 @@ public partial class CompanyDashboardPageViewModel(
             CompletedTaskCount = companyStats.Count > 0
                 ? companyStats.Sum(item => item.TotalTasksCompleted)
                 : completedFromTasks;
-            OverdueTaskCount = companyStats.Count > 0
-                ? companyStats.Sum(item => item.OverdueIncompleteTasksCount)
-                : overdueFromTasks;
+            OverdueTaskCount = overdueFromTasks + Math.Max(overdueTasksFromStats, overdueIndividualTaskCount);
             ResolvedReportCount = companyReports.Count(item => IsResolvedReportStatus(item.ReportStatusId));
             RejectedReportCount = companyReports.Count(item => IsRejectedReportStatus(item.ReportStatusId));
             AvailablePlanCount = plans.Count;
@@ -186,7 +187,7 @@ public partial class CompanyDashboardPageViewModel(
             UpdateTaskDistribution();
             UpdateReportDistribution();
 
-            StatusText = $"Ekip: {TotalTeamCount} | Çalışan: {TotalWorkerCount} | Görev: {TotalTaskCount}";
+            StatusText = $"Ekip: {TotalTeamCount} | Calisan: {TotalWorkerCount} | Gorev: {TotalTaskCount}";
         }
         catch (ApiException ex)
         {
@@ -202,7 +203,7 @@ public partial class CompanyDashboardPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
         }
         finally
         {
@@ -232,9 +233,9 @@ public partial class CompanyDashboardPageViewModel(
         IReadOnlyCollection<CompanyUserDto> users,
         IReadOnlyCollection<Models.Stats.WorkerStatsDto> companyStats)
     {
-        BestWorkerName = "Henüz belirlenmedi";
+        BestWorkerName = "Henuz belirlenmedi";
         BestWorkerScoreText = string.Empty;
-        WorstWorkerName = "Henüz belirlenmedi";
+        WorstWorkerName = "Henuz belirlenmedi";
         WorstWorkerScoreText = string.Empty;
         HasBestWorkerScore = false;
         HasWorstWorkerScore = false;
@@ -252,21 +253,37 @@ public partial class CompanyDashboardPageViewModel(
                 grouped =>
                 {
                     var name = grouped.First().Name?.Trim();
-                    return string.IsNullOrWhiteSpace(name) ? "Bilinmeyen Çalışan" : name;
+                    return string.IsNullOrWhiteSpace(name) ? "Bilinmeyen Calisan" : name;
                 });
 
         var rankedStats = companyStats
+            .Where(item => item.UserId != Guid.Empty)
+            .GroupBy(item => item.UserId)
+            .Select(group => new RankedWorkerSummary(
+                group.Key,
+                group.Sum(item => item.TotalPoints),
+                group.Sum(item => item.TotalTasksCompleted)))
             .OrderByDescending(item => item.TotalPoints)
             .ThenByDescending(item => item.TotalTasksCompleted)
             .ThenBy(item => ResolveUserDisplayName(item.UserId, userNameMap), StringComparer.OrdinalIgnoreCase)
             .ToList();
 
+        if (rankedStats.Count == 0)
+        {
+            return;
+        }
+
         var best = rankedStats[0];
-        var worst = rankedStats[^1];
+        var worst = rankedStats.Count > 1 ? rankedStats[^1] : null;
 
         BestWorkerName = ResolveUserDisplayName(best.UserId, userNameMap);
         HasBestWorkerScore = best.TotalPoints > 0;
         BestWorkerScoreText = HasBestWorkerScore ? $"{best.TotalPoints} puan" : string.Empty;
+
+        if (worst is null)
+        {
+            return;
+        }
 
         WorstWorkerName = ResolveUserDisplayName(worst.UserId, userNameMap);
         HasWorstWorkerScore = worst.TotalPoints > 0;
@@ -277,12 +294,12 @@ public partial class CompanyDashboardPageViewModel(
     {
         if (userId == Guid.Empty)
         {
-            return "Bilinmeyen Çalışan";
+            return "Bilinmeyen Calisan";
         }
 
         return userNameMap.TryGetValue(userId, out var name) && !string.IsNullOrWhiteSpace(name)
             ? name
-            : "Bilinmeyen Çalışan";
+            : "Bilinmeyen Calisan";
     }
 
     private void UpdateTaskDistribution()
@@ -375,7 +392,7 @@ public partial class CompanyDashboardPageViewModel(
         }
     }
 
-    private async Task<int> LoadAllCompanyIndividualTaskCountAsync(IEnumerable<CompanyUserDto> users)
+    private async Task<(int TotalCount, int OverdueCount)> LoadCompanyIndividualTaskSnapshotAsync(IEnumerable<CompanyUserDto> users, DateOnly period)
     {
         var userIds = users
             .Select(user => user.Id)
@@ -385,35 +402,61 @@ public partial class CompanyDashboardPageViewModel(
 
         if (userIds.Count == 0)
         {
-            return 0;
+            return (0, 0);
         }
 
-        var countJobs = userIds
-            .Select(LoadIndividualTaskCountByUserIdSafeAsync)
+        var snapshotJobs = userIds
+            .Select(userId => LoadIndividualTaskSnapshotByUserIdSafeAsync(userId, period))
             .ToList();
-        var counts = await Task.WhenAll(countJobs);
-        return counts.Sum();
+        var snapshots = await Task.WhenAll(snapshotJobs);
+
+        return (
+            TotalCount: snapshots.Sum(item => item.TotalCount),
+            OverdueCount: snapshots.Sum(item => item.OverdueCount));
     }
 
-    private async Task<int> LoadIndividualTaskCountByUserIdSafeAsync(Guid userId)
+    private async Task<(int TotalCount, int OverdueCount)> LoadIndividualTaskSnapshotByUserIdSafeAsync(Guid userId, DateOnly period)
     {
         try
         {
-            var firstPage = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(userId, 1, TasksPageSize);
-            var pageItemsCount = firstPage?.Items?.Count ?? 0;
-            return firstPage?.TotalCount > 0 ? firstPage.TotalCount : pageItemsCount;
+            var allTasks = new List<Models.ProjectManagement.IndividualTaskDto>();
+            var pageNumber = 1;
+
+            while (pageNumber <= MaxPageTraversal)
+            {
+                var response = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(userId, pageNumber, TasksPageSize);
+                var pageItems = response?.Items ?? [];
+
+                if (pageItems.Count == 0)
+                {
+                    break;
+                }
+
+                allTasks.AddRange(pageItems);
+
+                if (pageItems.Count < TasksPageSize)
+                {
+                    break;
+                }
+
+                pageNumber++;
+            }
+
+            return (
+                TotalCount: allTasks.Count,
+                OverdueCount: allTasks.Count(task => task.Deadline < period && !IsCompletedStatus(task.StatusName)));
         }
         catch (ApiException)
         {
-            return 0;
+            return (0, 0);
         }
         catch (HttpRequestException)
         {
-            return 0;
+            return (0, 0);
         }
         catch (TaskCanceledException)
         {
-            return 0;
+            return (0, 0);
         }
     }
 
@@ -513,7 +556,7 @@ public partial class CompanyDashboardPageViewModel(
     }
     partial void OnSelectedMonthOptionChanged(DashboardMonthOption? value)
     {
-        SelectedMonthDisplayText = value?.Label ?? "Dönem Seçin";
+        SelectedMonthDisplayText = value?.Label ?? "Donem Secin";
 
         if (_isInitializingMonthSelection || value is null)
         {
@@ -581,6 +624,7 @@ public partial class CompanyDashboardPageViewModel(
         _isInitializingMonthSelection = false;
     }
 
+    private sealed record RankedWorkerSummary(Guid UserId, int TotalPoints, int TotalTasksCompleted);
+
     public sealed record DashboardMonthOption(string Label, DateOnly Period);
 }
-

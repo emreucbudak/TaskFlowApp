@@ -5,7 +5,7 @@ public static class AppEndpoints
 #if ANDROID
     public const string ApiBaseUrl = "http://10.0.2.2:8080/";
 #else
-    public const string ApiBaseUrl = "http://localhost:8080/";
+    public const string ApiBaseUrl = "http://127.0.0.1:8080/";
 #endif
 
     public const string ChatHubPath = "chatHub";
