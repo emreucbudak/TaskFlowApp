@@ -67,6 +67,24 @@ public sealed class IdentityApiClient(IApiClient apiClient) : ControllerApiClien
             new { CompanyId = companyId },
             cancellationToken: cancellationToken);
 
+    public Task<PagedResultDto<CompanyUserDto>> SearchCompanyUsersAsync(Guid companyId, string searchText, int page = 1, int pageSize = 20, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<PagedResultDto<CompanyUserDto>>(
+            "SearchCompanyUsersQueryRequest",
+            new { CompanyId = companyId, SearchText = searchText, Page = page, PageSize = pageSize },
+            cancellationToken: cancellationToken);
+
+    public Task<DepartmentLeaderDto> GetDepartmentLeaderAsync(Guid departmentId, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<DepartmentLeaderDto>(
+            "GetDepartmentLeaderQueryRequest",
+            new { DepartmentId = departmentId },
+            cancellationToken: cancellationToken);
+
+    public async Task<Guid?> GetDepartmentLeaderIdAsync(Guid departmentId, CancellationToken cancellationToken = default)
+    {
+        var response = await GetDepartmentLeaderAsync(departmentId, cancellationToken);
+        return response.LeaderId == Guid.Empty ? null : response.LeaderId;
+    }
+
     public Task<JsonElement> GetDepartmentLeaderQueryRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostForJsonAsync("GetDepartmentLeaderQueryRequest", request, cancellationToken: cancellationToken);
 

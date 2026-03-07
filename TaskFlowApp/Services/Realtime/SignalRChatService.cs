@@ -98,18 +98,31 @@ public sealed class SignalRChatService(IUserSession userSession) : ISignalRChatS
 
         connection.On<string, string, DateTime>("ReceivePrivateMessage", (senderId, message, sendTime) =>
         {
-            var senderGuid = Guid.TryParse(senderId, out var parsed) ? parsed : Guid.Empty;
-            var model = new MessageDto
+            var senderGuid = Guid.TryParse(senderId, out var parsedSenderId) ? parsedSenderId : Guid.Empty;
+            PrivateMessageReceived?.Invoke(new MessageDto
             {
                 Id = Guid.NewGuid(),
                 SenderId = senderGuid,
                 Content = message,
-                SendTime = sendTime,
+                SendTime = NormalizeSendTime(sendTime),
                 IsRead = false,
                 IsDelivered = true
-            };
+            });
+        });
 
-            PrivateMessageReceived?.Invoke(model);
+        connection.On<string, MessageDto>("ReceivePrivateMessage", (_, message) =>
+        {
+            if (message is null)
+            {
+                return;
+            }
+
+            PrivateMessageReceived?.Invoke(message with
+            {
+                Id = message.Id == Guid.Empty ? Guid.NewGuid() : message.Id,
+                IsDelivered = true,
+                SendTime = NormalizeSendTime(message.SendTime)
+            });
         });
 
         connection.Reconnecting += _ =>
@@ -131,5 +144,12 @@ public sealed class SignalRChatService(IUserSession userSession) : ISignalRChatS
         };
 
         return connection;
+    }
+
+    private static DateTime NormalizeSendTime(DateTime sendTime)
+    {
+        return sendTime.Kind == DateTimeKind.Unspecified
+            ? DateTime.SpecifyKind(sendTime, DateTimeKind.Utc)
+            : sendTime;
     }
 }

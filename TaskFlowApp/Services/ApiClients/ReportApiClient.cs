@@ -22,6 +22,12 @@ public sealed class ReportApiClient(IApiClient apiClient) : ControllerApiClientB
             new { Page = page, PageSize = pageSize },
             cancellationToken: cancellationToken);
 
+    public Task<PagedResultDto<ReportDto>> GetDepartmentReportsAsync(Guid departmentId, int page = 1, int pageSize = 10, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<PagedResultDto<ReportDto>>(
+            "GetDepartmentReportsQueryRequest",
+            new { DepartmentId = departmentId, Page = page, PageSize = pageSize },
+            cancellationToken: cancellationToken);
+
     public Task<JsonElement> GetReportByIdQueryRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostForJsonAsync("GetReportByIdQueryRequest", request, cancellationToken: cancellationToken);
 

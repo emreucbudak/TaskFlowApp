@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Api;
+using TaskFlowApp.Infrastructure.Authorization;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Report;
@@ -17,6 +18,7 @@ public partial class ReportsPageViewModel(
     ReportApiClient reportApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     private const int FixedPageSize = 5;
+    private const string ReportAccessDeniedMessage = "Raporlar sadece departman lideri olan kullanicilar icin goruntulenebilir.";
 
     public ObservableCollection<WorkerReportCardItem> Reports { get; } = [];
 
@@ -34,6 +36,25 @@ public partial class ReportsPageViewModel(
 
     [ObservableProperty]
     private string pageInfoText = "Sayfa 1";
+
+    [ObservableProperty]
+    private bool hasReportAccess;
+
+    [ObservableProperty]
+    private string currentDepartmentName = string.Empty;
+
+    [ObservableProperty]
+    private string emptyReportsMessage = "Bu departman icin rapor bulunamadi.";
+
+    [ObservableProperty]
+    private string accessMessage = ReportAccessDeniedMessage;
+
+    public bool HasNoReportAccess => !HasReportAccess;
+
+    partial void OnHasReportAccessChanged(bool value)
+    {
+        OnPropertyChanged(nameof(HasNoReportAccess));
+    }
 
     [RelayCommand]
     private async Task LoadAsync()
@@ -76,9 +97,23 @@ public partial class ReportsPageViewModel(
         {
             IsBusy = true;
             ErrorMessage = string.Empty;
+            var accessState = await LoadWorkerReportAccessStateAsync();
+
+            if (!accessState.CanAccessReportsPage || accessState.DepartmentId is null)
+            {
+                ApplyAccessDeniedState();
+                return;
+            }
+
+            HasReportAccess = true;
+            CurrentDepartmentName = accessState.DepartmentName;
+            EmptyReportsMessage = string.IsNullOrWhiteSpace(CurrentDepartmentName)
+                ? "Bu departman icin rapor bulunamadi."
+                : $"{CurrentDepartmentName} departmani icin rapor bulunamadi.";
+            AccessMessage = string.Empty;
 
             var safePage = Math.Max(1, CurrentPage);
-            var pageResult = await reportApiClient.GetAllReportsAsync(safePage, FixedPageSize);
+            var pageResult = await reportApiClient.GetDepartmentReportsAsync(accessState.DepartmentId.Value, safePage, FixedPageSize);
             var items = pageResult?.Items?.ToList() ?? [];
             var totalCount = pageResult?.TotalCount > 0 ? pageResult.TotalCount : items.Count;
             var resolvedTotalPageCount = totalCount > 0
@@ -98,8 +133,8 @@ public partial class ReportsPageViewModel(
             TotalPageCount = Math.Max(1, resolvedTotalPageCount);
             CanGoPrevious = CurrentPage > 1;
             CanGoNext = CurrentPage < TotalPageCount;
-            PageInfoText = $"Sayfa {CurrentPage}";
-            StatusText = $"Toplam rapor: {totalCount} | Gosterilen: {Reports.Count}";
+            PageInfoText = $"Sayfa {CurrentPage} / {TotalPageCount}";
+            StatusText = $"Departman: {CurrentDepartmentName} | Toplam rapor: {totalCount} | Gosterilen: {Reports.Count}";
         }
         catch (ApiException ex)
         {
@@ -121,6 +156,21 @@ public partial class ReportsPageViewModel(
         {
             IsBusy = false;
         }
+    }
+
+    private void ApplyAccessDeniedState()
+    {
+        Reports.Clear();
+        HasReportAccess = false;
+        CurrentDepartmentName = string.Empty;
+        AccessMessage = ReportAccessDeniedMessage;
+        EmptyReportsMessage = "Bu departman icin rapor bulunamadi.";
+        CurrentPage = 1;
+        TotalPageCount = 1;
+        CanGoPrevious = false;
+        CanGoNext = false;
+        PageInfoText = string.Empty;
+        StatusText = string.Empty;
     }
 
     private static WorkerReportCardItem MapReport(ReportDto report)

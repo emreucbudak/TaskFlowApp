@@ -14,6 +14,12 @@ public sealed class ChatApiClient(IApiClient apiClient) : ControllerApiClientBas
     public Task<List<MessageDto>> GetMessagesBetweenUsersQueryRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostForResultAsync<List<MessageDto>>("GetMessagesBetweenUsersQueryRequest", request, cancellationToken: cancellationToken);
 
+    public Task<List<MessageDto>> GetMessagesBetweenUsersAsync(Guid currentUserId, Guid firstUserId, Guid secondUserId, int page = 1, int pageSize = 20, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<List<MessageDto>>(
+            "GetMessagesBetweenUsersQueryRequest",
+            new { CurrentUserId = currentUserId, UserId1 = firstUserId, UserId2 = secondUserId, Page = page, PageSize = pageSize },
+            cancellationToken: cancellationToken);
+
     public Task<List<MessageDto>> GetMessagesByGroupIdQueryRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostForResultAsync<List<MessageDto>>("GetMessagesByGroupIdQueryRequest", request, cancellationToken: cancellationToken);
 

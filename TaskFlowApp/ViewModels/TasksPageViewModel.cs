@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
+using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Models.ProjectManagement;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
@@ -14,10 +15,10 @@ public partial class TasksPageViewModel(
     INavigationService navigationService,
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
-    ProjectManagementApiClient projectManagementApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    ProjectManagementApiClient projectManagementApiClient,
+    IdentityApiClient identityApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     private const int TasksPageSize = 100;
-    private const int MaxPageTraversal = 200;
     private const int PreviewTaskCount = 4;
 
     private readonly List<CompanyTaskDto> allIndividualTasks = [];
@@ -52,15 +53,16 @@ public partial class TasksPageViewModel(
         {
             IsBusy = true;
             ErrorMessage = string.Empty;
+            await LoadWorkerReportAccessStateAsync();
 
             var userId = UserSession.UserId.Value;
             var individualTasksTask = LoadAllIndividualTasksAsync(userId);
-            var groupTasksTask = LoadAllGroupTasksSafeAsync(UserSession.CompanyId);
+            var groupTasksTask = LoadAllGroupTasksSafeAsync(userId, UserSession.CompanyId);
 
             await Task.WhenAll(individualTasksTask, groupTasksTask);
 
-            var individualTasks = await individualTasksTask;
-            var groupTasks = await groupTasksTask;
+            var individualTasks = OrderTasks(await individualTasksTask);
+            var groupTasks = OrderTasks(await groupTasksTask);
 
             allIndividualTasks.Clear();
             allGroupTasks.Clear();
@@ -129,29 +131,25 @@ public partial class TasksPageViewModel(
         var firstPage = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(userId, 1, TasksPageSize);
         var allTasks = firstPage?.Items?.ToList() ?? [];
         var totalCount = firstPage?.TotalCount > 0 ? firstPage.TotalCount : allTasks.Count;
+        var effectivePageSize = firstPage?.PageSize > 0 ? firstPage.PageSize : TasksPageSize;
+        var totalPages = (int)Math.Ceiling(totalCount / (double)Math.Max(1, effectivePageSize));
 
-        if (allTasks.Count < totalCount)
+        for (var page = 2; page <= totalPages; page++)
         {
-            var effectivePageSize = firstPage?.PageSize > 0 ? firstPage.PageSize : TasksPageSize;
-            var totalPages = (int)Math.Ceiling(totalCount / (double)Math.Max(1, effectivePageSize));
-
-            for (var page = 2; page <= totalPages; page++)
+            var pageResult = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(userId, page, effectivePageSize);
+            var pageItems = pageResult?.Items ?? [];
+            if (pageItems.Count == 0)
             {
-                var pageResult = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(userId, page, effectivePageSize);
-                var pageItems = pageResult?.Items ?? [];
-                if (pageItems.Count == 0)
-                {
-                    break;
-                }
-
-                allTasks.AddRange(pageItems);
+                break;
             }
+
+            allTasks.AddRange(pageItems);
         }
 
         return allTasks.Select(MapIndividualTask).ToList();
     }
 
-    private async Task<List<CompanyTaskDto>> LoadAllGroupTasksSafeAsync(Guid? companyId)
+    private async Task<List<CompanyTaskDto>> LoadAllGroupTasksSafeAsync(Guid userId, Guid? companyId)
     {
         if (companyId is null || companyId.Value == Guid.Empty)
         {
@@ -160,7 +158,7 @@ public partial class TasksPageViewModel(
 
         try
         {
-            return await LoadAllGroupTasksAsync(companyId.Value);
+            return await LoadAllGroupTasksAsync(userId, companyId.Value);
         }
         catch (ApiException)
         {
@@ -176,34 +174,45 @@ public partial class TasksPageViewModel(
         }
     }
 
-    private async Task<List<CompanyTaskDto>> LoadAllGroupTasksAsync(Guid companyId)
+    private async Task<List<CompanyTaskDto>> LoadAllGroupTasksAsync(Guid userId, Guid companyId)
     {
-        var allTasks = new List<CompanyTaskDto>();
-        var pageNumber = 1;
+        var usersTask = identityApiClient.GetAllCompanyUsersAsync(companyId);
+        var groupsTask = identityApiClient.GetAllCompanyGroupsAsync(companyId);
 
-        while (pageNumber <= MaxPageTraversal)
+        await Task.WhenAll(usersTask, groupsTask);
+
+        var users = await usersTask ?? [];
+        var groups = await groupsTask ?? [];
+        var userNameMap = BuildUserNameMap(users);
+        var userIdByNameMap = BuildUserIdByNameMap(users);
+        var userGroups = ResolveUserGroups(groups, userId, userNameMap);
+        var groupMemberIds = ResolveGroupMemberIds(userGroups, userIdByNameMap);
+
+        if (groupMemberIds.Count == 0)
         {
-            var response = await projectManagementApiClient.GetAllTasksByCompanyIdAsync(companyId, pageNumber, TasksPageSize);
-            var pageItems = response?.Items ?? [];
+            return [];
+        }
 
+        var firstPage = await projectManagementApiClient.GetGroupTasksByAssignedUsersAsync(groupMemberIds, 1, TasksPageSize);
+        var allTasks = firstPage?.Items?.ToList() ?? [];
+        var totalCount = firstPage?.TotalCount > 0 ? firstPage.TotalCount : allTasks.Count;
+        var effectivePageSize = firstPage?.PageSize > 0 ? firstPage.PageSize : TasksPageSize;
+        var totalPages = (int)Math.Ceiling(totalCount / (double)Math.Max(1, effectivePageSize));
+
+        for (var page = 2; page <= totalPages; page++)
+        {
+            var pageResult = await projectManagementApiClient.GetGroupTasksByAssignedUsersAsync(groupMemberIds, page, effectivePageSize);
+            var pageItems = pageResult?.Items ?? [];
             if (pageItems.Count == 0)
             {
                 break;
             }
 
             allTasks.AddRange(pageItems);
-
-            if (pageItems.Count < TasksPageSize)
-            {
-                break;
-            }
-
-            pageNumber++;
         }
 
         return allTasks
             .Select(NormalizeCategoryAndPriority)
-            .Select(task => task with { CategoryName = "Grup" })
             .ToList();
     }
 
@@ -266,6 +275,15 @@ public partial class TasksPageViewModel(
         };
     }
 
+    private static List<CompanyTaskDto> OrderTasks(IEnumerable<CompanyTaskDto> tasks)
+    {
+        return tasks
+            .OrderBy(task => IsCompletedStatus(task.StatusName))
+            .ThenBy(task => task.DeadlineTime)
+            .ThenBy(task => task.TaskName, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
     private void RefreshVisibleTaskCollections()
     {
         IndividualTasks.Clear();
@@ -288,5 +306,124 @@ public partial class TasksPageViewModel(
         {
             GroupTasks.Add(task);
         }
+    }
+
+    private static IReadOnlyDictionary<Guid, string> BuildUserNameMap(IEnumerable<CompanyUserDto> users)
+    {
+        return users
+            .Where(user => user.Id != Guid.Empty && !string.IsNullOrWhiteSpace(user.Name))
+            .GroupBy(user => user.Id)
+            .ToDictionary(group => group.Key, group => group.First().Name.Trim());
+    }
+
+    private static IReadOnlyDictionary<string, Guid> BuildUserIdByNameMap(IEnumerable<CompanyUserDto> users)
+    {
+        return users
+            .Where(user => user.Id != Guid.Empty && !string.IsNullOrWhiteSpace(user.Name))
+            .GroupBy(user => user.Name.Trim(), StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.First().Id, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static List<CompanyGroupDto> ResolveUserGroups(
+        IEnumerable<CompanyGroupDto> groups,
+        Guid userId,
+        IReadOnlyDictionary<Guid, string> userNameMap)
+    {
+        userNameMap.TryGetValue(userId, out var currentUserName);
+
+        return NormalizeGroups(groups)
+            .Where(group => IsGroupMember(group, userId, currentUserName))
+            .OrderBy(group => group.GroupName, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    private static List<Guid> ResolveGroupMemberIds(
+        IEnumerable<CompanyGroupDto> groups,
+        IReadOnlyDictionary<string, Guid> userIdByNameMap)
+    {
+        var memberIds = new HashSet<Guid>(
+            groups
+                .SelectMany(group => group.WorkerUserIds)
+                .Where(userId => userId != Guid.Empty));
+
+        foreach (var workerName in groups.SelectMany(group => group.WorkerName))
+        {
+            var normalizedWorkerName = workerName?.Trim();
+            if (string.IsNullOrWhiteSpace(normalizedWorkerName))
+            {
+                continue;
+            }
+
+            if (userIdByNameMap.TryGetValue(normalizedWorkerName, out var workerId) && workerId != Guid.Empty)
+            {
+                memberIds.Add(workerId);
+            }
+        }
+
+        return memberIds.ToList();
+    }
+
+    private static bool IsGroupMember(CompanyGroupDto group, Guid userId, string? currentUserName)
+    {
+        if (group.WorkerUserIds.Contains(userId))
+        {
+            return true;
+        }
+
+        if (string.IsNullOrWhiteSpace(currentUserName))
+        {
+            return false;
+        }
+
+        return group.WorkerName.Any(name =>
+            string.Equals(name?.Trim(), currentUserName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static List<CompanyGroupDto> NormalizeGroups(IEnumerable<CompanyGroupDto> groups)
+    {
+        return groups
+            .Where(group => !string.IsNullOrWhiteSpace(group.GroupName))
+            .GroupBy(group => group.GroupName.Trim(), StringComparer.OrdinalIgnoreCase)
+            .Select(grouped => new CompanyGroupDto
+            {
+                GroupId = grouped
+                    .Select(group => group.GroupId)
+                    .FirstOrDefault(groupId => groupId != Guid.Empty),
+                GroupName = grouped.First().GroupName,
+                WorkerUserIds = grouped
+                    .SelectMany(group => group.WorkerUserIds)
+                    .Where(workerId => workerId != Guid.Empty)
+                    .Distinct()
+                    .ToList(),
+                WorkerName = grouped
+                    .SelectMany(group => group.WorkerName)
+                    .Select(name => name?.Trim())
+                    .Where(name => !string.IsNullOrWhiteSpace(name))
+                    .Cast<string>()
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList(),
+                DepartmenName = grouped
+                    .SelectMany(group => group.DepartmenName)
+                    .Select(name => name?.Trim())
+                    .Where(name => !string.IsNullOrWhiteSpace(name))
+                    .Cast<string>()
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList()
+            })
+            .ToList();
+    }
+
+    private static bool IsCompletedStatus(string? statusName)
+    {
+        if (string.IsNullOrWhiteSpace(statusName))
+        {
+            return false;
+        }
+
+        var normalizedStatus = statusName.Trim().ToLowerInvariant();
+        return normalizedStatus.Contains("tamam")
+            || normalizedStatus.Contains("complete")
+            || normalizedStatus.Contains("done")
+            || normalizedStatus.Contains("closed");
     }
 }

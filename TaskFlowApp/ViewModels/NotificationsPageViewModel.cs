@@ -53,6 +53,7 @@ public partial class NotificationsPageViewModel(
         {
             IsBusy = true;
             ErrorMessage = string.Empty;
+            await LoadWorkerReportAccessStateAsync();
 
             ResetPagination();
             Notifications.Clear();
