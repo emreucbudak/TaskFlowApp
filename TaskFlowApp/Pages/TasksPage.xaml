@@ -88,7 +88,7 @@
                             BackgroundColor="#1A3A5C"
                             TextColor="White"
                             CornerRadius="8"
-                            HeightRequest="34"
+                            HeightRequest="28"
                             Padding="12,4"
                             FontSize="12" />
                 </Grid>
@@ -241,7 +241,7 @@
                             BackgroundColor="#1A3A5C"
                             TextColor="White"
                             CornerRadius="8"
-                            HeightRequest="34"
+                            HeightRequest="28"
                             Padding="12,4"
                             FontSize="12" />
                 </Grid>
@@ -385,48 +385,49 @@
                  HeightRequest="1"
                  HorizontalOptions="Fill" />
 
-        <Grid Grid.Row="4"
-              ColumnDefinitions="*,*,*,*,*,*"
-              BackgroundColor="#0F1E2D"
-              Padding="0,6,0,18">
+        <FlexLayout Grid.Row="4"
+                    Direction="Row"
+                    JustifyContent="SpaceAround"
+                    AlignItems="Center"
+                    HorizontalOptions="Fill"
+                    BackgroundColor="#0F1E2D"
+                    Padding="30,10,30,24">
             <VerticalStackLayout Grid.Column="0"
                                  HorizontalOptions="Center"
-                                 Spacing="3">
+                                 Spacing="2">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnHomeTapped" />
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
-                        WidthRequest="38"
-                        HeightRequest="28"
+                        WidthRequest="42"
+                        HeightRequest="30"
                         HorizontalOptions="Center">
                     <Image x:Name="HomeIconImage"
                            Source="{mi:MaterialOutlined Icon=Home}"
-                           WidthRequest="18"
-                           HeightRequest="18"
+                           WidthRequest="16"
+                           HeightRequest="16"
                            Aspect="AspectFit"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
 
-            <VerticalStackLayout Grid.Column="1"
-                                 HorizontalOptions="Center"
-                                 Spacing="3">
+            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="2" IsVisible="{Binding CanAccessReportsPage}">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnReportsTapped" />
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
-                        WidthRequest="38"
-                        HeightRequest="28"
+                        WidthRequest="42"
+                        HeightRequest="30"
                         HorizontalOptions="Center">
                     <Image x:Name="ReportsIconImage"
                            Source="{mi:MaterialOutlined Icon=InsertChartOutlined}"
-                           WidthRequest="18"
-                           HeightRequest="18"
+                           WidthRequest="16"
+                           HeightRequest="16"
                            Aspect="AspectFit"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
@@ -435,20 +436,20 @@
 
             <VerticalStackLayout Grid.Column="2"
                                  HorizontalOptions="Center"
-                                 Spacing="3">
+                                 Spacing="2">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTasksTapped" />
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
-                        WidthRequest="38"
-                        HeightRequest="28"
+                        WidthRequest="42"
+                        HeightRequest="30"
                         HorizontalOptions="Center">
                     <Image x:Name="TasksIconImage"
                            Source="{mi:MaterialOutlined Icon=Checklist}"
-                           WidthRequest="18"
-                           HeightRequest="18"
+                           WidthRequest="16"
+                           HeightRequest="16"
                            Aspect="AspectFit"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
@@ -462,20 +463,20 @@
 
             <VerticalStackLayout Grid.Column="3"
                                  HorizontalOptions="Center"
-                                 Spacing="3">
+                                 Spacing="2">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnMessagesTapped" />
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
-                        WidthRequest="38"
-                        HeightRequest="28"
+                        WidthRequest="42"
+                        HeightRequest="30"
                         HorizontalOptions="Center">
                     <Image x:Name="MessagesIconImage"
                            Source="{mi:MaterialOutlined Icon=ChatBubbleOutline}"
-                           WidthRequest="18"
-                           HeightRequest="18"
+                           WidthRequest="16"
+                           HeightRequest="16"
                            Aspect="AspectFit"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
@@ -484,20 +485,20 @@
 
             <VerticalStackLayout Grid.Column="4"
                                  HorizontalOptions="Center"
-                                 Spacing="3">
+                                 Spacing="2">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnNotificationsTapped" />
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
-                        WidthRequest="38"
-                        HeightRequest="28"
+                        WidthRequest="42"
+                        HeightRequest="30"
                         HorizontalOptions="Center">
                     <Image x:Name="NotificationsIconImage"
                            Source="{mi:MaterialOutlined Icon=NotificationsNone}"
-                           WidthRequest="18"
-                           HeightRequest="18"
+                           WidthRequest="16"
+                           HeightRequest="16"
                            Aspect="AspectFit"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
@@ -506,25 +507,25 @@
 
             <VerticalStackLayout Grid.Column="5"
                                  HorizontalOptions="Center"
-                                 Spacing="3">
+                                 Spacing="2">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnLogoutTapped" />
                 </VerticalStackLayout.GestureRecognizers>
                 <Border BackgroundColor="#1E2E3E"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
-                        WidthRequest="38"
-                        HeightRequest="28"
+                        WidthRequest="42"
+                        HeightRequest="30"
                         HorizontalOptions="Center">
                     <Image x:Name="LogoutIconImage"
                            Source="{mi:MaterialOutlined Icon=Logout}"
-                           WidthRequest="18"
-                           HeightRequest="18"
+                           WidthRequest="16"
+                           HeightRequest="16"
                            Aspect="AspectFit"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
-        </Grid>
+        </FlexLayout>
     </Grid>
 </ContentPage>

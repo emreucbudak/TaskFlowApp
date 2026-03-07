@@ -7,7 +7,6 @@ using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Chat;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Models.ProjectManagement;
-using TaskFlowApp.Models.Stats;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
 
@@ -17,17 +16,17 @@ public partial class DashBoardPageViewModel(
     INavigationService navigationService,
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
-    StatsApiClient statsApiClient,
     ProjectManagementApiClient projectManagementApiClient,
     ChatApiClient chatApiClient,
     IdentityApiClient identityApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     private const int GroupActivityPreviewCount = 5;
-    private const int GroupMessagesPageSize = 100;
-    private const int IndividualTasksPageSize = 100;
-    private const string NoGroupMessage = "Üyesi olunan grup bulunamadı.";
-    private const string NoActivityMessage = "Grupta henüz aktivite yok.";
-    private const string NoDailySummaryMessage = "Günün özeti bulunamadı.";
+    private const int GroupActivityPageSize = 5;
+    private const int GroupSummaryPageSize = 100;
+    private const int TasksPageSize = 100;
+    private const string NoGroupMessage = "Uyesi olunan grup bulunamadi.";
+    private const string NoActivityMessage = "Grupta henuz aktivite yok.";
+    private const string NoDailySummaryMessage = "Gunun ozeti bulunamadi.";
 
     public ObservableCollection<GroupRecentActivityItem> GroupRecentActivities { get; } = [];
 
@@ -91,7 +90,7 @@ public partial class DashBoardPageViewModel(
             return;
         }
 
-        if (UserSession.UserId is null)
+        if (UserSession.UserId is null || UserSession.CompanyId is null)
         {
             ErrorMessage = "Oturum bilgisi eksik. Tekrar giris yapin.";
             return;
@@ -101,51 +100,50 @@ public partial class DashBoardPageViewModel(
         {
             IsBusy = true;
             ErrorMessage = string.Empty;
+            await LoadWorkerReportAccessStateAsync();
             ResetGroupActivitiesState();
 
             var userId = UserSession.UserId.Value;
+            var companyId = UserSession.CompanyId.Value;
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
+            var usersTask = identityApiClient.GetAllCompanyUsersAsync(companyId);
+            var groupsTask = identityApiClient.GetAllCompanyGroupsAsync(companyId);
             var individualTasksTask = LoadAllIndividualTasksAsync(userId);
             var unreadTask = chatApiClient.GetUnreadMessageCountAsync(userId);
-            var groupActivitiesTask = LoadGroupRecentActivitiesSafeAsync(userId);
 
-            WorkerStatsDto? stats = null;
-            try
-            {
-                stats = await statsApiClient.GetWorkerStatsByUserAndPeriodAsync(userId, today);
-            }
-            catch (ApiException ex) when (ex.StatusCode == 404)
-            {
-                // Bu ay icin istatistik kaydi olmayabilir; dashboard yine de acilmalidir.
-                stats = null;
-            }
+            await Task.WhenAll(usersTask, groupsTask, individualTasksTask, unreadTask);
 
-            await Task.WhenAll(individualTasksTask, unreadTask, groupActivitiesTask);
-
+            var users = await usersTask ?? [];
+            var groups = await groupsTask ?? [];
             var individualTasks = await individualTasksTask;
             var unread = await unreadTask;
-            var individualTaskCount = individualTasks.Count;
-            var assignedTasks = stats?.TotalTasksAssigned ?? individualTaskCount;
-            var groupedTasks = Math.Max(0, assignedTasks - individualTaskCount);
-            var completedTasks = stats?.TotalTasksCompleted ?? 0;
-            var overdueTaskCount = stats?.OverdueIncompleteTasksCount ?? 0;
+
+            var userNameMap = BuildUserNameMap(users);
+            var userGroups = ResolveUserGroups(groups, userId, userNameMap);
+            var groupMemberIds = ResolveGroupMemberIds(userGroups);
+
+            var groupTasksTask = LoadAllGroupTasksAsync(companyId, groupMemberIds);
+            var groupActivitiesTask = LoadGroupRecentActivitiesSafeAsync(userId, userGroups, userNameMap);
+
+            await Task.WhenAll(groupTasksTask, groupActivitiesTask);
+
+            var groupTasks = await groupTasksTask;
             var completedIndividualTasks = individualTasks.Count(task => IsCompletedStatus(task.StatusName));
-            var overdueIndividualTasks = individualTasks.Count(task =>
-                task.Deadline < today &&
-                !IsCompletedStatus(task.StatusName));
+            var completedGroupTasks = groupTasks.Count(task => IsCompletedStatus(task.StatusName));
+            var overdueIndividualTasks = individualTasks.Count(task => task.Deadline < today && !IsCompletedStatus(task.StatusName));
+            var overdueGroupTasks = groupTasks.Count(task => task.DeadlineTime < today && !IsCompletedStatus(task.StatusName));
 
-            TotalAssigned = assignedTasks;
-            TotalCompleted = completedTasks;
-            OverdueTasks = overdueTaskCount;
-            IndividualTaskCount = individualTaskCount;
-            GroupTaskCount = groupedTasks;
+            IndividualTaskCount = individualTasks.Count;
+            GroupTaskCount = groupTasks.Count;
             CompletedIndividualTaskCount = completedIndividualTasks;
-            CompletedGroupTaskCount = Math.Max(0, completedTasks - completedIndividualTasks);
+            CompletedGroupTaskCount = completedGroupTasks;
             OverdueIndividualTaskCount = overdueIndividualTasks;
-            OverdueGroupTaskCount = Math.Max(0, overdueTaskCount - overdueIndividualTasks);
+            OverdueGroupTaskCount = overdueGroupTasks;
+            TotalAssigned = IndividualTaskCount + GroupTaskCount;
+            TotalCompleted = CompletedIndividualTaskCount + CompletedGroupTaskCount;
+            OverdueTasks = OverdueIndividualTaskCount + OverdueGroupTaskCount;
             UnreadMessageCount = unread;
-
             StatusText = string.Empty;
         }
         catch (ApiException ex)
@@ -170,11 +168,14 @@ public partial class DashBoardPageViewModel(
         }
     }
 
-    private async Task LoadGroupRecentActivitiesSafeAsync(Guid userId)
+    private async Task LoadGroupRecentActivitiesSafeAsync(
+        Guid userId,
+        IReadOnlyList<CompanyGroupDto> userGroups,
+        IReadOnlyDictionary<Guid, string> userNameMap)
     {
         try
         {
-            await LoadGroupRecentActivitiesAsync(userId);
+            await LoadGroupRecentActivitiesAsync(userId, userGroups, userNameMap);
         }
         catch (ApiException ex) when (ex.StatusCode == 404)
         {
@@ -189,31 +190,12 @@ public partial class DashBoardPageViewModel(
         }
     }
 
-    private async Task LoadGroupRecentActivitiesAsync(Guid userId)
+    private async Task LoadGroupRecentActivitiesAsync(
+        Guid userId,
+        IReadOnlyList<CompanyGroupDto> userGroups,
+        IReadOnlyDictionary<Guid, string> userNameMap)
     {
-        if (UserSession.CompanyId is null || UserSession.CompanyId.Value == Guid.Empty)
-        {
-            ApplyNoGroupState();
-            return;
-        }
-
-        var companyId = UserSession.CompanyId.Value;
-        var groupsTask = identityApiClient.GetAllCompanyGroupsAsync(companyId);
-        var usersTask = identityApiClient.GetAllCompanyUsersAsync(companyId);
-
-        await Task.WhenAll(groupsTask, usersTask);
-
-        var groups = NormalizeGroups(await groupsTask ?? []);
-        var users = await usersTask ?? [];
-
-        var userNameMap = users
-            .Where(user => user.Id != Guid.Empty && !string.IsNullOrWhiteSpace(user.Name))
-            .GroupBy(user => user.Id)
-            .ToDictionary(group => group.Key, group => group.First().Name.Trim());
-
-        userNameMap.TryGetValue(userId, out var currentUserName);
-
-        var currentGroup = groups.FirstOrDefault(group => IsGroupMember(group, userId, currentUserName));
+        var currentGroup = userGroups.FirstOrDefault();
         if (currentGroup is null)
         {
             ApplyNoGroupState();
@@ -230,17 +212,30 @@ public partial class DashBoardPageViewModel(
             return;
         }
 
-        var messages = await chatApiClient.GetMessagesByGroupIdQueryRequestAsync(new
+        var recentMessagesTask = chatApiClient.GetMessagesByGroupIdQueryRequestAsync(new
         {
             CurrentUserId = userId,
             GroupId = currentGroup.GroupId,
-            PageSize = GroupMessagesPageSize,
+            PageSize = GroupActivityPageSize,
             Page = 1
-        }) ?? [];
+        });
 
-        DailySummaryText = ResolveDailySummaryText(messages);
+        var summaryMessagesTask = chatApiClient.GetMessagesByGroupIdQueryRequestAsync(new
+        {
+            CurrentUserId = userId,
+            GroupId = currentGroup.GroupId,
+            PageSize = GroupSummaryPageSize,
+            Page = 1
+        });
 
-        var recentActivities = messages
+        await Task.WhenAll(recentMessagesTask, summaryMessagesTask);
+
+        var recentMessages = await recentMessagesTask ?? [];
+        var summaryMessages = await summaryMessagesTask ?? [];
+
+        DailySummaryText = ResolveDailySummaryText(summaryMessages);
+
+        var recentActivities = recentMessages
             .Where(message => !message.IsDeleted)
             .OrderByDescending(message => message.SendTime)
             .Take(GroupActivityPreviewCount)
@@ -284,22 +279,15 @@ public partial class DashBoardPageViewModel(
 
     private async Task<List<IndividualTaskDto>> LoadAllIndividualTasksAsync(Guid userId)
     {
-        var firstPage = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(
-            userId,
-            1,
-            IndividualTasksPageSize);
-
+        var firstPage = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(userId, 1, TasksPageSize);
         var allTasks = firstPage?.Items?.ToList() ?? [];
         var totalCount = firstPage?.TotalCount > 0 ? firstPage.TotalCount : allTasks.Count;
-        var effectivePageSize = firstPage?.PageSize > 0 ? firstPage.PageSize : IndividualTasksPageSize;
+        var effectivePageSize = firstPage?.PageSize > 0 ? firstPage.PageSize : TasksPageSize;
         var totalPages = (int)Math.Ceiling(totalCount / (double)Math.Max(1, effectivePageSize));
 
         for (var page = 2; page <= totalPages; page++)
         {
-            var pageResult = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(
-                userId,
-                page,
-                effectivePageSize);
+            var pageResult = await projectManagementApiClient.GetIndividualTasksByUserIdAsync(userId, page, effectivePageSize);
             var pageItems = pageResult?.Items ?? [];
             if (pageItems.Count == 0)
             {
@@ -310,6 +298,76 @@ public partial class DashBoardPageViewModel(
         }
 
         return allTasks;
+    }
+
+    private async Task<List<CompanyTaskDto>> LoadAllGroupTasksAsync(Guid companyId, IReadOnlyList<Guid> groupMemberIds)
+    {
+        if (groupMemberIds.Count == 0)
+        {
+            return [];
+        }
+
+        var memberIdSet = groupMemberIds.ToHashSet();
+        var matchingTasks = new List<CompanyTaskDto>();
+        var pageNumber = 1;
+        var totalCount = int.MaxValue;
+
+        while ((pageNumber - 1) * TasksPageSize < totalCount)
+        {
+            var response = await projectManagementApiClient.GetAllTasksByCompanyIdAsync(companyId, pageNumber, TasksPageSize);
+            var pageItems = response?.Items ?? [];
+            if (pageItems.Count == 0)
+            {
+                break;
+            }
+
+            totalCount = response?.TotalCount > 0 ? response.TotalCount : pageItems.Count;
+
+            matchingTasks.AddRange(pageItems.Where(task =>
+                task.SubTasks.Any(subTask => memberIdSet.Contains(subTask.AssignedUserId))));
+
+            if (pageItems.Count < TasksPageSize)
+            {
+                break;
+            }
+
+            pageNumber++;
+        }
+
+        return matchingTasks
+            .GroupBy(task => $"{task.TaskName}|{task.Description}|{task.DeadlineTime}|{task.StatusName}|{task.CategoryName}|{task.TaskPriorityName}")
+            .Select(group => group.First())
+            .ToList();
+    }
+
+    private static IReadOnlyDictionary<Guid, string> BuildUserNameMap(IEnumerable<CompanyUserDto> users)
+    {
+        return users
+            .Where(user => user.Id != Guid.Empty && !string.IsNullOrWhiteSpace(user.Name))
+            .GroupBy(user => user.Id)
+            .ToDictionary(group => group.Key, group => group.First().Name.Trim());
+    }
+
+    private static List<CompanyGroupDto> ResolveUserGroups(
+        IEnumerable<CompanyGroupDto> groups,
+        Guid userId,
+        IReadOnlyDictionary<Guid, string> userNameMap)
+    {
+        userNameMap.TryGetValue(userId, out var currentUserName);
+
+        return NormalizeGroups(groups)
+            .Where(group => IsGroupMember(group, userId, currentUserName))
+            .OrderBy(group => group.GroupName)
+            .ToList();
+    }
+
+    private static List<Guid> ResolveGroupMemberIds(IEnumerable<CompanyGroupDto> groups)
+    {
+        return groups
+            .SelectMany(group => group.WorkerUserIds)
+            .Where(userId => userId != Guid.Empty)
+            .Distinct()
+            .ToList();
     }
 
     private static bool IsGroupMember(CompanyGroupDto group, Guid userId, string? currentUserName)
@@ -340,26 +398,25 @@ public partial class DashBoardPageViewModel(
                     .FirstOrDefault(groupId => groupId != Guid.Empty),
                 GroupName = grouped.First().GroupName,
                 WorkerUserIds = grouped
-                    .SelectMany(group => group.WorkerUserIds ?? [])
+                    .SelectMany(group => group.WorkerUserIds)
                     .Where(workerId => workerId != Guid.Empty)
                     .Distinct()
                     .ToList(),
                 WorkerName = grouped
-                    .SelectMany(group => group.WorkerName ?? [])
+                    .SelectMany(group => group.WorkerName)
                     .Select(name => name?.Trim())
                     .Where(name => !string.IsNullOrWhiteSpace(name))
                     .Cast<string>()
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList(),
                 DepartmenName = grouped
-                    .SelectMany(group => group.DepartmenName ?? [])
+                    .SelectMany(group => group.DepartmenName)
                     .Select(name => name?.Trim())
                     .Where(name => !string.IsNullOrWhiteSpace(name))
                     .Cast<string>()
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList()
             })
-            .OrderBy(group => group.GroupName)
             .ToList();
     }
 
@@ -373,7 +430,7 @@ public partial class DashBoardPageViewModel(
         return "Bilinmeyen kullanici";
     }
 
-    private static string ResolveActivityText(string content)
+    private static string ResolveActivityText(string? content)
     {
         var normalizedContent = content?.Trim();
         return string.IsNullOrWhiteSpace(normalizedContent)
@@ -383,9 +440,7 @@ public partial class DashBoardPageViewModel(
 
     private static string ResolveDailySummaryText(IEnumerable<MessageDto> messages)
     {
-        foreach (var message in messages
-                     .Where(message => !message.IsDeleted)
-                     .OrderByDescending(message => message.SendTime))
+        foreach (var message in messages.Where(message => !message.IsDeleted).OrderByDescending(message => message.SendTime))
         {
             var summaryText = TryExtractDailySummaryText(message);
             if (!string.IsNullOrWhiteSpace(summaryText))
@@ -413,12 +468,8 @@ public partial class DashBoardPageViewModel(
 
         var prefixes = new[]
         {
-            "Günün özeti:",
-            "Günün özeti",
             "Gunun ozeti:",
             "Gunun ozeti",
-            "Gün özeti:",
-            "Gün özeti",
             "Gun ozeti:",
             "Gun ozeti",
             "Daily summary:",
@@ -432,7 +483,7 @@ public partial class DashBoardPageViewModel(
                 continue;
             }
 
-            var trimmedSummary = content[prefix.Length..].TrimStart(' ', ':', '-', '–');
+            var trimmedSummary = content[prefix.Length..].TrimStart(' ', ':', '-');
             return string.IsNullOrWhiteSpace(trimmedSummary) ? content : trimmedSummary;
         }
 
@@ -442,9 +493,7 @@ public partial class DashBoardPageViewModel(
     private static bool ContainsDailySummaryKeyword(string content)
     {
         var normalized = content.Trim().ToLowerInvariant();
-        return normalized.Contains("günün özeti")
-            || normalized.Contains("gunun ozeti")
-            || normalized.Contains("gün özeti")
+        return normalized.Contains("gunun ozeti")
             || normalized.Contains("gun ozeti")
             || normalized.Contains("daily summary");
     }
@@ -476,7 +525,6 @@ public partial class DashBoardPageViewModel(
     private static string FormatRelativeTime(DateTime sendTime)
     {
         var localTime = ConvertToLocalTime(sendTime);
-
         var elapsed = DateTime.Now - localTime;
         if (elapsed < TimeSpan.Zero)
         {

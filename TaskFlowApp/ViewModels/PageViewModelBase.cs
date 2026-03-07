@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using TaskFlowApp.Infrastructure;
 using TaskFlowApp.Infrastructure.Api;
+using TaskFlowApp.Infrastructure.Authorization;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Services.Realtime;
@@ -12,9 +14,17 @@ public abstract partial class PageViewModelBase(
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager) : ObservableObject
 {
+    private bool canAccessReportsPage;
+
     protected IUserSession UserSession { get; } = userSession;
     protected INavigationService NavigationService { get; } = navigationService;
     protected IRealtimeConnectionManager RealtimeConnectionManager { get; } = realtimeConnectionManager;
+
+    public bool CanAccessReportsPage
+    {
+        get => canAccessReportsPage;
+        protected set => SetProperty(ref canAccessReportsPage, value);
+    }
 
     [ObservableProperty]
     private bool isBusy;
@@ -38,6 +48,28 @@ public abstract partial class PageViewModelBase(
             403 => AccessDeniedMessage,
             _ => defaultMessage
         };
+    }
+
+    protected async Task<WorkerReportAccessState> LoadWorkerReportAccessStateAsync(CancellationToken cancellationToken = default)
+    {
+        if (!string.Equals(UserSession.Role, "worker", StringComparison.OrdinalIgnoreCase))
+        {
+            CanAccessReportsPage = false;
+            return WorkerReportAccessState.None;
+        }
+
+        try
+        {
+            var resolver = ServiceLocator.GetRequiredService<IWorkerReportAccessResolver>();
+            var state = await resolver.GetStateAsync(cancellationToken);
+            CanAccessReportsPage = state.CanAccessReportsPage;
+            return state;
+        }
+        catch
+        {
+            CanAccessReportsPage = false;
+            return WorkerReportAccessState.None;
+        }
     }
 
     [RelayCommand]
@@ -95,6 +127,7 @@ public abstract partial class PageViewModelBase(
     {
         await RealtimeConnectionManager.DisconnectAllAsync();
         UserSession.Clear();
+        CanAccessReportsPage = false;
         await NavigationService.GoToRootAsync("MainPage");
     }
 }

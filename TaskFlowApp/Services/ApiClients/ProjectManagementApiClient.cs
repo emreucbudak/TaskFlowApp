@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Models.Common;
 using TaskFlowApp.Models.ProjectManagement;
@@ -47,6 +47,12 @@ public sealed class ProjectManagementApiClient(IApiClient apiClient) : Controlle
         PostForResultAsync<PagedResultDto<CompanyTaskDto>>(
             "GetAllTasksQueriesRequest",
             new { CompanyId = companyId, PageNumber = pageNumber, PageSize = pageSize },
+            cancellationToken: cancellationToken);
+
+    public Task<PagedResultDto<CompanyTaskDto>> GetGroupTasksByAssignedUsersAsync(IReadOnlyCollection<Guid> assignedUserIds, int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<PagedResultDto<CompanyTaskDto>>(
+            "GetGroupTasksByAssignedUsersQueryRequest",
+            new { AssignedUserIds = assignedUserIds, PageNumber = pageNumber, PageSize = pageSize },
             cancellationToken: cancellationToken);
 
     public Task<JsonElement> GetIndividualTaskByIdQueryRequestAsync(object request, CancellationToken cancellationToken = default) =>

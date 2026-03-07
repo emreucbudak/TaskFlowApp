@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using MauiIcons.Material.Outlined;
 using TaskFlowApp.Infrastructure;
 using TaskFlowApp.Infrastructure.Api;
+using TaskFlowApp.Infrastructure.Authorization;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Pages;
@@ -52,6 +53,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ReportApiClient>();
         builder.Services.AddSingleton<StatsApiClient>();
         builder.Services.AddSingleton<TenantApiClient>();
+        builder.Services.AddSingleton<IWorkerReportAccessResolver, WorkerReportAccessResolver>();
         builder.Services.AddSingleton<ISignalRChatService, SignalRChatService>();
         builder.Services.AddSingleton<ISignalRNotificationService, SignalRNotificationService>();
         builder.Services.AddSingleton<IRealtimeConnectionManager, RealtimeConnectionManager>();
