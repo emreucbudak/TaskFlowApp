@@ -5,6 +5,8 @@ namespace TaskFlowApp.Controls;
 
 public sealed class DonutChartView : GraphicsView, IDrawable
 {
+    private const double SegmentVisibilityEpsilon = 0.0001d;
+
     public static readonly BindableProperty FirstValueProperty =
         BindableProperty.Create(
             nameof(FirstValue),
@@ -124,12 +126,30 @@ public sealed class DonutChartView : GraphicsView, IDrawable
             return;
         }
 
+        if (second <= SegmentVisibilityEpsilon)
+        {
+            DrawFullRing(canvas, centerX, centerY, radius, FirstSegmentColor);
+            return;
+        }
+
+        if (first <= SegmentVisibilityEpsilon)
+        {
+            DrawFullRing(canvas, centerX, centerY, radius, SecondSegmentColor);
+            return;
+        }
+
         const float startAngle = -90f;
         var firstSweep = (float)(360d * (first / total));
         var secondSweep = 360f - firstSweep;
 
         DrawSegment(canvas, x, y, drawableDiameter, startAngle, firstSweep, FirstSegmentColor);
         DrawSegment(canvas, x, y, drawableDiameter, startAngle + firstSweep, secondSweep, SecondSegmentColor);
+    }
+
+    private static void DrawFullRing(ICanvas canvas, float centerX, float centerY, float radius, Color color)
+    {
+        canvas.StrokeColor = color;
+        canvas.DrawCircle(centerX, centerY, radius);
     }
 
     private static void DrawSegment(
@@ -154,7 +174,7 @@ public sealed class DonutChartView : GraphicsView, IDrawable
             size,
             startAngle,
             startAngle + sweepAngle,
-            false,
+            true,
             false);
     }
 

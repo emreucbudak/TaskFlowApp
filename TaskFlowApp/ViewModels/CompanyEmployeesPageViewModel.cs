@@ -18,7 +18,6 @@ public partial class CompanyEmployeesPageViewModel(
     IdentityApiClient identityApiClient)
     : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
-    public ObservableCollection<CompanyGroupDto> Groups { get; } = [];
     public ObservableCollection<DepartmentDto> Departments { get; } = [];
     public ObservableCollection<CompanyUserDto> CompanyUsers { get; } = [];
 
@@ -89,13 +88,11 @@ public partial class CompanyEmployeesPageViewModel(
             IsBusy = true;
             ErrorMessage = string.Empty;
             var companyId = UserSession.CompanyId.Value;
-            var groupsTask = identityApiClient.GetAllCompanyGroupsAsync(companyId);
             var departmentsTask = TryGetDepartmentsAsync(companyId);
             var usersTask = TryGetUsersAsync(companyId);
 
-            await Task.WhenAll(groupsTask, departmentsTask, usersTask);
+            await Task.WhenAll(departmentsTask, usersTask);
 
-            ApplyGroups((await groupsTask) ?? []);
             ApplyDepartments(await departmentsTask);
             ApplyUsers(await usersTask);
 
@@ -208,7 +205,6 @@ public partial class CompanyEmployeesPageViewModel(
             });
 
             var companyId = UserSession.CompanyId.Value;
-            await RefreshGroupsAsync(companyId);
             _ = await TryRefreshDepartmentsAsync(companyId);
             _ = await TryRefreshUsersAsync(companyId);
 
@@ -288,7 +284,6 @@ public partial class CompanyEmployeesPageViewModel(
             });
 
             var companyId = UserSession.CompanyId.Value;
-            await RefreshGroupsAsync(companyId);
             _ = await TryRefreshUsersAsync(companyId);
 
             FormMessage = "Çalışan başarıyla departmana transfer edildi.";
@@ -353,7 +348,6 @@ public partial class CompanyEmployeesPageViewModel(
             });
 
             var companyId = UserSession.CompanyId.Value;
-            await RefreshGroupsAsync(companyId);
             var departmentsRefreshed = await TryRefreshDepartmentsAsync(companyId);
             var departmentVisible = Departments.Any(item =>
                 string.Equals(item.Name, departmentName, StringComparison.OrdinalIgnoreCase));
@@ -425,7 +419,6 @@ public partial class CompanyEmployeesPageViewModel(
             });
 
             var companyId = UserSession.CompanyId.Value;
-            await RefreshGroupsAsync(companyId);
             _ = await TryRefreshUsersAsync(companyId);
 
             SelectedDeleteUser = null;
@@ -542,12 +535,6 @@ public partial class CompanyEmployeesPageViewModel(
         }
     }
 
-    private async Task RefreshGroupsAsync(Guid companyId)
-    {
-        var response = await identityApiClient.GetAllCompanyGroupsAsync(companyId);
-        ApplyGroups(response ?? []);
-    }
-
     private async Task RefreshDepartmentsAsync(Guid companyId)
     {
         var response = await identityApiClient.GetAllCompanyDepartmentsAsync(companyId);
@@ -597,17 +584,6 @@ public partial class CompanyEmployeesPageViewModel(
         catch (TaskCanceledException)
         {
             return [];
-        }
-    }
-
-    private void ApplyGroups(IEnumerable<CompanyGroupDto> groups)
-    {
-        var normalizedGroups = NormalizeGroups(groups);
-
-        Groups.Clear();
-        foreach (var group in normalizedGroups)
-        {
-            Groups.Add(group);
         }
     }
 
@@ -723,29 +699,4 @@ public partial class CompanyEmployeesPageViewModel(
         SelectedPasswordUserDisplayText = value?.Name ?? "Çalışan Seçin";
     }
 
-    private static List<CompanyGroupDto> NormalizeGroups(IEnumerable<CompanyGroupDto> groups)
-    {
-        return groups
-            .Where(group => !string.IsNullOrWhiteSpace(group.GroupName))
-            .Where(group => !group.GroupName.Trim().StartsWith("ATF", StringComparison.OrdinalIgnoreCase))
-            .GroupBy(group => group.GroupName.Trim(), StringComparer.OrdinalIgnoreCase)
-            .Select(grouped => new CompanyGroupDto
-            {
-                GroupName = grouped.First().GroupName,
-                WorkerName = grouped
-                    .SelectMany(item => item.WorkerName ?? [])
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .OrderBy(name => name)
-                    .ToList(),
-                DepartmenName = grouped
-                    .SelectMany(item => item.DepartmenName ?? [])
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .OrderBy(name => name)
-                    .ToList()
-            })
-            .OrderBy(group => group.GroupName)
-            .ToList();
-    }
 }
