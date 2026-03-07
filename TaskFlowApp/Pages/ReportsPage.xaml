@@ -72,27 +72,6 @@
                 <Label Text="{Binding ErrorMessage}"
                        TextColor="#f87171"
                        FontSize="12" />
-
-                <Border BackgroundColor="#0F2338"
-                        Stroke="#2E4A67"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 14"
-                        Padding="14"
-                        IsVisible="{Binding HasReportAccess}">
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Departman raporlari"
-                               TextColor="White"
-                               FontSize="16"
-                               FontAttributes="Bold" />
-                        <Label Text="{Binding CurrentDepartmentName, StringFormat='Departman: {0}'}"
-                               TextColor="#B8C6D6"
-                               FontSize="12" />
-                        <Label Text="{Binding StatusText}"
-                               TextColor="#8DA5BD"
-                               FontSize="11" />
-                    </VerticalStackLayout>
-                </Border>
-
                 <Border BackgroundColor="#3B1621"
                         Stroke="#A63A50"
                         StrokeThickness="1"

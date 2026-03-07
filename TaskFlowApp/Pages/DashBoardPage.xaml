@@ -213,10 +213,6 @@
                         StrokeShape="RoundRectangle 14"
                         Padding="14">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="{Binding CurrentGroupName, StringFormat='Grup: {0}'}"
-                               TextColor="#B8C6D6"
-                               FontSize="12"
-                               IsVisible="{Binding HasUserGroup}" />
 
                         <Label Text="{Binding GroupActivityEmptyMessage}"
                                TextColor="#B8C6D6"
@@ -228,7 +224,7 @@
                                              Spacing="8">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate>
-                                    <Border BackgroundColor="#122A41"
+                                    <Border BackgroundColor="#0F2338"
                                             Stroke="#2E4A67"
                                             StrokeThickness="1"
                                             StrokeShape="RoundRectangle 10"
@@ -424,3 +420,4 @@
         </FlexLayout>
     </Grid>
 </ContentPage>
+
