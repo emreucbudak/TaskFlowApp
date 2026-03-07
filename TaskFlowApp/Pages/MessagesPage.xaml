@@ -87,9 +87,125 @@
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 16"
                         Padding="14">
-                    <Grid RowDefinitions="Auto,*"
+                    <Grid RowDefinitions="Auto,Auto,*"
                           RowSpacing="12">
-                        <Grid Grid.Row="0"
+                        <Border Grid.Row="0"
+                                BackgroundColor="#122A40"
+                                Stroke="#33506E"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 14"
+                                Padding="12"
+                                IsVisible="{Binding IsDepartmentLeader}">
+                            <VerticalStackLayout Spacing="10">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Departman Grubu Olustur"
+                                           TextColor="White"
+                                           FontSize="15"
+                                           FontAttributes="Bold" />
+                                    <Label Text="Sadece lideri oldugunuz departmandaki calisanlari secerek grup olusturabilirsiniz."
+                                           TextColor="#94a3b8"
+                                           FontSize="11" />
+                                </VerticalStackLayout>
+
+                                <Border BackgroundColor="#162030"
+                                        Stroke="#203347"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="12,8">
+                                    <Entry Text="{Binding GroupNameInput}"
+                                           Placeholder="Grup adi"
+                                           PlaceholderColor="#64748b"
+                                           TextColor="White"
+                                           BackgroundColor="Transparent"
+                                           ClearButtonVisibility="WhileEditing" />
+                                </Border>
+
+                                <Border BackgroundColor="#162030"
+                                        Stroke="#203347"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="10,4">
+                                    <Picker ItemsSource="{Binding ManagedDepartments}"
+                                            SelectedItem="{Binding SelectedManagedDepartment}"
+                                            ItemDisplayBinding="{Binding DepartmentName}"
+                                            Title="Departman sec"
+                                            TextColor="White"
+                                            TitleColor="#94a3b8"
+                                            BackgroundColor="Transparent" />
+                                </Border>
+
+                                <CollectionView ItemsSource="{Binding EligibleDepartmentUsers}"
+                                                SelectionMode="None"
+                                                HeightRequest="180">
+                                    <CollectionView.ItemsLayout>
+                                        <LinearItemsLayout Orientation="Vertical"
+                                                           ItemSpacing="8" />
+                                    </CollectionView.ItemsLayout>
+                                    <CollectionView.EmptyView>
+                                        <Label Text="Secilen departmanda gruba eklenebilecek calisan bulunmuyor."
+                                               FontSize="11"
+                                               TextColor="#94a3b8"
+                                               HorizontalTextAlignment="Center"
+                                               Margin="0,12,0,0" />
+                                    </CollectionView.EmptyView>
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BackgroundColor="#162030"
+                                                    Stroke="#203347"
+                                                    StrokeThickness="1"
+                                                    StrokeShape="RoundRectangle 12"
+                                                    Padding="10">
+                                                <Grid ColumnDefinitions="*,Auto"
+                                                      ColumnSpacing="10">
+                                                    <VerticalStackLayout Grid.Column="0"
+                                                                         Spacing="2">
+                                                        <Label Text="{Binding Name}"
+                                                               TextColor="White"
+                                                               FontSize="13"
+                                                               FontAttributes="Bold"
+                                                               LineBreakMode="TailTruncation" />
+                                                        <Label Text="{Binding DepartmentName}"
+                                                               TextColor="#94a3b8"
+                                                               FontSize="11"
+                                                               LineBreakMode="TailTruncation" />
+                                                    </VerticalStackLayout>
+
+                                                    <CheckBox Grid.Column="1"
+                                                              IsChecked="{Binding IsSelected}"
+                                                              Color="#3b82f6"
+                                                              VerticalOptions="Center" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+
+                                <Grid ColumnDefinitions="*,Auto"
+                                      ColumnSpacing="12">
+                                    <Button Grid.Column="0"
+                                            Text="Grup Olustur"
+                                            Command="{Binding CreateDepartmentGroupCommand}"
+                                            BackgroundColor="#2563EB"
+                                            TextColor="White"
+                                            CornerRadius="12"
+                                            HeightRequest="44" />
+
+                                    <ActivityIndicator Grid.Column="1"
+                                                       WidthRequest="24"
+                                                       HeightRequest="24"
+                                                       IsRunning="{Binding IsCreatingDepartmentGroup}"
+                                                       IsVisible="{Binding IsCreatingDepartmentGroup}"
+                                                       Color="#dbeafe"
+                                                       VerticalOptions="Center" />
+                                </Grid>
+
+                                <Label Text="{Binding GroupCreationStatus}"
+                                       TextColor="#86efac"
+                                       FontSize="11" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Grid Grid.Row="1"
                               ColumnDefinitions="*,Auto"
                               ColumnSpacing="8">
                             <Border Grid.Column="0"
@@ -126,7 +242,7 @@
                                                VerticalOptions="Center" />
                         </Grid>
 
-                        <CollectionView Grid.Row="1"
+                        <CollectionView Grid.Row="2"
                                         ItemsSource="{Binding VisibleUsers}"
                                         SelectionMode="None">
                             <CollectionView.ItemsLayout>
@@ -460,3 +576,4 @@
         </FlexLayout>
     </Grid>
 </ContentPage>
+

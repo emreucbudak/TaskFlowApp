@@ -24,6 +24,7 @@ public partial class MessagesPageViewModel(
     private const int ConversationListMaxPages = 5;
     private const int SearchPageSize = 20;
     private const int MessagePageSize = 100;
+    private const int DepartmentLeaderRoleId = 1;
     private const string EmptyConversationListMessage = "Henuz mesajlasilan kullanici yok.";
     private const string EmptySearchResultMessage = "Arama ile eslesen kullanici bulunamadi.";
     private const string EmptyConversationMessage = "";
@@ -40,6 +41,8 @@ public partial class MessagesPageViewModel(
 
     public ObservableCollection<MessageConversationUserItem> VisibleUsers { get; } = [];
     public ObservableCollection<ConversationMessageItem> ConversationMessages { get; } = [];
+    public ObservableCollection<LeaderDepartmentOption> ManagedDepartments { get; } = [];
+    public ObservableCollection<SelectableDepartmentUserItem> EligibleDepartmentUsers { get; } = [];
 
     [ObservableProperty]
     private string searchText = string.Empty;
@@ -76,6 +79,21 @@ public partial class MessagesPageViewModel(
 
     [ObservableProperty]
     private bool hasSelectedConversation;
+
+    [ObservableProperty]
+    private bool isDepartmentLeader;
+
+    [ObservableProperty]
+    private bool isCreatingDepartmentGroup;
+
+    [ObservableProperty]
+    private string groupNameInput = string.Empty;
+
+    [ObservableProperty]
+    private string groupCreationStatus = string.Empty;
+
+    [ObservableProperty]
+    private LeaderDepartmentOption? selectedManagedDepartment;
 
     [RelayCommand]
     private async Task LoadAsync()
@@ -119,6 +137,7 @@ public partial class MessagesPageViewModel(
             await Task.WhenAll(usersTask, unreadTask);
 
             ReplacePriorConversationUsers(await usersTask);
+            ConfigureDepartmentGroupState(currentUserId);
             UnreadCount = await unreadTask;
             StatusText = priorConversationUsers.Count > 0
                 ? $"Son yazisilan kisi sayisi: {priorConversationUsers.Count}"
@@ -297,6 +316,90 @@ public partial class MessagesPageViewModel(
     }
 
     [RelayCommand]
+    private async Task CreateDepartmentGroupAsync()
+    {
+        if (IsCreatingDepartmentGroup || !IsDepartmentLeader)
+        {
+            return;
+        }
+
+        if (UserSession.CompanyId is not Guid companyId)
+        {
+            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            return;
+        }
+
+        if (SelectedManagedDepartment is null)
+        {
+            ErrorMessage = "Grup icin yonettiginiz departmani secin.";
+            return;
+        }
+
+        var trimmedGroupName = GroupNameInput.Trim();
+        if (trimmedGroupName.Length < 3 || trimmedGroupName.Length > 100)
+        {
+            ErrorMessage = "Grup adi 3 ile 100 karakter arasinda olmalidir.";
+            return;
+        }
+
+        var selectedUserIds = EligibleDepartmentUsers
+            .Where(item => item.IsSelected)
+            .Select(item => item.UserId)
+            .Where(userId => userId != Guid.Empty)
+            .Distinct()
+            .ToList();
+
+        if (selectedUserIds.Count == 0)
+        {
+            ErrorMessage = "Gruba eklemek icin en az bir calisan secin.";
+            return;
+        }
+
+        try
+        {
+            IsCreatingDepartmentGroup = true;
+            ErrorMessage = string.Empty;
+            GroupCreationStatus = string.Empty;
+
+            await identityApiClient.AddGroupsCommandRequestAsync(new
+            {
+                Name = trimmedGroupName,
+                CompanyId = companyId,
+                DepartmentId = SelectedManagedDepartment.DepartmentId,
+                UserIds = selectedUserIds
+            });
+
+            foreach (var item in EligibleDepartmentUsers)
+            {
+                item.IsSelected = false;
+            }
+
+            GroupNameInput = string.Empty;
+            GroupCreationStatus = "Departman grubu basariyla olusturuldu.";
+            StatusText = $"{trimmedGroupName} grubu olusturuldu. Secilen calisan sayisi: {selectedUserIds.Count}";
+        }
+        catch (ApiException ex) when (ex.StatusCode == 400)
+        {
+            ErrorMessage = "Grup olusturulamadi. Grup adi ve secilen kullanicilari kontrol edin.";
+        }
+        catch (ApiException ex)
+        {
+            ErrorMessage = ResolveApiErrorMessage(ex, "Grup olusturulamadi. Lutfen tekrar deneyin.");
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Grup olusturulurken bir sorun olustu. Lutfen tekrar deneyin.";
+        }
+        finally
+        {
+            IsCreatingDepartmentGroup = false;
+        }
+    }
+    [RelayCommand]
     private Task DisconnectRealtimeAsync() => signalRChatService.DisconnectAsync();
 
     public void RegisterRealtimeHandlers()
@@ -313,6 +416,12 @@ public partial class MessagesPageViewModel(
     partial void OnSearchTextChanged(string value)
     {
         _ = RefreshVisibleUsersForCurrentSearchAsync();
+    }
+
+    partial void OnSelectedManagedDepartmentChanged(LeaderDepartmentOption? value)
+    {
+        GroupCreationStatus = string.Empty;
+        RefreshEligibleDepartmentUsers();
     }
 
     private async Task<List<MessageConversationUserItem>> LoadPriorConversationUsersAsync(Guid currentUserId, Guid companyId)
@@ -484,6 +593,88 @@ public partial class MessagesPageViewModel(
         ConversationMessages.Clear();
     }
 
+    private void ConfigureDepartmentGroupState(Guid currentUserId)
+    {
+        ManagedDepartments.Clear();
+        EligibleDepartmentUsers.Clear();
+        IsDepartmentLeader = false;
+        GroupCreationStatus = string.Empty;
+        SelectedManagedDepartment = null;
+
+        if (!string.Equals(UserSession.Role, "worker", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        var currentUser = allCompanyUsers.FirstOrDefault(user => user.Id == currentUserId);
+        if (currentUser is null)
+        {
+            return;
+        }
+
+        var managedDepartments = currentUser.DepartmentMemberships
+            .Where(membership => membership.DepartmentId != Guid.Empty && membership.DepartmentRoleId == DepartmentLeaderRoleId)
+            .Select(membership => new LeaderDepartmentOption
+            {
+                DepartmentId = membership.DepartmentId,
+                DepartmentName = string.IsNullOrWhiteSpace(membership.DepartmentName)
+                    ? "Departman"
+                    : membership.DepartmentName.Trim()
+            })
+            .DistinctBy(item => item.DepartmentId)
+            .OrderBy(item => item.DepartmentName, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (managedDepartments.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var department in managedDepartments)
+        {
+            ManagedDepartments.Add(department);
+        }
+
+        IsDepartmentLeader = true;
+        SelectedManagedDepartment = ManagedDepartments[0];
+        RefreshEligibleDepartmentUsers();
+    }
+
+    private void RefreshEligibleDepartmentUsers()
+    {
+        var selectedIds = EligibleDepartmentUsers
+            .Where(item => item.IsSelected)
+            .Select(item => item.UserId)
+            .ToHashSet();
+
+        EligibleDepartmentUsers.Clear();
+
+        if (SelectedManagedDepartment is null || UserSession.UserId is not Guid currentUserId)
+        {
+            return;
+        }
+
+        var selectedDepartmentId = SelectedManagedDepartment.DepartmentId;
+        var selectedDepartmentName = SelectedManagedDepartment.DepartmentName;
+
+        var eligibleUsers = allCompanyUsers
+            .Where(user => user.Id != Guid.Empty && user.Id != currentUserId)
+            .Where(user => user.DepartmentMemberships.Any(membership => membership.DepartmentId == selectedDepartmentId))
+            .OrderBy(user => ResolveDisplayName(user), StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        foreach (var user in eligibleUsers)
+        {
+            EligibleDepartmentUsers.Add(new SelectableDepartmentUserItem
+            {
+                UserId = user.Id,
+                Name = ResolveDisplayName(user),
+                DepartmentName = selectedDepartmentName,
+                IsSelected = selectedIds.Contains(user.Id)
+            });
+        }
+    }
+
     private void ReplacePriorConversationUsers(IEnumerable<MessageConversationUserItem> users)
     {
         priorConversationUsers.Clear();
@@ -582,7 +773,7 @@ public partial class MessagesPageViewModel(
         HasSelectedConversation = user is not null;
         SelectedConversationTitle = user?.Name ?? string.Empty;
         SelectedConversationSubtitle = user is null ? string.Empty : ResolveConversationSubtitle(user);
-        ConversationEmptyMessage = user is null ? string.Empty : NewConversationMessage;
+        ConversationEmptyMessage = user is null ? EmptyConversationMessage : NewConversationMessage;
         ApplySelectionState(user?.UserId);
     }
 
@@ -853,6 +1044,12 @@ public partial class MessagesPageViewModel(
     }
 }
 
+public sealed record LeaderDepartmentOption
+{
+    public Guid DepartmentId { get; init; }
+    public string DepartmentName { get; init; } = string.Empty;
+}
+
 public partial class MessageConversationUserItem : ObservableObject
 {
     public Guid UserId { get; init; }
@@ -872,3 +1069,16 @@ public sealed record ConversationMessageItem
     public string SentAtText { get; init; } = string.Empty;
     public bool IsOwnMessage { get; init; }
 }
+
+
+
+public partial class SelectableDepartmentUserItem : ObservableObject
+{
+    public Guid UserId { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string DepartmentName { get; init; } = string.Empty;
+
+    [ObservableProperty]
+    private bool isSelected;
+}
+
