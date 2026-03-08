@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Api;
@@ -27,7 +27,6 @@ public partial class DashBoardPageViewModel(
     private const string NoActivityMessage = "Grupta henuz aktivite yok.";
     private const string NoDailySummaryMessage = "Gunun ozeti bulunamadi.";
     private readonly List<GroupRecentActivityItem> allGroupRecentActivities = [];
-    private bool isShowingAllGroupRecentActivities;
     public ObservableCollection<GroupRecentActivityItem> GroupRecentActivities { get; } = [];
 
     [ObservableProperty]
@@ -75,13 +74,17 @@ public partial class DashBoardPageViewModel(
     [ObservableProperty]
     private bool hasUserGroup;
 
-    [ObservableProperty]
-    private bool canShowAllGroupRecentActivities;
     public bool HasNoGroupRecentActivities => !HasGroupRecentActivities;
+    public bool CanOpenGroupDetails => HasUserGroup;
 
     partial void OnHasGroupRecentActivitiesChanged(bool value)
     {
         OnPropertyChanged(nameof(HasNoGroupRecentActivities));
+    }
+
+    partial void OnHasUserGroupChanged(bool value)
+    {
+        OnPropertyChanged(nameof(CanOpenGroupDetails));
     }
 
     [RelayCommand]
@@ -171,17 +174,14 @@ public partial class DashBoardPageViewModel(
     }
 
     [RelayCommand]
-    private Task ShowAllGroupRecentActivitiesAsync()
+    private Task OpenGroupDetailsAsync()
     {
-        if (!CanShowAllGroupRecentActivities)
+        if (!HasUserGroup)
         {
             return Task.CompletedTask;
         }
 
-        isShowingAllGroupRecentActivities = true;
-        CanShowAllGroupRecentActivities = false;
-        RefreshVisibleGroupRecentActivities();
-        return Task.CompletedTask;
+        return NavigationService.GoToAsync("GroupDetailsPage");
     }
 
     private async Task LoadGroupRecentActivitiesSafeAsync(
@@ -253,8 +253,6 @@ public partial class DashBoardPageViewModel(
 
         allGroupRecentActivities.Clear();
         allGroupRecentActivities.AddRange(recentActivities);
-        isShowingAllGroupRecentActivities = false;
-        CanShowAllGroupRecentActivities = allGroupRecentActivities.Count > GroupActivityPreviewCount;
         RefreshVisibleGroupRecentActivities();
     }
 
@@ -264,8 +262,6 @@ public partial class DashBoardPageViewModel(
         GroupRecentActivities.Clear();
         HasGroupRecentActivities = false;
         HasUserGroup = false;
-        CanShowAllGroupRecentActivities = false;
-        isShowingAllGroupRecentActivities = false;
         CurrentGroupName = string.Empty;
         DailySummaryText = NoDailySummaryMessage;
         GroupActivityEmptyMessage = NoGroupMessage;
@@ -277,8 +273,6 @@ public partial class DashBoardPageViewModel(
         GroupRecentActivities.Clear();
         HasGroupRecentActivities = false;
         HasUserGroup = false;
-        CanShowAllGroupRecentActivities = false;
-        isShowingAllGroupRecentActivities = false;
         CurrentGroupName = string.Empty;
         DailySummaryText = NoDailySummaryMessage;
         GroupActivityEmptyMessage = NoGroupMessage;
@@ -286,12 +280,8 @@ public partial class DashBoardPageViewModel(
 
     private void RefreshVisibleGroupRecentActivities()
     {
-        var visibleActivities = isShowingAllGroupRecentActivities
-            ? allGroupRecentActivities
-            : allGroupRecentActivities.Take(GroupActivityPreviewCount).ToList();
-
         GroupRecentActivities.Clear();
-        foreach (var activity in visibleActivities)
+        foreach (var activity in allGroupRecentActivities.Take(GroupActivityPreviewCount))
         {
             GroupRecentActivities.Add(activity);
         }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MauiIcons.Material.Outlined;
 using TaskFlowApp.Infrastructure;
@@ -60,6 +60,7 @@ public static class MauiProgram
 
         builder.Services.AddTransient<MainPageViewModel>();
         builder.Services.AddTransient<DashBoardPageViewModel>();
+        builder.Services.AddTransient<GroupDetailsPageViewModel>();
         builder.Services.AddTransient<CompanyDashboardPageViewModel>();
         builder.Services.AddTransient<CompanyReportsPageViewModel>();
         builder.Services.AddTransient<CompanyTasksPageViewModel>();
@@ -73,6 +74,7 @@ public static class MauiProgram
 
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<DashBoardPage>();
+        builder.Services.AddTransient<GroupDetailsPage>();
         builder.Services.AddTransient<CompanyDashboardPage>();
         builder.Services.AddTransient<CompanyReportsPage>();
         builder.Services.AddTransient<CompanyTasksPage>();

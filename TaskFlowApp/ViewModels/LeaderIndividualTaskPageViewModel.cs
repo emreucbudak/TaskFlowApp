@@ -18,12 +18,11 @@ public partial class LeaderIndividualTaskPageViewModel(
     IdentityApiClient identityApiClient,
     ProjectManagementApiClient projectManagementApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
-    private const int DepartmentLeaderRoleId = 1;
     private const string AccessDeniedMessageText = "Bu sayfa sadece departman liderleri icindir.";
 
     private readonly List<CompanyUserDto> allCompanyUsers = [];
+    private Guid? managedDepartmentId;
 
-    public ObservableCollection<ManagedDepartmentOption> ManagedDepartments { get; } = [];
     public ObservableCollection<AssignableDepartmentUserOption> EligibleUsers { get; } = [];
     public ObservableCollection<TaskPriorityOption> PriorityOptions { get; } = [];
 
@@ -32,9 +31,6 @@ public partial class LeaderIndividualTaskPageViewModel(
 
     [ObservableProperty]
     private string accessMessage = AccessDeniedMessageText;
-
-    [ObservableProperty]
-    private ManagedDepartmentOption? selectedManagedDepartment;
 
     [ObservableProperty]
     private AssignableDepartmentUserOption? selectedAssignedUser;
@@ -68,12 +64,6 @@ public partial class LeaderIndividualTaskPageViewModel(
     partial void OnHasLeaderAccessChanged(bool value)
     {
         OnPropertyChanged(nameof(HasNoLeaderAccess));
-    }
-
-    partial void OnSelectedManagedDepartmentChanged(ManagedDepartmentOption? value)
-    {
-        CreateStatus = string.Empty;
-        RefreshEligibleUsers();
     }
 
     [RelayCommand]
@@ -167,9 +157,9 @@ public partial class LeaderIndividualTaskPageViewModel(
             return;
         }
 
-        if (SelectedManagedDepartment is null)
+        if (managedDepartmentId is null || managedDepartmentId == Guid.Empty)
         {
-            ErrorMessage = "Yonettiginiz departmani secin.";
+            ErrorMessage = "Aktif departman bilgisi bulunamadi.";
             return;
         }
 
@@ -211,6 +201,7 @@ public partial class LeaderIndividualTaskPageViewModel(
             IsCreatingTask = true;
             ErrorMessage = string.Empty;
             CreateStatus = string.Empty;
+
             var assignedUserName = SelectedAssignedUser.Name;
             var assignedUserId = SelectedAssignedUser.UserId;
 
@@ -230,7 +221,9 @@ public partial class LeaderIndividualTaskPageViewModel(
             SelectedAssignedUser = EligibleUsers.FirstOrDefault(item => item.UserId == assignedUserId)
                 ?? EligibleUsers.FirstOrDefault();
             CreateStatus = $"Gorev {assignedUserName} kullanicisina basariyla atandi.";
-            StatusText = $"{SelectedManagedDepartment.DepartmentName} departmanina yeni bireysel gorev atandi.";
+            StatusText = string.IsNullOrWhiteSpace(CurrentDepartmentName)
+                ? "Yeni bireysel gorev atandi."
+                : $"{CurrentDepartmentName} departmanina yeni bireysel gorev atandi.";
         }
         catch (ApiException ex) when (ex.StatusCode == 400)
         {
@@ -260,10 +253,9 @@ public partial class LeaderIndividualTaskPageViewModel(
 
     private void ConfigureManagedDepartment(WorkerReportAccessState accessState)
     {
-        ManagedDepartments.Clear();
         EligibleUsers.Clear();
         SelectedAssignedUser = null;
-        SelectedManagedDepartment = null;
+        managedDepartmentId = null;
         HasLeaderAccess = false;
         CurrentDepartmentName = string.Empty;
         AccessMessage = AccessDeniedMessageText;
@@ -275,33 +267,27 @@ public partial class LeaderIndividualTaskPageViewModel(
             return;
         }
 
-        var managedDepartment = new ManagedDepartmentOption
-        {
-            DepartmentId = accessState.DepartmentId.Value,
-            DepartmentName = string.IsNullOrWhiteSpace(accessState.DepartmentName)
-                ? "Departman"
-                : accessState.DepartmentName.Trim()
-        };
-
-        ManagedDepartments.Add(managedDepartment);
+        managedDepartmentId = accessState.DepartmentId.Value;
         HasLeaderAccess = true;
-        SelectedManagedDepartment = managedDepartment;
-        CurrentDepartmentName = managedDepartment.DepartmentName;
+        CurrentDepartmentName = string.IsNullOrWhiteSpace(accessState.DepartmentName)
+            ? "Departman"
+            : accessState.DepartmentName.Trim();
         AccessMessage = string.Empty;
+        RefreshEligibleUsers();
     }
 
     private void RefreshEligibleUsers()
     {
         EligibleUsers.Clear();
         SelectedAssignedUser = null;
-        CurrentDepartmentName = SelectedManagedDepartment?.DepartmentName ?? string.Empty;
 
-        if (SelectedManagedDepartment is null || UserSession.UserId is not Guid currentUserId)
+        if (managedDepartmentId is not Guid departmentId ||
+            departmentId == Guid.Empty ||
+            UserSession.UserId is not Guid currentUserId)
         {
             return;
         }
 
-        var departmentId = SelectedManagedDepartment.DepartmentId;
         var items = allCompanyUsers
             .Where(user => user.Id != Guid.Empty && user.Id != currentUserId)
             .Where(user => user.DepartmentMemberships.Any(membership => membership.DepartmentId == departmentId))
@@ -310,7 +296,7 @@ public partial class LeaderIndividualTaskPageViewModel(
             {
                 UserId = user.Id,
                 Name = ResolveDisplayName(user),
-                DepartmentName = SelectedManagedDepartment.DepartmentName
+                DepartmentName = CurrentDepartmentName
             })
             .ToList();
 
@@ -343,9 +329,8 @@ public partial class LeaderIndividualTaskPageViewModel(
     private void ApplyAccessDeniedState()
     {
         HasLeaderAccess = false;
-        ManagedDepartments.Clear();
         EligibleUsers.Clear();
-        SelectedManagedDepartment = null;
+        managedDepartmentId = null;
         SelectedAssignedUser = null;
         CurrentDepartmentName = string.Empty;
         AccessMessage = AccessDeniedMessageText;
@@ -360,12 +345,6 @@ public partial class LeaderIndividualTaskPageViewModel(
     }
 }
 
-public sealed record ManagedDepartmentOption
-{
-    public Guid DepartmentId { get; init; }
-    public string DepartmentName { get; init; } = string.Empty;
-}
-
 public sealed record AssignableDepartmentUserOption
 {
     public Guid UserId { get; init; }
@@ -378,6 +357,3 @@ public sealed record TaskPriorityOption
     public int Id { get; init; }
     public string DisplayName { get; init; } = string.Empty;
 }
-
-
-

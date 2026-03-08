@@ -212,8 +212,8 @@
                            VerticalOptions="Center" />
                     <Button Grid.Column="1"
                             Text="T&#252;m&#252;n&#252; G&#246;r"
-                            Command="{Binding ShowAllGroupRecentActivitiesCommand}"
-                            IsEnabled="{Binding CanShowAllGroupRecentActivities}"
+                            Command="{Binding OpenGroupDetailsCommand}"
+                            IsEnabled="{Binding CanOpenGroupDetails}"
                             BackgroundColor="#1A3A5C"
                             TextColor="White"
                             CornerRadius="8"
