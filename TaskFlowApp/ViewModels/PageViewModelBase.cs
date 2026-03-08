@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure;
 using TaskFlowApp.Infrastructure.Api;
@@ -100,6 +100,17 @@ public abstract partial class PageViewModelBase(
             : "TasksPage";
 
         return NavigationService.GoToRootAsync(tasksRoute);
+    }
+
+    [RelayCommand]
+    private Task NavigateLeaderTasksAsync()
+    {
+        if (!string.Equals(UserSession.Role, "worker", StringComparison.OrdinalIgnoreCase) || !CanAccessReportsPage)
+        {
+            return Task.CompletedTask;
+        }
+
+        return NavigationService.GoToRootAsync("LeaderIndividualTaskPage");
     }
 
     [RelayCommand]

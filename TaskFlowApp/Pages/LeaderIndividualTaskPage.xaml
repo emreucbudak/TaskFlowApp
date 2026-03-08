@@ -1,0 +1,399 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             x:Class="TaskFlowApp.Pages.LeaderIndividualTaskPage"
+             BackgroundColor="#0D1B2A"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+        <Grid Grid.Row="0"
+              Padding="20,16,20,10"
+              ColumnDefinitions="Auto,*,Auto"
+              BackgroundColor="#0D1B2A">
+            <Image Grid.Column="0"
+                   Source="https://www.logoai.com/uploads/icon/2021/08/06/732ca933-7df8-43e8-b085-69466243c919.png"
+                   WidthRequest="32"
+                   HeightRequest="32"
+                   Aspect="AspectFit"
+                   VerticalOptions="Center" />
+
+            <Grid Grid.Column="2"
+                  WidthRequest="44"
+                  HeightRequest="44"
+                  HorizontalOptions="End"
+                  VerticalOptions="Center">
+                <Ellipse WidthRequest="44"
+                         HeightRequest="44"
+                         Stroke="#3A5068"
+                         StrokeThickness="1.5"
+                         Fill="#1A3A5C"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center" />
+                <Grid WidthRequest="44"
+                      HeightRequest="44"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center">
+                    <Ellipse WidthRequest="16"
+                             HeightRequest="16"
+                             Fill="#5B8DB8"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Start"
+                             Margin="0,10,0,0" />
+                    <Ellipse WidthRequest="28"
+                             HeightRequest="20"
+                             Fill="#5B8DB8"
+                             HorizontalOptions="Center"
+                             VerticalOptions="End"
+                             Margin="0,0,0,2" />
+                </Grid>
+                <Ellipse WidthRequest="12"
+                         HeightRequest="12"
+                         Fill="#4CAF50"
+                         Stroke="#0D1B2A"
+                         StrokeThickness="2"
+                         HorizontalOptions="End"
+                         VerticalOptions="End"
+                         Margin="0,0,1,1" />
+            </Grid>
+        </Grid>
+
+        <BoxView Grid.Row="1"
+                 Color="#1E2E3E"
+                 HeightRequest="1"
+                 HorizontalOptions="Fill" />
+
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Padding="20,14,20,20"
+                                 Spacing="16">
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="#2196F3" />
+
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="#f87171"
+                       FontSize="12" />
+
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#2E4A67"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="16"
+                        IsVisible="{Binding HasNoLeaderAccess}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Erisim Yok"
+                               TextColor="White"
+                               FontSize="17"
+                               FontAttributes="Bold" />
+                        <Label Text="{Binding AccessMessage}"
+                               TextColor="#94a3b8"
+                               FontSize="12" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#2E4A67"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 18"
+                        Padding="18"
+                        IsVisible="{Binding HasLeaderAccess}">
+                    <VerticalStackLayout Spacing="16">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Bireysel Gorev Ata"
+                                   TextColor="White"
+                                   FontSize="20"
+                                   FontAttributes="Bold" />
+                            <Label Text="Yonettiginiz departmandaki kullanicilara oncelikli gorev olusturun."
+                                   TextColor="#94a3b8"
+                                   FontSize="12" />
+                        </VerticalStackLayout>
+
+                        <Border BackgroundColor="#162030"
+                                Stroke="#203347"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 12"
+                                Padding="12">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Aktif departman"
+                                       TextColor="#94a3b8"
+                                       FontSize="11" />
+                                <Label Text="{Binding CurrentDepartmentName}"
+                                       TextColor="White"
+                                       FontSize="14"
+                                       FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border BackgroundColor="#162030"
+                                Stroke="#203347"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 12"
+                                Padding="10,4">
+                            <Picker ItemsSource="{Binding ManagedDepartments}"
+                                    SelectedItem="{Binding SelectedManagedDepartment}"
+                                    ItemDisplayBinding="{Binding DepartmentName}"
+                                    Title="Departman sec"
+                                    TitleColor="#94a3b8"
+                                    TextColor="White"
+                                    BackgroundColor="Transparent" />
+                        </Border>
+
+                        <Border BackgroundColor="#162030"
+                                Stroke="#203347"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 12"
+                                Padding="10,4">
+                            <Picker ItemsSource="{Binding EligibleUsers}"
+                                    SelectedItem="{Binding SelectedAssignedUser}"
+                                    ItemDisplayBinding="{Binding Name}"
+                                    Title="Kullanici sec"
+                                    TitleColor="#94a3b8"
+                                    TextColor="White"
+                                    BackgroundColor="Transparent" />
+                        </Border>
+
+                        <Border BackgroundColor="#162030"
+                                Stroke="#203347"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 12"
+                                Padding="10,4">
+                            <Picker ItemsSource="{Binding PriorityOptions}"
+                                    SelectedItem="{Binding SelectedPriority}"
+                                    ItemDisplayBinding="{Binding DisplayName}"
+                                    Title="Oncelik sec"
+                                    TitleColor="#94a3b8"
+                                    TextColor="White"
+                                    BackgroundColor="Transparent" />
+                        </Border>
+
+                        <Border BackgroundColor="#162030"
+                                Stroke="#203347"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 12"
+                                Padding="12,8">
+                            <Entry Text="{Binding TaskTitle}"
+                                   Placeholder="Gorev basligi"
+                                   PlaceholderColor="#64748b"
+                                   TextColor="White"
+                                   BackgroundColor="Transparent"
+                                   ClearButtonVisibility="WhileEditing" />
+                        </Border>
+
+                        <Border BackgroundColor="#162030"
+                                Stroke="#203347"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 12"
+                                Padding="12">
+                            <Editor Text="{Binding Description}"
+                                    Placeholder="Gorev aciklamasi"
+                                    PlaceholderColor="#64748b"
+                                    TextColor="White"
+                                    BackgroundColor="Transparent"
+                                    AutoSize="TextChanges"
+                                    MinimumHeightRequest="120" />
+                        </Border>
+
+                        <Border BackgroundColor="#162030"
+                                Stroke="#203347"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 12"
+                                Padding="12,8">
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="Teslim tarihi"
+                                       TextColor="#94a3b8"
+                                       FontSize="11" />
+                                <DatePicker Date="{Binding DeadlineDate}"
+                                            MinimumDate="{Binding MinimumDeadlineDate}"
+                                            TextColor="White"
+                                            BackgroundColor="Transparent" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="12">
+                            <Button Grid.Column="0"
+                                    Text="Gorev Olustur"
+                                    Command="{Binding CreateTaskCommand}"
+                                    BackgroundColor="#2563EB"
+                                    TextColor="White"
+                                    CornerRadius="12"
+                                    HeightRequest="46" />
+
+                            <ActivityIndicator Grid.Column="1"
+                                               WidthRequest="24"
+                                               HeightRequest="24"
+                                               IsRunning="{Binding IsCreatingTask}"
+                                               IsVisible="{Binding IsCreatingTask}"
+                                               Color="#dbeafe"
+                                               VerticalOptions="Center" />
+                        </Grid>
+
+                        <Label Text="{Binding CreateStatus}"
+                               TextColor="#86efac"
+                               FontSize="11" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <BoxView Grid.Row="3"
+                 Color="#1E2E3E"
+                 HeightRequest="1"
+                 HorizontalOptions="Fill" />
+
+        <FlexLayout Grid.Row="4"
+                    Direction="Row"
+                    JustifyContent="SpaceAround"
+                    AlignItems="Center"
+                    HorizontalOptions="Fill"
+                    BackgroundColor="#0F1E2D"
+                    Padding="18,10,18,24">
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 Spacing="2">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnHomeTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E"
+                        StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent"
+                        WidthRequest="42"
+                        HeightRequest="30"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=Home}"
+                           WidthRequest="16"
+                           HeightRequest="16"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 Spacing="2"
+                                 IsVisible="{Binding CanAccessReportsPage}">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnReportsTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E"
+                        StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent"
+                        WidthRequest="42"
+                        HeightRequest="30"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=InsertChartOutlined}"
+                           WidthRequest="16"
+                           HeightRequest="16"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 Spacing="2">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnTasksTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E"
+                        StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent"
+                        WidthRequest="42"
+                        HeightRequest="30"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=Checklist}"
+                           WidthRequest="16"
+                           HeightRequest="16"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 Spacing="2"
+                                 IsVisible="{Binding CanAccessReportsPage}">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLeaderTasksTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E"
+                        StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent"
+                        WidthRequest="42"
+                        HeightRequest="30"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=AddCircleOutline}"
+                           WidthRequest="16"
+                           HeightRequest="16"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+                <BoxView Color="#2196F3"
+                         WidthRequest="4"
+                         HeightRequest="3"
+                         CornerRadius="1.5"
+                         HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 Spacing="2">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnMessagesTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E"
+                        StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent"
+                        WidthRequest="42"
+                        HeightRequest="30"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=ChatBubbleOutline}"
+                           WidthRequest="16"
+                           HeightRequest="16"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 Spacing="2">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnNotificationsTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E"
+                        StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent"
+                        WidthRequest="42"
+                        HeightRequest="30"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=NotificationsNone}"
+                           WidthRequest="16"
+                           HeightRequest="16"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 Spacing="2">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLogoutTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E"
+                        StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent"
+                        WidthRequest="42"
+                        HeightRequest="30"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=Logout}"
+                           WidthRequest="16"
+                           HeightRequest="16"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+        </FlexLayout>
+    </Grid>
+</ContentPage>

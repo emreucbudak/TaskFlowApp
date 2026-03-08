@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <Shell
     x:Class="TaskFlowApp.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -47,6 +47,10 @@
         Route="TasksPage" />
     <ShellContent
         Title=""
+        ContentTemplate="{DataTemplate pages:LeaderIndividualTaskPage}"
+        Route="LeaderIndividualTaskPage" />
+    <ShellContent
+        Title=""
         ContentTemplate="{DataTemplate pages:MessagesPage}"
         Route="MessagesPage" />
     <ShellContent
@@ -55,3 +59,4 @@
         Route="NotificationsPage" />
 
 </Shell>
+
