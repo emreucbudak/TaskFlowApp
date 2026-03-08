@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
@@ -201,12 +201,26 @@
                     </Border>
                 </Grid>
 
-                <Label Text="Grubun Son Aktiviteleri"
-                       TextColor="White"
-                       FontSize="16"
-                       FontAttributes="Bold"
-                       Margin="2,6,0,0" />
-
+                <Grid ColumnDefinitions="*,Auto"
+                      ColumnSpacing="12"
+                      Margin="2,6,0,0">
+                    <Label Grid.Column="0"
+                           Text="Grubun Son Aktiviteleri"
+                           TextColor="White"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center" />
+                    <Button Grid.Column="1"
+                            Text="T&#252;m&#252;n&#252; G&#246;r"
+                            Command="{Binding ShowAllGroupRecentActivitiesCommand}"
+                            IsEnabled="{Binding CanShowAllGroupRecentActivities}"
+                            BackgroundColor="#1A3A5C"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="28"
+                            Padding="12,4"
+                            FontSize="12" />
+                </Grid>
                 <Border BackgroundColor="#0F2338"
                         Stroke="#2E4A67"
                         StrokeThickness="1"

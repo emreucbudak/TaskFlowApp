@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
@@ -81,7 +81,7 @@
                         Padding="16"
                         IsVisible="{Binding HasNoLeaderAccess}">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Erisim Yok"
+                        <Label Text="Erişim Yok"
                                TextColor="White"
                                FontSize="17"
                                FontAttributes="Bold" />
@@ -99,13 +99,10 @@
                         IsVisible="{Binding HasLeaderAccess}">
                     <VerticalStackLayout Spacing="16">
                         <VerticalStackLayout Spacing="4">
-                            <Label Text="Bireysel Gorev Ata"
+                            <Label Text="Görev Atama"
                                    TextColor="White"
                                    FontSize="20"
                                    FontAttributes="Bold" />
-                            <Label Text="Yonettiginiz departmandaki kullanicilara oncelikli gorev olusturun."
-                                   TextColor="#94a3b8"
-                                   FontSize="12" />
                         </VerticalStackLayout>
 
                         <Border BackgroundColor="#162030"
@@ -114,7 +111,7 @@
                                 StrokeShape="RoundRectangle 12"
                                 Padding="12">
                             <VerticalStackLayout Spacing="4">
-                                <Label Text="Aktif departman"
+                                <Label Text="Aktif Departman"
                                        TextColor="#94a3b8"
                                        FontSize="11" />
                                 <Label Text="{Binding CurrentDepartmentName}"
@@ -125,94 +122,94 @@
                         </Border>
 
                         <Border BackgroundColor="#162030"
-                                Stroke="#203347"
-                                StrokeThickness="1"
+                                Stroke="Transparent"
+                                StrokeThickness="0"
                                 StrokeShape="RoundRectangle 12"
                                 Padding="10,4">
                             <Picker ItemsSource="{Binding ManagedDepartments}"
                                     SelectedItem="{Binding SelectedManagedDepartment}"
                                     ItemDisplayBinding="{Binding DepartmentName}"
-                                    Title="Departman sec"
+                                    Title="Departman Seç"
                                     TitleColor="#94a3b8"
                                     TextColor="White"
-                                    BackgroundColor="Transparent" />
+                                    BackgroundColor="Transparent" HandlerChanged="OnInputHandlerChanged" />
                         </Border>
 
                         <Border BackgroundColor="#162030"
-                                Stroke="#203347"
-                                StrokeThickness="1"
+                                Stroke="Transparent"
+                                StrokeThickness="0"
                                 StrokeShape="RoundRectangle 12"
                                 Padding="10,4">
                             <Picker ItemsSource="{Binding EligibleUsers}"
                                     SelectedItem="{Binding SelectedAssignedUser}"
                                     ItemDisplayBinding="{Binding Name}"
-                                    Title="Kullanici sec"
+                                    Title="Kullanıcı Seç"
                                     TitleColor="#94a3b8"
                                     TextColor="White"
-                                    BackgroundColor="Transparent" />
+                                    BackgroundColor="Transparent" HandlerChanged="OnInputHandlerChanged" />
                         </Border>
 
                         <Border BackgroundColor="#162030"
-                                Stroke="#203347"
-                                StrokeThickness="1"
+                                Stroke="Transparent"
+                                StrokeThickness="0"
                                 StrokeShape="RoundRectangle 12"
                                 Padding="10,4">
                             <Picker ItemsSource="{Binding PriorityOptions}"
                                     SelectedItem="{Binding SelectedPriority}"
                                     ItemDisplayBinding="{Binding DisplayName}"
-                                    Title="Oncelik sec"
+                                    Title="Öncelik Seç"
                                     TitleColor="#94a3b8"
                                     TextColor="White"
-                                    BackgroundColor="Transparent" />
+                                    BackgroundColor="Transparent" HandlerChanged="OnInputHandlerChanged" />
                         </Border>
 
                         <Border BackgroundColor="#162030"
-                                Stroke="#203347"
-                                StrokeThickness="1"
+                                Stroke="Transparent"
+                                StrokeThickness="0"
                                 StrokeShape="RoundRectangle 12"
                                 Padding="12,8">
                             <Entry Text="{Binding TaskTitle}"
-                                   Placeholder="Gorev basligi"
+                                   Placeholder="Görev Başlığı"
                                    PlaceholderColor="#64748b"
                                    TextColor="White"
                                    BackgroundColor="Transparent"
-                                   ClearButtonVisibility="WhileEditing" />
+                                   ClearButtonVisibility="WhileEditing" HandlerChanged="OnInputHandlerChanged" />
                         </Border>
 
                         <Border BackgroundColor="#162030"
-                                Stroke="#203347"
-                                StrokeThickness="1"
+                                Stroke="Transparent"
+                                StrokeThickness="0"
                                 StrokeShape="RoundRectangle 12"
                                 Padding="12">
                             <Editor Text="{Binding Description}"
-                                    Placeholder="Gorev aciklamasi"
+                                    Placeholder="Görev Açıklaması"
                                     PlaceholderColor="#64748b"
                                     TextColor="White"
                                     BackgroundColor="Transparent"
                                     AutoSize="TextChanges"
-                                    MinimumHeightRequest="120" />
+                                    MinimumHeightRequest="120" HandlerChanged="OnInputHandlerChanged" />
                         </Border>
 
                         <Border BackgroundColor="#162030"
-                                Stroke="#203347"
-                                StrokeThickness="1"
+                                Stroke="Transparent"
+                                StrokeThickness="0"
                                 StrokeShape="RoundRectangle 12"
                                 Padding="12,8">
                             <VerticalStackLayout Spacing="6">
-                                <Label Text="Teslim tarihi"
+                                <Label Text="Teslim Tarihi"
                                        TextColor="#94a3b8"
                                        FontSize="11" />
                                 <DatePicker Date="{Binding DeadlineDate}"
                                             MinimumDate="{Binding MinimumDeadlineDate}"
                                             TextColor="White"
-                                            BackgroundColor="Transparent" />
+                                            BackgroundColor="Transparent" HandlerChanged="OnInputHandlerChanged" />
                             </VerticalStackLayout>
                         </Border>
 
                         <Grid ColumnDefinitions="*,Auto"
                               ColumnSpacing="12">
                             <Button Grid.Column="0"
-                                    Text="Gorev Olustur"
+                                    Text="Görev Oluştur"
                                     Command="{Binding CreateTaskCommand}"
                                     BackgroundColor="#2563EB"
                                     TextColor="White"

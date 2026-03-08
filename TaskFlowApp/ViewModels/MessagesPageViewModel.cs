@@ -78,6 +78,9 @@ public partial class MessagesPageViewModel(
     private string conversationEmptyMessage = string.Empty;
 
     [ObservableProperty]
+    private string conversationStatusMessage = string.Empty;
+
+    [ObservableProperty]
     private bool hasSelectedConversation;
 
     [ObservableProperty]
@@ -193,32 +196,21 @@ public partial class MessagesPageViewModel(
             var cachedMessages = GetCachedConversationMessages(currentUserId, user.UserId);
             if (cachedMessages.Count > 0)
             {
-                ReplaceConversationMessages(cachedMessages, currentUserId);
+                SyncConversationMessages(cachedMessages, currentUserId);
                 return;
             }
 
             ConversationMessages.Clear();
             IsConversationLoading = true;
 
-            var messages = await chatApiClient.GetMessagesBetweenUsersAsync(
-                currentUserId,
-                currentUserId,
-                user.UserId,
-                1,
-                MessagePageSize,
-                cancellationToken);
+            var conversationMessages = await GetConversationMessagesAsync(currentUserId, user.UserId, cancellationToken);
 
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
             }
 
-            var conversationMessages = (messages ?? [])
-                .Where(message => !message.IsDeleted && message.GroupId is null)
-                .OrderBy(message => message.SendTime)
-                .ToList();
-
-            CacheConversationMessages(conversationMessages);
+            ReplaceConversationCache(currentUserId, user.UserId, conversationMessages);
             ReplaceConversationMessages(conversationMessages, currentUserId);
         }
         catch (OperationCanceledException)
@@ -265,6 +257,7 @@ public partial class MessagesPageViewModel(
             return;
         }
 
+        var selectedUser = SelectedConversationUser;
         var content = MessageDraft.Trim();
 
         try
@@ -276,26 +269,12 @@ public partial class MessagesPageViewModel(
             {
                 Content = content,
                 SenderId = currentUserId,
-                ReceiverId = SelectedConversationUser.UserId,
+                ReceiverId = selectedUser.UserId,
                 GroupId = (Guid?)null
             });
 
-            var message = new MessageDto
-            {
-                Id = Guid.NewGuid(),
-                Content = content,
-                SendTime = DateTime.UtcNow,
-                SenderId = currentUserId,
-                ReceiverId = SelectedConversationUser.UserId,
-                IsDelivered = true,
-                IsRead = true
-            };
-
-            UpsertDirectMessageCache(message);
-            ConversationMessages.Add(MapConversationMessage(message, currentUserId));
-            ConversationEmptyMessage = string.Empty;
             MessageDraft = string.Empty;
-            UpsertPriorConversationUser(message, SelectedConversationUser.UserId, SelectedConversationUser.Name);
+            await RefreshConversationAfterSendAsync(currentUserId, selectedUser.UserId, selectedUser.Name, content);
         }
         catch (ApiException ex)
         {
@@ -312,6 +291,61 @@ public partial class MessagesPageViewModel(
         finally
         {
             IsSendingMessage = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteMessageAsync(ConversationMessageItem? messageItem)
+    {
+        if (messageItem is null ||
+            messageItem.IsDeleting ||
+            !messageItem.IsOwnMessage ||
+            messageItem.MessageId == Guid.Empty ||
+            UserSession.UserId is not Guid currentUserId ||
+            SelectedConversationUser is null)
+        {
+            return;
+        }
+
+        var selectedUser = SelectedConversationUser;
+
+        try
+        {
+            messageItem.IsDeleting = true;
+            ErrorMessage = string.Empty;
+
+            await chatApiClient.DeleteMessageCommandRequestAsync(new
+            {
+                Id = messageItem.MessageId
+            });
+
+            MarkCachedMessageAsDeleted(messageItem.MessageId);
+            var cachedMessages = GetCachedConversationMessages(currentUserId, selectedUser.UserId);
+
+            if (SelectedConversationUser?.UserId == selectedUser.UserId)
+            {
+                SyncConversationMessages(cachedMessages, currentUserId);
+            }
+
+            RefreshPriorConversationUserFromCache(currentUserId, selectedUser.UserId, selectedUser.Name);
+
+        }
+        catch (ApiException ex)
+        {
+            ErrorMessage = ResolveApiErrorMessage(ex, "Mesaj silinemedi. Lutfen tekrar deneyin.");
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Mesaj silinirken bir sorun olustu. Lutfen tekrar deneyin.";
+        }
+        finally
+        {
+            messageItem.IsDeleting = false;
+            messageItem.IsDeleteVisible = false;
         }
     }
 
@@ -489,6 +523,73 @@ public partial class MessagesPageViewModel(
         }
 
         return messages;
+    }
+
+    private async Task<List<MessageDto>> GetConversationMessagesAsync(
+        Guid currentUserId,
+        Guid otherUserId,
+        CancellationToken cancellationToken = default)
+    {
+        var messages = await chatApiClient.GetMessagesBetweenUsersAsync(
+            currentUserId,
+            currentUserId,
+            otherUserId,
+            1,
+            MessagePageSize,
+            cancellationToken);
+
+        return (messages ?? [])
+            .Where(message => !message.IsDeleted && message.GroupId is null)
+            .OrderBy(message => message.SendTime)
+            .ToList();
+    }
+
+    private async Task RefreshConversationAfterSendAsync(
+        Guid currentUserId,
+        Guid otherUserId,
+        string? fallbackName,
+        string content)
+    {
+        try
+        {
+            var conversationMessages = await GetConversationMessagesAsync(currentUserId, otherUserId);
+            if (conversationMessages.Count == 0)
+            {
+                throw new InvalidOperationException("Mesaj gonderildikten sonra sohbet yenilenemedi.");
+            }
+
+            ReplaceConversationCache(currentUserId, otherUserId, conversationMessages);
+
+            if (SelectedConversationUser?.UserId == otherUserId)
+            {
+                SyncConversationMessages(conversationMessages, currentUserId);
+            }
+
+            RefreshPriorConversationUserFromCache(currentUserId, otherUserId, fallbackName);
+        }
+        catch
+        {
+            var fallbackMessage = new MessageDto
+            {
+                Id = Guid.NewGuid(),
+                Content = content,
+                SendTime = DateTime.UtcNow,
+                SenderId = currentUserId,
+                ReceiverId = otherUserId,
+                IsDelivered = true,
+                IsRead = true
+            };
+
+            UpsertDirectMessageCache(fallbackMessage);
+
+            if (SelectedConversationUser?.UserId == otherUserId)
+            {
+                ConversationMessages.Add(MapConversationMessage(fallbackMessage, currentUserId));
+                ConversationEmptyMessage = string.Empty;
+            }
+
+            UpsertPriorConversationUser(fallbackMessage, otherUserId, fallbackName);
+        }
     }
 
     private async Task RefreshVisibleUsersForCurrentSearchAsync()
@@ -707,6 +808,23 @@ public partial class MessagesPageViewModel(
         }
     }
 
+    private void ReplaceConversationCache(Guid currentUserId, Guid otherUserId, IEnumerable<MessageDto> messages)
+    {
+        recentDirectMessages.RemoveAll(message =>
+            message.GroupId is null &&
+            ((message.SenderId == currentUserId && message.ReceiverId == otherUserId) ||
+             (message.SenderId == otherUserId && message.ReceiverId == currentUserId)));
+
+        foreach (var message in messages
+            .Where(message => !message.IsDeleted && message.GroupId is null)
+            .OrderByDescending(message => message.SendTime))
+        {
+            recentDirectMessages.Add(message);
+        }
+
+        recentDirectMessages.Sort((left, right) => right.SendTime.CompareTo(left.SendTime));
+    }
+
     private void UpsertDirectMessageCache(MessageDto message)
     {
         if (message.IsDeleted || message.GroupId is not null)
@@ -738,6 +856,20 @@ public partial class MessagesPageViewModel(
             .ToList();
     }
 
+    private void MarkCachedMessageAsDeleted(Guid messageId)
+    {
+        var existingIndex = recentDirectMessages.FindIndex(item => item.Id == messageId);
+        if (existingIndex < 0)
+        {
+            return;
+        }
+
+        recentDirectMessages[existingIndex] = recentDirectMessages[existingIndex] with
+        {
+            IsDeleted = true
+        };
+    }
+
     private void ReplaceConversationMessages(IEnumerable<MessageDto> messages, Guid currentUserId)
     {
         ConversationMessages.Clear();
@@ -748,6 +880,69 @@ public partial class MessagesPageViewModel(
             .Select(message => MapConversationMessage(message, currentUserId)))
         {
             ConversationMessages.Add(item);
+        }
+
+        ConversationEmptyMessage = ConversationMessages.Count == 0
+            ? NewConversationMessage
+            : string.Empty;
+    }
+
+    private void SyncConversationMessages(IEnumerable<MessageDto> messages, Guid currentUserId)
+    {
+        var desiredMessages = messages
+            .Where(message => !message.IsDeleted && message.GroupId is null)
+            .OrderBy(message => message.SendTime)
+            .Select(message => MapConversationMessage(message, currentUserId))
+            .ToList();
+
+        var desiredIds = desiredMessages
+            .Select(item => item.MessageId)
+            .ToHashSet();
+
+        for (var index = ConversationMessages.Count - 1; index >= 0; index--)
+        {
+            if (!desiredIds.Contains(ConversationMessages[index].MessageId))
+            {
+                ConversationMessages.RemoveAt(index);
+            }
+        }
+
+        for (var desiredIndex = 0; desiredIndex < desiredMessages.Count; desiredIndex++)
+        {
+            var desiredItem = desiredMessages[desiredIndex];
+
+            if (desiredIndex < ConversationMessages.Count &&
+                ConversationMessages[desiredIndex].MessageId == desiredItem.MessageId)
+            {
+                continue;
+            }
+
+            var existingIndex = -1;
+            for (var currentIndex = 0; currentIndex < ConversationMessages.Count; currentIndex++)
+            {
+                if (ConversationMessages[currentIndex].MessageId == desiredItem.MessageId)
+                {
+                    existingIndex = currentIndex;
+                    break;
+                }
+            }
+
+            if (existingIndex >= 0)
+            {
+                var existingItem = ConversationMessages[existingIndex];
+                existingItem.IsDeleteVisible = false;
+                existingItem.IsDeleting = false;
+                ConversationMessages.RemoveAt(existingIndex);
+                ConversationMessages.Insert(desiredIndex, existingItem);
+                continue;
+            }
+
+            ConversationMessages.Insert(desiredIndex, desiredItem);
+        }
+
+        while (ConversationMessages.Count > desiredMessages.Count)
+        {
+            ConversationMessages.RemoveAt(ConversationMessages.Count - 1);
         }
 
         ConversationEmptyMessage = ConversationMessages.Count == 0
@@ -832,7 +1027,25 @@ public partial class MessagesPageViewModel(
 
     private void UpsertPriorConversationUser(MessageDto message, Guid otherUserId, string? fallbackName = null)
     {
-        var updatedItem = BuildConversationUserItem(otherUserId, ResolveDisplayName(otherUserId, fallbackName), message);
+        UpdateConversationUserSummary(otherUserId, message, fallbackName);
+    }
+
+    private void RefreshPriorConversationUserFromCache(Guid currentUserId, Guid otherUserId, string? fallbackName = null)
+    {
+        var latestMessage = recentDirectMessages
+            .Where(message => !message.IsDeleted && message.GroupId is null)
+            .Where(message =>
+                (message.SenderId == currentUserId && message.ReceiverId == otherUserId) ||
+                (message.SenderId == otherUserId && message.ReceiverId == currentUserId))
+            .OrderByDescending(message => message.SendTime)
+            .FirstOrDefault();
+
+        UpdateConversationUserSummary(otherUserId, latestMessage, fallbackName);
+    }
+
+    private void UpdateConversationUserSummary(Guid otherUserId, MessageDto? latestMessage, string? fallbackName = null)
+    {
+        var updatedItem = BuildConversationUserItem(otherUserId, ResolveDisplayName(otherUserId, fallbackName), latestMessage);
         priorConversationUserMap[otherUserId] = updatedItem;
 
         var existingIndex = priorConversationUsers.FindIndex(item => item.UserId == otherUserId);
@@ -888,7 +1101,11 @@ public partial class MessagesPageViewModel(
 
             if (SelectedConversationUser?.UserId == otherUserId.Value)
             {
-                ConversationMessages.Add(MapConversationMessage(message, currentUserId));
+                if (ConversationMessages.All(item => item.MessageId != message.Id))
+                {
+                    ConversationMessages.Add(MapConversationMessage(message, currentUserId));
+                }
+
                 ConversationEmptyMessage = string.Empty;
                 return;
             }
@@ -984,9 +1201,11 @@ public partial class MessagesPageViewModel(
     {
         return new ConversationMessageItem
         {
+            MessageId = message.Id,
             Content = message.Content,
             SentAtText = FormatDetailedTimestamp(message.SendTime),
-            IsOwnMessage = message.SenderId == currentUserId
+            IsOwnMessage = message.SenderId == currentUserId,
+            IsDeleteVisible = false
         };
     }
 
@@ -1063,14 +1282,19 @@ public partial class MessageConversationUserItem : ObservableObject
     private bool isSelected;
 }
 
-public sealed record ConversationMessageItem
+public partial class ConversationMessageItem : ObservableObject
 {
+    public Guid MessageId { get; init; }
     public string Content { get; init; } = string.Empty;
     public string SentAtText { get; init; } = string.Empty;
     public bool IsOwnMessage { get; init; }
+
+    [ObservableProperty]
+    private bool isDeleteVisible;
+
+    [ObservableProperty]
+    private bool isDeleting;
 }
-
-
 
 public partial class SelectableDepartmentUserItem : ObservableObject
 {
@@ -1081,4 +1305,3 @@ public partial class SelectableDepartmentUserItem : ObservableObject
     [ObservableProperty]
     private bool isSelected;
 }
-

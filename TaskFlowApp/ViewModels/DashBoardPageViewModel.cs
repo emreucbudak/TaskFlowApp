@@ -21,13 +21,13 @@ public partial class DashBoardPageViewModel(
     IdentityApiClient identityApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     private const int GroupActivityPreviewCount = 5;
-    private const int GroupActivityPageSize = 5;
     private const int GroupSummaryPageSize = 100;
     private const int TasksPageSize = 100;
     private const string NoGroupMessage = "Uyesi olunan grup bulunamadi.";
     private const string NoActivityMessage = "Grupta henuz aktivite yok.";
     private const string NoDailySummaryMessage = "Gunun ozeti bulunamadi.";
-
+    private readonly List<GroupRecentActivityItem> allGroupRecentActivities = [];
+    private bool isShowingAllGroupRecentActivities;
     public ObservableCollection<GroupRecentActivityItem> GroupRecentActivities { get; } = [];
 
     [ObservableProperty]
@@ -75,6 +75,8 @@ public partial class DashBoardPageViewModel(
     [ObservableProperty]
     private bool hasUserGroup;
 
+    [ObservableProperty]
+    private bool canShowAllGroupRecentActivities;
     public bool HasNoGroupRecentActivities => !HasGroupRecentActivities;
 
     partial void OnHasGroupRecentActivitiesChanged(bool value)
@@ -168,6 +170,20 @@ public partial class DashBoardPageViewModel(
         }
     }
 
+    [RelayCommand]
+    private Task ShowAllGroupRecentActivitiesAsync()
+    {
+        if (!CanShowAllGroupRecentActivities)
+        {
+            return Task.CompletedTask;
+        }
+
+        isShowingAllGroupRecentActivities = true;
+        CanShowAllGroupRecentActivities = false;
+        RefreshVisibleGroupRecentActivities();
+        return Task.CompletedTask;
+    }
+
     private async Task LoadGroupRecentActivitiesSafeAsync(
         Guid userId,
         IReadOnlyList<CompanyGroupDto> userGroups,
@@ -212,14 +228,6 @@ public partial class DashBoardPageViewModel(
             return;
         }
 
-        var recentMessagesTask = chatApiClient.GetMessagesByGroupIdQueryRequestAsync(new
-        {
-            CurrentUserId = userId,
-            GroupId = currentGroup.GroupId,
-            PageSize = GroupActivityPageSize,
-            Page = 1
-        });
-
         var summaryMessagesTask = chatApiClient.GetMessagesByGroupIdQueryRequestAsync(new
         {
             CurrentUserId = userId,
@@ -228,17 +236,13 @@ public partial class DashBoardPageViewModel(
             Page = 1
         });
 
-        await Task.WhenAll(recentMessagesTask, summaryMessagesTask);
-
-        var recentMessages = await recentMessagesTask ?? [];
         var summaryMessages = await summaryMessagesTask ?? [];
 
         DailySummaryText = ResolveDailySummaryText(summaryMessages);
 
-        var recentActivities = recentMessages
+        var recentActivities = summaryMessages
             .Where(message => !message.IsDeleted)
             .OrderByDescending(message => message.SendTime)
-            .Take(GroupActivityPreviewCount)
             .Select(message => new GroupRecentActivityItem
             {
                 ActorName = ResolveDisplayName(message.SenderId, userNameMap),
@@ -247,21 +251,21 @@ public partial class DashBoardPageViewModel(
             })
             .ToList();
 
-        GroupRecentActivities.Clear();
-        foreach (var activity in recentActivities)
-        {
-            GroupRecentActivities.Add(activity);
-        }
-
-        HasGroupRecentActivities = GroupRecentActivities.Count > 0;
-        GroupActivityEmptyMessage = HasGroupRecentActivities ? string.Empty : NoActivityMessage;
+        allGroupRecentActivities.Clear();
+        allGroupRecentActivities.AddRange(recentActivities);
+        isShowingAllGroupRecentActivities = false;
+        CanShowAllGroupRecentActivities = allGroupRecentActivities.Count > GroupActivityPreviewCount;
+        RefreshVisibleGroupRecentActivities();
     }
 
     private void ResetGroupActivitiesState()
     {
+        allGroupRecentActivities.Clear();
         GroupRecentActivities.Clear();
         HasGroupRecentActivities = false;
         HasUserGroup = false;
+        CanShowAllGroupRecentActivities = false;
+        isShowingAllGroupRecentActivities = false;
         CurrentGroupName = string.Empty;
         DailySummaryText = NoDailySummaryMessage;
         GroupActivityEmptyMessage = NoGroupMessage;
@@ -269,12 +273,31 @@ public partial class DashBoardPageViewModel(
 
     private void ApplyNoGroupState()
     {
+        allGroupRecentActivities.Clear();
         GroupRecentActivities.Clear();
         HasGroupRecentActivities = false;
         HasUserGroup = false;
+        CanShowAllGroupRecentActivities = false;
+        isShowingAllGroupRecentActivities = false;
         CurrentGroupName = string.Empty;
         DailySummaryText = NoDailySummaryMessage;
         GroupActivityEmptyMessage = NoGroupMessage;
+    }
+
+    private void RefreshVisibleGroupRecentActivities()
+    {
+        var visibleActivities = isShowingAllGroupRecentActivities
+            ? allGroupRecentActivities
+            : allGroupRecentActivities.Take(GroupActivityPreviewCount).ToList();
+
+        GroupRecentActivities.Clear();
+        foreach (var activity in visibleActivities)
+        {
+            GroupRecentActivities.Add(activity);
+        }
+
+        HasGroupRecentActivities = GroupRecentActivities.Count > 0;
+        GroupActivityEmptyMessage = HasGroupRecentActivities ? string.Empty : NoActivityMessage;
     }
 
     private async Task<List<IndividualTaskDto>> LoadAllIndividualTasksAsync(Guid userId)

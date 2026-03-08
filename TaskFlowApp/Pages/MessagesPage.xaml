@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
@@ -210,8 +210,8 @@
                               ColumnSpacing="8">
                             <Border Grid.Column="0"
                                     BackgroundColor="#162030"
-                                    Stroke="#203347"
-                                    StrokeThickness="1"
+                                    Stroke="Transparent"
+                                    StrokeThickness="0"
                                     StrokeShape="RoundRectangle 12"
                                     Padding="12,8">
                                 <Grid ColumnDefinitions="Auto,*"
@@ -229,7 +229,8 @@
                                            TextColor="White"
                                            BackgroundColor="Transparent"
                                            ClearButtonVisibility="WhileEditing"
-                                           VerticalOptions="Center" />
+                                           VerticalOptions="Center"
+                                           HandlerChanged="OnInputHandlerChanged" />
                                 </Grid>
                             </Border>
 
@@ -380,31 +381,72 @@
                                             </VerticalStackLayout>
                                         </Border>
 
-                                        <Border Grid.Column="1"
-                                                BackgroundColor="#1A3A5C"
-                                                Stroke="#4B82B5"
-                                                StrokeThickness="1"
-                                                StrokeShape="RoundRectangle 14"
-                                                Padding="12"
-                                                Margin="32,0,0,0"
-                                                IsVisible="False">
-                                            <Border.Triggers>
-                                                <DataTrigger TargetType="Border"
+                                        <Grid Grid.Column="1"
+                                              ColumnDefinitions="*,Auto"
+                                              ColumnSpacing="8"
+                                              Margin="32,0,0,0"
+                                              IsVisible="False">
+                                            <Grid.Triggers>
+                                                <DataTrigger TargetType="Grid"
                                                              Binding="{Binding IsOwnMessage}"
                                                              Value="True">
                                                     <Setter Property="IsVisible" Value="True" />
                                                 </DataTrigger>
-                                            </Border.Triggers>
-                                            <VerticalStackLayout Spacing="6">
-                                                <Label Text="{Binding Content}"
-                                                       TextColor="White"
-                                                       FontSize="13"
-                                                       LineBreakMode="WordWrap" />
-                                                <Label Text="{Binding SentAtText}"
-                                                       TextColor="#dbeafe"
-                                                       FontSize="10" />
-                                            </VerticalStackLayout>
-                                        </Border>
+                                            </Grid.Triggers>
+                                            <Grid.GestureRecognizers>
+                                                <PointerGestureRecognizer PointerEntered="OnOwnMessagePointerEntered"
+                                                                          PointerExited="OnOwnMessagePointerExited" />
+                                                <TapGestureRecognizer Tapped="OnOwnMessageTapped" />
+                                            </Grid.GestureRecognizers>
+
+                                            <Border Grid.Column="0"
+                                                    BackgroundColor="#1A3A5C"
+                                                    Stroke="#4B82B5"
+                                                    StrokeThickness="1"
+                                                    StrokeShape="RoundRectangle 14"
+                                                    Padding="12">
+                                                <VerticalStackLayout Spacing="6">
+                                                    <Label Text="{Binding Content}"
+                                                           TextColor="White"
+                                                           FontSize="13"
+                                                           LineBreakMode="WordWrap" />
+                                                    <Label Text="{Binding SentAtText}"
+                                                           TextColor="#dbeafe"
+                                                           FontSize="10" />
+                                                </VerticalStackLayout>
+                                            </Border>
+
+                                            <Border Grid.Column="1"
+                                                    BackgroundColor="#122A40"
+                                                    Stroke="#33506E"
+                                                    StrokeThickness="1"
+                                                    StrokeShape="RoundRectangle 10"
+                                                    Padding="6"
+                                                    WidthRequest="32"
+                                                    HeightRequest="32"
+                                                    HorizontalOptions="End"
+                                                    VerticalOptions="End"
+                                                    Opacity="0"
+                                                    InputTransparent="True">
+                                                <Border.Triggers>
+                                                    <DataTrigger TargetType="Border"
+                                                                 Binding="{Binding IsDeleteVisible}"
+                                                                 Value="True">
+                                                        <Setter Property="Opacity" Value="1" />
+                                                        <Setter Property="InputTransparent" Value="False" />
+                                                    </DataTrigger>
+                                                </Border.Triggers>
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Tapped="OnDeleteMessageTapped" />
+                                                </Border.GestureRecognizers>
+                                                <Image Source="{mi:MaterialOutlined Icon=Delete}"
+                                                       WidthRequest="16"
+                                                       HeightRequest="16"
+                                                       Aspect="AspectFit"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center" />
+                                            </Border>
+                                        </Grid>
                                     </Grid>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
@@ -415,8 +457,8 @@
                               ColumnSpacing="12">
                             <Border Grid.Column="0"
                                     BackgroundColor="#162030"
-                                    Stroke="#203347"
-                                    StrokeThickness="1"
+                                    Stroke="Transparent"
+                                    StrokeThickness="0"
                                     StrokeShape="RoundRectangle 12"
                                     Padding="12,8">
                                 <Entry Text="{Binding MessageDraft}"
@@ -426,7 +468,8 @@
                                        BackgroundColor="Transparent"
                                        IsEnabled="{Binding HasSelectedConversation}"
                                        ClearButtonVisibility="WhileEditing"
-                                       ReturnCommand="{Binding SendMessageCommand}" />
+                                       ReturnCommand="{Binding SendMessageCommand}"
+                                       HandlerChanged="OnInputHandlerChanged" />
                             </Border>
 
                             <Grid Grid.Column="1"
@@ -593,5 +636,3 @@
         </FlexLayout>
     </Grid>
 </ContentPage>
-
-

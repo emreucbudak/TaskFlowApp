@@ -1,4 +1,4 @@
-﻿using TaskFlowApp.Infrastructure;
+using TaskFlowApp.Infrastructure;
 using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp.Pages;
@@ -17,6 +17,14 @@ public partial class LeaderIndividualTaskPage : ContentPage
     {
         base.OnAppearing();
         await ViewModel.LoadCommand.ExecuteAsync(null);
+    }
+
+    private void OnInputHandlerChanged(object? sender, EventArgs e)
+    {
+        if (sender is VisualElement element)
+        {
+            InputChromeHelper.RemoveNativeChrome(element.Handler?.PlatformView);
+        }
     }
 
     private async void OnHomeTapped(object? sender, TappedEventArgs e) => await ViewModel.NavigateHomeCommand.ExecuteAsync(null);
