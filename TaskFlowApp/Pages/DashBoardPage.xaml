@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
@@ -290,7 +290,7 @@
                     AlignItems="Center"
                     HorizontalOptions="Fill"
                     BackgroundColor="#0F1E2D"
-                    Padding="30,10,30,24">
+                    Padding="18,10,18,24">
             <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnHomeTapped" />
@@ -350,6 +350,27 @@
                         HorizontalOptions="Center">
                     <Image x:Name="TasksIconImage"
                            Source="{mi:MaterialOutlined Icon=Checklist}"
+                           WidthRequest="16"
+                           HeightRequest="16"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 Spacing="2"
+                                 IsVisible="{Binding CanAccessReportsPage}">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLeaderTasksTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border BackgroundColor="#1E2E3E"
+                        StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent"
+                        WidthRequest="42"
+                        HeightRequest="30"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=AddCircleOutline}"
                            WidthRequest="16"
                            HeightRequest="16"
                            Aspect="AspectFit"
@@ -420,4 +441,5 @@
         </FlexLayout>
     </Grid>
 </ContentPage>
+
 

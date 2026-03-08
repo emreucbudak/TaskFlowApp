@@ -3,14 +3,14 @@ using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp.Pages;
 
-public partial class TasksPage : ContentPage
+public partial class LeaderIndividualTaskPage : ContentPage
 {
-    private TasksPageViewModel ViewModel => (TasksPageViewModel)BindingContext;
+    private LeaderIndividualTaskPageViewModel ViewModel => (LeaderIndividualTaskPageViewModel)BindingContext;
 
-    public TasksPage()
+    public LeaderIndividualTaskPage()
     {
         InitializeComponent();
-        BindingContext = ServiceLocator.GetRequiredService<TasksPageViewModel>();
+        BindingContext = ServiceLocator.GetRequiredService<LeaderIndividualTaskPageViewModel>();
     }
 
     protected override async void OnAppearing()
@@ -27,4 +27,3 @@ public partial class TasksPage : ContentPage
     private async void OnNotificationsTapped(object? sender, TappedEventArgs e) => await ViewModel.NavigateNotificationsCommand.ExecuteAsync(null);
     private async void OnLogoutTapped(object? sender, TappedEventArgs e) => await ViewModel.LogoutCommand.ExecuteAsync(null);
 }
-
