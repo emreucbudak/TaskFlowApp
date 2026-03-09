@@ -1,6 +1,7 @@
-ï»¿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
              xmlns:controls="clr-namespace:TaskFlowApp.Controls"
              x:Class="TaskFlowApp.Pages.ProfilePage"
              BackgroundColor="#0D1B2A"
@@ -15,14 +16,19 @@
                     Stroke="#2E4A67"
                     StrokeThickness="1"
                     StrokeShape="RoundRectangle 12"
-                    Padding="12,6">
+                    WidthRequest="44"
+                    HeightRequest="40"
+                    Padding="0"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center">
                 <Border.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnBackTapped" />
+                    <TapGestureRecognizer Command="{Binding NavigateBackCommand}" />
                 </Border.GestureRecognizers>
-                <Label Text="Geri"
-                       TextColor="White"
-                       FontSize="12"
-                       FontAttributes="Bold" />
+                <Image Source="{mi:MaterialOutlined Icon=ArrowBack}"
+                       WidthRequest="18"
+                       HeightRequest="18"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
             </Border>
 
             <Label Grid.Column="1"
@@ -45,7 +51,7 @@
                     <RoundRectangle CornerRadius="22" />
                 </Border.StrokeShape>
                 <Label Text="{Binding Initials}"
-                       TextColor="#dbeafe"
+                       TextColor="#DBEAFE"
                        FontAttributes="Bold"
                        HorizontalTextAlignment="Center"
                        VerticalTextAlignment="Center" />
@@ -65,7 +71,7 @@
                                    Color="#2196F3" />
 
                 <Label Text="{Binding ErrorMessage}"
-                       TextColor="#f87171"
+                       TextColor="#F87171"
                        FontSize="12" />
 
                 <Border BackgroundColor="#0F2338"
@@ -84,7 +90,7 @@
                                 <RoundRectangle CornerRadius="30" />
                             </Border.StrokeShape>
                             <Label Text="{Binding Initials}"
-                                   TextColor="#dbeafe"
+                                   TextColor="#DBEAFE"
                                    FontSize="20"
                                    FontAttributes="Bold"
                                    HorizontalTextAlignment="Center"
@@ -104,28 +110,18 @@
                                    FontAttributes="Bold" />
                             <Label Text="{Binding Subtitle}"
                                    TextColor="#9FB5CB"
-                                   FontSize="12" />
+                                   FontSize="12"
+                                   IsVisible="{Binding HasSubtitle}" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
 
-                <Border BackgroundColor="#0F2338"
-                        Stroke="#34506C"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 14"
-                        Padding="14">
-                    <Label Text="{Binding SummaryText}"
-                           TextColor="#D4E2F0"
-                           FontSize="12"
-                           LineBreakMode="WordWrap" />
-                </Border>
-
-                <Label Text="Hesap Ozetleri"
+                <Label Text="Hesap Özeti"
                        TextColor="White"
                        FontSize="16"
                        FontAttributes="Bold" />
 
-                <Grid ColumnDefinitions="*,*,*"
+                <Grid ColumnDefinitions="*,*"
                       ColumnSpacing="10">
                     <Border Grid.Column="0"
                             BackgroundColor="#0F2338"
@@ -133,14 +129,16 @@
                             StrokeThickness="1"
                             StrokeShape="RoundRectangle 14"
                             Padding="14">
-                        <VerticalStackLayout Spacing="4">
+                        <VerticalStackLayout Spacing="6">
                             <Label Text="{Binding PrimaryMetricTitle}"
                                    TextColor="#9FB5CB"
                                    FontSize="12" />
                             <Label Text="{Binding PrimaryMetricValue}"
                                    TextColor="White"
-                                   FontSize="24"
-                                   FontAttributes="Bold" />
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   LineBreakMode="WordWrap"
+                                   MaxLines="2" />
                         </VerticalStackLayout>
                     </Border>
 
@@ -150,31 +148,16 @@
                             StrokeThickness="1"
                             StrokeShape="RoundRectangle 14"
                             Padding="14">
-                        <VerticalStackLayout Spacing="4">
+                        <VerticalStackLayout Spacing="6">
                             <Label Text="{Binding SecondaryMetricTitle}"
                                    TextColor="#9FB5CB"
                                    FontSize="12" />
                             <Label Text="{Binding SecondaryMetricValue}"
                                    TextColor="White"
-                                   FontSize="24"
-                                   FontAttributes="Bold" />
-                        </VerticalStackLayout>
-                    </Border>
-
-                    <Border Grid.Column="2"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="{Binding TertiaryMetricTitle}"
-                                   TextColor="#9FB5CB"
-                                   FontSize="12" />
-                            <Label Text="{Binding TertiaryMetricValue}"
-                                   TextColor="White"
-                                   FontSize="24"
-                                   FontAttributes="Bold" />
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   LineBreakMode="WordWrap"
+                                   MaxLines="2" />
                         </VerticalStackLayout>
                     </Border>
                 </Grid>
@@ -216,22 +199,6 @@
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
-
-                <Label Text="Not"
-                       TextColor="White"
-                       FontSize="16"
-                       FontAttributes="Bold" />
-
-                <Border BackgroundColor="#0F2338"
-                        Stroke="#34506C"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 14"
-                        Padding="14">
-                    <Label Text="{Binding InsightText}"
-                           TextColor="#D4E2F0"
-                           FontSize="12"
-                           LineBreakMode="WordWrap" />
-                </Border>
             </VerticalStackLayout>
         </ScrollView>
 
@@ -248,3 +215,6 @@
                                 IsOpen="{Binding IsProfileMenuOpen}" />
     </Grid>
 </ContentPage>
+
+
+

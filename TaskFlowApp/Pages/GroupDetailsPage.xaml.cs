@@ -1,4 +1,4 @@
-﻿using TaskFlowApp.Infrastructure;
+using TaskFlowApp.Infrastructure;
 using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp.Pages;
@@ -10,6 +10,7 @@ public partial class GroupDetailsPage : ContentPage
     public GroupDetailsPage()
     {
         InitializeComponent();
+        Shell.SetPresentationMode(this, PresentationMode.NotAnimated);
         BindingContext = ServiceLocator.GetRequiredService<GroupDetailsPageViewModel>();
     }
 

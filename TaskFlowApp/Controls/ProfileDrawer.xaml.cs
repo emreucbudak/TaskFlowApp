@@ -1,4 +1,4 @@
-﻿using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.ApplicationModel;
 
 namespace TaskFlowApp.Controls;
 
@@ -50,7 +50,7 @@ public partial class ProfileDrawer : ContentView
         ((ProfileDrawer)bindable).ApplyActiveState();
     }
 
-    private async Task UpdateDrawerStateAsync(bool isOpen)
+    private Task UpdateDrawerStateAsync(bool isOpen)
     {
         Backdrop.CancelAnimations();
         DrawerPanel.CancelAnimations();
@@ -59,23 +59,13 @@ public partial class ProfileDrawer : ContentView
         {
             IsVisible = true;
             InputTransparent = false;
-            await Task.WhenAll(
-                Backdrop.FadeTo(0.38, 180, Easing.CubicOut),
-                DrawerPanel.TranslateTo(0, 0, 220, Easing.CubicOut));
-            return;
+            Backdrop.Opacity = 0.38;
+            DrawerPanel.TranslationX = 0;
+            return Task.CompletedTask;
         }
-
-        if (!IsVisible)
-        {
-            ApplyClosedState();
-            return;
-        }
-
-        await Task.WhenAll(
-            Backdrop.FadeTo(0, 140, Easing.CubicIn),
-            DrawerPanel.TranslateTo(ClosedOffset, 0, 190, Easing.CubicIn));
 
         ApplyClosedState();
+        return Task.CompletedTask;
     }
 
     private void ApplyClosedState()

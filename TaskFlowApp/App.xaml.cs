@@ -1,4 +1,4 @@
-﻿#if WINDOWS
+#if WINDOWS
 using TaskFlowApp.Infrastructure.Windows;
 using TaskFlowApp.Infrastructure.Payments;
 #endif
@@ -10,6 +10,7 @@ namespace TaskFlowApp
         public App()
         {
             InitializeComponent();
+            UserAppTheme = AppTheme.Dark;
 #if WINDOWS
             DesktopProtocolRegistrar.EnsureRegistered();
             PaymentReturnState.TryStoreFromCommandLine(Environment.GetCommandLineArgs());
@@ -22,3 +23,4 @@ namespace TaskFlowApp
         }
     }
 }
+
