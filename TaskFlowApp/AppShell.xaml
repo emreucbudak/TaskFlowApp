@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <Shell
     x:Class="TaskFlowApp.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:TaskFlowApp"
     xmlns:pages="clr-namespace:TaskFlowApp.Pages"
     Title=""
+    BackgroundColor="#0D1B2A"
     IsVisible="False"
     FlyoutBehavior="Disabled">
 
@@ -59,4 +60,3 @@
         Route="NotificationsPage" />
 
 </Shell>
-

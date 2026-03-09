@@ -51,6 +51,23 @@ public sealed class UserSession : IUserSession
         "unique_name"
     ];
 
+    private static readonly string[] DepartmentClaimKeys =
+    [
+        "department",
+        "Department",
+        "departments",
+        "Departments",
+        "departmentName",
+        "DepartmentName",
+        "departmentNames",
+        "DepartmentNames",
+        "department_name",
+        "department_names",
+        "dept",
+        "deptName",
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/department"
+    ];
+
     public string? AccessToken { get; private set; }
     public string? RefreshToken { get; private set; }
     public Guid? UserId { get; private set; }
@@ -58,6 +75,7 @@ public sealed class UserSession : IUserSession
     public string? Role { get; private set; }
     public string? DisplayName { get; private set; }
     public string? Email { get; private set; }
+    public IReadOnlyList<string> DepartmentNames { get; private set; } = Array.Empty<string>();
 
     public void SetRawTokens(string accessToken, string? refreshToken)
     {
@@ -68,6 +86,7 @@ public sealed class UserSession : IUserSession
         Role = null;
         DisplayName = ReadStringClaim(accessToken, DisplayNameClaimKeys);
         Email = ReadStringClaim(accessToken, EmailClaimKeys);
+        DepartmentNames = ReadDepartmentClaims(accessToken);
     }
 
     public void SetTokens(
@@ -86,6 +105,7 @@ public sealed class UserSession : IUserSession
             : roleOverride;
         DisplayName = ReadStringClaim(accessToken, DisplayNameClaimKeys);
         Email = ReadStringClaim(accessToken, EmailClaimKeys);
+        DepartmentNames = ReadDepartmentClaims(accessToken);
     }
 
     public void Clear()
@@ -97,187 +117,203 @@ public sealed class UserSession : IUserSession
         Role = null;
         DisplayName = null;
         Email = null;
+        DepartmentNames = Array.Empty<string>();
     }
 
     private static Guid? ReadGuidClaim(string jwtToken, IEnumerable<string> claimKeys)
     {
-        try
-        {
-            var tokenParts = jwtToken.Split('.');
-            if (tokenParts.Length < 2)
-            {
-                return null;
-            }
-
-            var payload = tokenParts[1].Replace('-', '+').Replace('_', '/');
-            switch (payload.Length % 4)
-            {
-                case 2:
-                    payload += "==";
-                    break;
-                case 3:
-                    payload += "=";
-                    break;
-            }
-
-            var jsonBytes = Convert.FromBase64String(payload);
-            using var document = JsonDocument.Parse(Encoding.UTF8.GetString(jsonBytes));
-            var root = document.RootElement;
-
-            foreach (var key in claimKeys)
-            {
-                if (!TryGetPropertyIgnoreCase(root, key, out var value))
-                {
-                    continue;
-                }
-
-                if (value.ValueKind == JsonValueKind.String &&
-                    Guid.TryParse(value.GetString(), out var parsed))
-                {
-                    return parsed;
-                }
-            }
-        }
-        catch
-        {
-            return null;
-        }
-
-        return null;
+        var stringValue = ReadStringClaim(jwtToken, claimKeys);
+        return Guid.TryParse(stringValue, out var parsed) ? parsed : null;
     }
 
     private static string? ReadRoleClaim(string jwtToken, IEnumerable<string> claimKeys)
     {
-        try
-        {
-            var tokenParts = jwtToken.Split('.');
-            if (tokenParts.Length < 2)
-            {
-                return null;
-            }
-
-            var payload = tokenParts[1].Replace('-', '+').Replace('_', '/');
-            switch (payload.Length % 4)
-            {
-                case 2:
-                    payload += "==";
-                    break;
-                case 3:
-                    payload += "=";
-                    break;
-            }
-
-            var jsonBytes = Convert.FromBase64String(payload);
-            using var document = JsonDocument.Parse(Encoding.UTF8.GetString(jsonBytes));
-            var root = document.RootElement;
-
-            foreach (var key in claimKeys)
-            {
-                if (!TryGetPropertyIgnoreCase(root, key, out var value))
-                {
-                    continue;
-                }
-
-                if (value.ValueKind == JsonValueKind.String)
-                {
-                    var role = value.GetString();
-                    if (!string.IsNullOrWhiteSpace(role))
-                    {
-                        return role;
-                    }
-                }
-
-                if (value.ValueKind == JsonValueKind.Array)
-                {
-                    foreach (var element in value.EnumerateArray())
-                    {
-                        if (element.ValueKind != JsonValueKind.String)
-                        {
-                            continue;
-                        }
-
-                        var role = element.GetString();
-                        if (!string.IsNullOrWhiteSpace(role))
-                        {
-                            return role;
-                        }
-                    }
-                }
-            }
-        }
-        catch
-        {
-            return null;
-        }
-
-        return null;
+        return ReadClaimValues(jwtToken, claimKeys).FirstOrDefault();
     }
 
     private static string? ReadStringClaim(string jwtToken, IEnumerable<string> claimKeys)
     {
+        return ReadClaimValues(jwtToken, claimKeys).FirstOrDefault();
+    }
+
+    private static IReadOnlyList<string> ReadDepartmentClaims(string jwtToken)
+    {
+        return ReadClaimValues(jwtToken, DepartmentClaimKeys, splitCompositeValues: true);
+    }
+
+    private static IReadOnlyList<string> ReadClaimValues(
+        string jwtToken,
+        IEnumerable<string> claimKeys,
+        bool splitCompositeValues = false)
+    {
         try
         {
-            var tokenParts = jwtToken.Split('.');
-            if (tokenParts.Length < 2)
+            using var document = ParseTokenPayload(jwtToken);
+            if (document is null)
             {
-                return null;
+                return Array.Empty<string>();
             }
 
-            var payload = tokenParts[1].Replace('-', '+').Replace('_', '/');
-            switch (payload.Length % 4)
-            {
-                case 2:
-                    payload += "==";
-                    break;
-                case 3:
-                    payload += "=";
-                    break;
-            }
-
-            var jsonBytes = Convert.FromBase64String(payload);
-            using var document = JsonDocument.Parse(Encoding.UTF8.GetString(jsonBytes));
-            var root = document.RootElement;
+            var values = new List<string>();
+            var seenValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var key in claimKeys)
             {
-                if (!TryGetPropertyIgnoreCase(root, key, out var value))
+                if (!TryGetPropertyIgnoreCase(document.RootElement, key, out var value))
                 {
                     continue;
                 }
 
-                if (value.ValueKind == JsonValueKind.String)
-                {
-                    var stringValue = value.GetString()?.Trim();
-                    if (!string.IsNullOrWhiteSpace(stringValue))
-                    {
-                        return stringValue;
-                    }
-                }
-
-                if (value.ValueKind == JsonValueKind.Array)
-                {
-                    foreach (var element in value.EnumerateArray())
-                    {
-                        if (element.ValueKind != JsonValueKind.String)
-                        {
-                            continue;
-                        }
-
-                        var stringValue = element.GetString()?.Trim();
-                        if (!string.IsNullOrWhiteSpace(stringValue))
-                        {
-                            return stringValue;
-                        }
-                    }
-                }
+                AppendClaimValues(value, values, seenValues, splitCompositeValues);
             }
+
+            return values;
         }
         catch
+        {
+            return Array.Empty<string>();
+        }
+    }
+
+    private static JsonDocument? ParseTokenPayload(string jwtToken)
+    {
+        var tokenParts = jwtToken.Split('.');
+        if (tokenParts.Length < 2)
         {
             return null;
         }
 
-        return null;
+        var payload = tokenParts[1].Replace('-', '+').Replace('_', '/');
+        switch (payload.Length % 4)
+        {
+            case 2:
+                payload += "==";
+                break;
+            case 3:
+                payload += "=";
+                break;
+        }
+
+        var jsonBytes = Convert.FromBase64String(payload);
+        return JsonDocument.Parse(Encoding.UTF8.GetString(jsonBytes));
+    }
+
+    private static void AppendClaimValues(
+        JsonElement value,
+        ICollection<string> values,
+        ISet<string> seenValues,
+        bool splitCompositeValues)
+    {
+        switch (value.ValueKind)
+        {
+            case JsonValueKind.String:
+                AppendStringValue(value.GetString(), values, seenValues, splitCompositeValues);
+                break;
+            case JsonValueKind.Array:
+                foreach (var item in value.EnumerateArray())
+                {
+                    AppendClaimValues(item, values, seenValues, splitCompositeValues);
+                }
+                break;
+            case JsonValueKind.Object:
+                foreach (var property in value.EnumerateObject())
+                {
+                    if (splitCompositeValues &&
+                        !property.Name.Contains("name", StringComparison.OrdinalIgnoreCase) &&
+                        !string.Equals(property.Name, "department", StringComparison.OrdinalIgnoreCase) &&
+                        !string.Equals(property.Name, "departments", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    AppendClaimValues(property.Value, values, seenValues, splitCompositeValues);
+                }
+                break;
+        }
+    }
+
+    private static void AppendStringValue(
+        string? rawValue,
+        ICollection<string> values,
+        ISet<string> seenValues,
+        bool splitCompositeValues)
+    {
+        if (string.IsNullOrWhiteSpace(rawValue))
+        {
+            return;
+        }
+
+        var trimmedValue = rawValue.Trim();
+        if (TryAppendJsonArrayString(trimmedValue, values, seenValues, splitCompositeValues))
+        {
+            return;
+        }
+
+        if (!splitCompositeValues)
+        {
+            AddUniqueValue(trimmedValue, values, seenValues);
+            return;
+        }
+
+        var parts = trimmedValue.Split([',', ';', '|'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parts.Length <= 1)
+        {
+            AddUniqueValue(trimmedValue, values, seenValues);
+            return;
+        }
+
+        foreach (var part in parts)
+        {
+            AddUniqueValue(part, values, seenValues);
+        }
+    }
+
+    private static bool TryAppendJsonArrayString(
+        string rawValue,
+        ICollection<string> values,
+        ISet<string> seenValues,
+        bool splitCompositeValues)
+    {
+        if (!rawValue.StartsWith('[') || !rawValue.EndsWith(']'))
+        {
+            return false;
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(rawValue);
+            if (document.RootElement.ValueKind != JsonValueKind.Array)
+            {
+                return false;
+            }
+
+            foreach (var item in document.RootElement.EnumerateArray())
+            {
+                AppendClaimValues(item, values, seenValues, splitCompositeValues);
+            }
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static void AddUniqueValue(string? value, ICollection<string> values, ISet<string> seenValues)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        var trimmedValue = value.Trim();
+        if (!seenValues.Add(trimmedValue))
+        {
+            return;
+        }
+
+        values.Add(trimmedValue);
     }
 
     private static bool TryGetPropertyIgnoreCase(JsonElement root, string key, out JsonElement value)

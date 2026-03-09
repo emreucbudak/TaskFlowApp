@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Api;
+using TaskFlowApp.Infrastructure.Authorization;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
@@ -16,10 +17,12 @@ public partial class ProfilePageViewModel(
     IRealtimeConnectionManager realtimeConnectionManager,
     IdentityApiClient identityApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
+    private const int DepartmentLeaderRoleId = 1;
+
     public ObservableCollection<ProfileDetailItem> DetailItems { get; } = [];
 
     [ObservableProperty]
-    private string displayName = "TaskFlow Kullanicisi";
+    private string displayName = "TaskFlow Kullanıcısı";
 
     [ObservableProperty]
     private string initials = "TF";
@@ -31,40 +34,34 @@ public partial class ProfilePageViewModel(
     private string subtitle = string.Empty;
 
     [ObservableProperty]
-    private string summaryText = "Hesap ozetin hazirlaniyor.";
-
-    [ObservableProperty]
-    private string insightText = "Profil drawer menu ile hizli erisim sunar.";
-
-    [ObservableProperty]
     private string primaryMetricTitle = "Departman";
 
     [ObservableProperty]
-    private string primaryMetricValue = "0";
+    private string primaryMetricValue = "Henüz atanmadı";
 
     [ObservableProperty]
     private string secondaryMetricTitle = "Grup";
 
     [ObservableProperty]
-    private string secondaryMetricValue = "0";
-
-    [ObservableProperty]
-    private string tertiaryMetricTitle = "Yonetim";
-
-    [ObservableProperty]
-    private string tertiaryMetricValue = "Kapali";
+    private string secondaryMetricValue = "Henüz yok";
 
     [ObservableProperty]
     private bool hasDetails;
 
     [ObservableProperty]
-    private string detailEmptyMessage = "Detay bilgisi bulunamadi.";
+    private string detailEmptyMessage = "Ek profil bilgisi bulunamadı.";
 
     public bool HasNoDetails => !HasDetails;
+    public bool HasSubtitle => !string.IsNullOrWhiteSpace(Subtitle);
 
     partial void OnHasDetailsChanged(bool value)
     {
         OnPropertyChanged(nameof(HasNoDetails));
+    }
+
+    partial void OnSubtitleChanged(string value)
+    {
+        OnPropertyChanged(nameof(HasSubtitle));
     }
 
     [RelayCommand]
@@ -77,7 +74,7 @@ public partial class ProfilePageViewModel(
 
         if (UserSession.UserId is null || UserSession.CompanyId is null)
         {
-            ErrorMessage = "Oturum bilgisi eksik. Tekrar giris yapin.";
+            ErrorMessage = "Oturum bilgisi eksik. Tekrar giriş yapın.";
             return;
         }
 
@@ -85,7 +82,8 @@ public partial class ProfilePageViewModel(
         {
             IsBusy = true;
             ErrorMessage = string.Empty;
-            await LoadWorkerReportAccessStateAsync();
+
+            var accessState = await LoadWorkerReportAccessStateAsync();
             ResetState();
 
             var companyId = UserSession.CompanyId.Value;
@@ -100,38 +98,38 @@ public partial class ProfilePageViewModel(
             var users = await usersTask ?? [];
             var groups = await groupsTask ?? [];
             var departments = await departmentsTask ?? [];
-            var currentUser = users.FirstOrDefault(user => user.Id == userId);
+            var currentUser = ResolveCurrentUser(users, userId);
 
             DisplayName = ResolveCurrentUserName(currentUser);
             Initials = BuildInitials(DisplayName);
 
             if (IsCompanyUser)
             {
-                ApplyCompanyState(users, groups, departments);
+                ApplyCompanyState(groups, departments);
             }
             else
             {
-                ApplyWorkerState(users, groups, currentUser, userId);
+                ApplyWorkerState(users, groups, currentUser, userId, accessState);
             }
 
             HasDetails = DetailItems.Count > 0;
-            StatusText = "Profil detaylari yuklendi.";
+            StatusText = "Profil detayları yüklendi.";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = ResolveApiErrorMessage(ex, GenericLoadErrorMessage);
+            ErrorMessage = ResolveApiErrorMessage(ex, "Veriler şu anda yüklenemiyor. Lütfen tekrar deneyin.");
         }
         catch (HttpRequestException)
         {
-            ErrorMessage = GenericConnectionErrorMessage;
+            ErrorMessage = "Şu anda işlem gerçekleştirilemiyor. Lütfen tekrar deneyin.";
         }
         catch (TaskCanceledException)
         {
-            ErrorMessage = GenericConnectionErrorMessage;
+            ErrorMessage = "Şu anda işlem gerçekleştirilemiyor. Lütfen tekrar deneyin.";
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -150,121 +148,121 @@ public partial class ProfilePageViewModel(
         DisplayName = CurrentUserDisplayName;
         Initials = BuildInitials(DisplayName);
         RoleTitle = AccountRoleLabel;
-        Subtitle = CurrentUserSupportText;
-        SummaryText = "Hesap ozetin hazirlaniyor.";
-        InsightText = "Profil drawer menu ile hizli erisim sunar.";
+        Subtitle = !string.IsNullOrWhiteSpace(UserSession.Email)
+            ? UserSession.Email!.Trim()
+            : string.Empty;
         PrimaryMetricTitle = "Departman";
-        PrimaryMetricValue = "0";
+        PrimaryMetricValue = "Henüz atanmadı";
         SecondaryMetricTitle = "Grup";
-        SecondaryMetricValue = "0";
-        TertiaryMetricTitle = "Yonetim";
-        TertiaryMetricValue = IsCompanyUser ? "Acik" : "Kapali";
-        DetailEmptyMessage = "Detay bilgisi bulunamadi.";
+        SecondaryMetricValue = "Henüz yok";
+        DetailEmptyMessage = "Ek profil bilgisi bulunamadı.";
         DetailItems.Clear();
         HasDetails = false;
         StatusText = string.Empty;
     }
 
     private void ApplyCompanyState(
-        IReadOnlyCollection<CompanyUserDto> users,
         IEnumerable<CompanyGroupDto> groups,
         IEnumerable<DepartmentDto> departments)
     {
         var normalizedGroups = NormalizeGroups(groups);
-        var departmentNames = departments
-            .Select(department => department.Name?.Trim())
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Cast<string>()
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
-            .ToList();
+        var departmentNames = NormalizeNames(departments.Select(department => department.Name));
+        var groupNames = NormalizeNames(normalizedGroups.Select(group => group.GroupName));
 
-        RoleTitle = "Sirket yonetim hesabi";
+        RoleTitle = "Şirket yönetim hesabı";
         Subtitle = !string.IsNullOrWhiteSpace(UserSession.Email)
-            ? UserSession.Email!
-            : $"{users.Count} calisan kaydi bulundu";
-        SummaryText = $"{users.Count} calisan, {departmentNames.Count} departman ve {normalizedGroups.Count} grup tek ekranda ozetlendi.";
-        InsightText = "Raporlar ve abonelikler artik sagdan acilan profil menusunde toplanir.";
-
-        PrimaryMetricTitle = "Calisan";
-        PrimaryMetricValue = users.Count.ToString();
-        SecondaryMetricTitle = "Departman";
-        SecondaryMetricValue = departmentNames.Count.ToString();
-        TertiaryMetricTitle = "Grup";
-        TertiaryMetricValue = normalizedGroups.Count.ToString();
+            ? UserSession.Email!.Trim()
+            : string.Empty;
+        PrimaryMetricValue = BuildCardValue(departmentNames, "Kayıtlı departman yok");
+        SecondaryMetricValue = BuildCardValue(groupNames, "Kayıtlı grup yok");
 
         AddDetail("Rol", RoleTitle);
-        AddDetail("E-posta", ResolveEmailText());
-        AddDetail("Kullanici", DisplayName);
-        AddDetail("Sirket Kimligi", UserSession.CompanyId?.ToString() ?? "Bulunamadi");
-        AddDetail("Kullanici Kimligi", UserSession.UserId?.ToString() ?? "Bulunamadi");
-        AddDetail("Departmanlar", BuildJoinedSummary(departmentNames, "Kayitli departman yok."));
+        AddDetail("Şirket Kimliği", UserSession.CompanyId?.ToString() ?? "Bulunamadı");
+        AddDetail("Departman", BuildJoinedSummary(departmentNames, "Kayıtlı departman yok."));
+        AddDetail("Grup", BuildJoinedSummary(groupNames, "Kayıtlı grup yok."));
     }
 
     private void ApplyWorkerState(
         IReadOnlyCollection<CompanyUserDto> users,
         IEnumerable<CompanyGroupDto> groups,
         CompanyUserDto? currentUser,
-        Guid userId)
+        Guid userId,
+        WorkerReportAccessState accessState)
     {
-        var departmentNames = currentUser?.DepartmentMemberships
-            .Select(membership => membership.DepartmentName?.Trim())
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Cast<string>()
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
-            .ToList()
-            ?? [];
-
+        var departmentNames = ResolveDepartmentNames(currentUser, accessState);
         var userNameMap = BuildUserNameMap(users);
         var userGroups = ResolveUserGroups(groups, userId, userNameMap);
-        var groupNames = userGroups
-            .Select(group => group.GroupName.Trim())
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
-            .ToList();
+        var groupNames = NormalizeNames(userGroups.Select(group => group.GroupName));
+        var leaderDepartmentName = ResolveLeaderDepartmentName(currentUser, accessState);
 
         RoleTitle = CanAccessReportsPage
-            ? "Departman lideri ve calisan"
-            : "Calisan hesabi";
+            ? BuildLeaderRoleTitle(leaderDepartmentName)
+            : "Çalışan hesabı";
         Subtitle = !string.IsNullOrWhiteSpace(UserSession.Email)
-            ? UserSession.Email!
-            : departmentNames.Count == 0
-                ? "Departman atamasi bulunmuyor"
-                : BuildJoinedSummary(departmentNames, "Departman atamasi bulunmuyor");
-        SummaryText = groupNames.Count == 0
-            ? "Profilin hazir. Grup atamasi oldugunda burada gorunur."
-            : $"{groupNames.Count} grup ve {departmentNames.Count} departman uyeligi bulundu.";
-        InsightText = groupNames.Count == 0
-            ? "Grubum sayfasi yine profil menusunden acilabilir."
-            : $"Drawer uzerindeki Grubum kisayolu ile {groupNames[0]} detayina hizli donebilirsin.";
-
-        PrimaryMetricTitle = "Departman";
-        PrimaryMetricValue = departmentNames.Count.ToString();
-        SecondaryMetricTitle = "Grup";
-        SecondaryMetricValue = groupNames.Count.ToString();
-        TertiaryMetricTitle = "Yonetim";
-        TertiaryMetricValue = CanAccessReportsPage ? "Acik" : "Kapali";
+            ? UserSession.Email!.Trim()
+            : string.Empty;
+        PrimaryMetricValue = BuildCardValue(departmentNames, "Henüz atanmadı");
+        SecondaryMetricValue = BuildCardValue(groupNames, "Henüz yok");
 
         AddDetail("Rol", RoleTitle);
-        AddDetail("E-posta", ResolveEmailText());
-        AddDetail("Departmanlar", BuildJoinedSummary(departmentNames, "Departman atamasi bulunmuyor."));
-        AddDetail("Grup Uyelikleri", BuildJoinedSummary(groupNames, "Aktif grup uyeligi bulunmuyor."));
-        AddDetail("Kullanici Kimligi", UserSession.UserId?.ToString() ?? "Bulunamadi");
+        AddDetail("Departman", BuildJoinedSummary(departmentNames, "Henüz bir departman üyeliği görünmüyor."));
+        AddDetail("Grup", BuildJoinedSummary(groupNames, "Aktif grup üyeliği bulunmuyor."));
+    }
+
+    private CompanyUserDto? ResolveCurrentUser(IReadOnlyCollection<CompanyUserDto> users, Guid userId)
+    {
+        var currentUser = users.FirstOrDefault(user => user.Id == userId);
+        if (currentUser is not null)
+        {
+            return currentUser;
+        }
+
+        var sessionDisplayName = UserSession.DisplayName?.Trim();
+        if (string.IsNullOrWhiteSpace(sessionDisplayName))
+        {
+            return null;
+        }
+
+        return users.FirstOrDefault(user =>
+            string.Equals(user.Name?.Trim(), sessionDisplayName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private List<string> ResolveDepartmentNames(CompanyUserDto? currentUser, WorkerReportAccessState accessState)
+    {
+        var tokenDepartments = NormalizeNames(UserSession.DepartmentNames);
+        var membershipDepartments = NormalizeNames(
+            currentUser?.DepartmentMemberships.Select(membership => membership.DepartmentName)
+            ?? Enumerable.Empty<string>());
+        var leaderDepartments = NormalizeNames([accessState.DepartmentName]);
+
+        return NormalizeNames(tokenDepartments.Concat(membershipDepartments).Concat(leaderDepartments));
+    }
+
+    private static string ResolveLeaderDepartmentName(CompanyUserDto? currentUser, WorkerReportAccessState accessState)
+    {
+        if (!string.IsNullOrWhiteSpace(accessState.DepartmentName))
+        {
+            return accessState.DepartmentName.Trim();
+        }
+
+        return currentUser?.DepartmentMemberships
+            .Where(membership => membership.DepartmentRoleId == DepartmentLeaderRoleId)
+            .Select(membership => membership.DepartmentName?.Trim())
+            .FirstOrDefault(name => !string.IsNullOrWhiteSpace(name))
+            ?? string.Empty;
+    }
+
+    private static string BuildLeaderRoleTitle(string departmentName)
+    {
+        return string.IsNullOrWhiteSpace(departmentName)
+            ? "Departman lideri"
+            : $"{departmentName} Departmanı Lideri";
     }
 
     private string ResolveCurrentUserName(CompanyUserDto? currentUser)
     {
         var name = currentUser?.Name?.Trim();
         return string.IsNullOrWhiteSpace(name) ? CurrentUserDisplayName : name;
-    }
-
-    private string ResolveEmailText()
-    {
-        return string.IsNullOrWhiteSpace(UserSession.Email)
-            ? "Kayitli e-posta bulunamadi."
-            : UserSession.Email!;
     }
 
     private void AddDetail(string title, string value)
@@ -352,6 +350,29 @@ public partial class ProfilePageViewModel(
             .ToList();
     }
 
+    private static List<string> NormalizeNames(IEnumerable<string?> names)
+    {
+        return names
+            .Select(name => name?.Trim())
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Cast<string>()
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    private static string BuildCardValue(IReadOnlyList<string> items, string emptyText)
+    {
+        if (items.Count == 0)
+        {
+            return emptyText;
+        }
+
+        return items.Count == 1
+            ? items[0]
+            : $"{items[0]} +{items.Count - 1}";
+    }
+
     private static string BuildJoinedSummary(IReadOnlyList<string> items, string emptyText)
     {
         if (items.Count == 0)
@@ -362,7 +383,7 @@ public partial class ProfilePageViewModel(
         const int previewCount = 3;
         var preview = string.Join(", ", items.Take(previewCount));
         return items.Count > previewCount
-            ? $"{preview}, +{items.Count - previewCount} diger"
+            ? $"{preview}, +{items.Count - previewCount} diğer"
             : preview;
     }
 }

@@ -1,4 +1,4 @@
-﻿using TaskFlowApp.Infrastructure;
+using TaskFlowApp.Infrastructure;
 using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp.Pages;
@@ -10,6 +10,7 @@ public partial class ProfilePage : ContentPage
     public ProfilePage()
     {
         InitializeComponent();
+        Shell.SetPresentationMode(this, PresentationMode.NotAnimated);
         BindingContext = ServiceLocator.GetRequiredService<ProfilePageViewModel>();
     }
 
@@ -17,10 +18,5 @@ public partial class ProfilePage : ContentPage
     {
         base.OnAppearing();
         await ViewModel.LoadCommand.ExecuteAsync(null);
-    }
-
-    private async void OnBackTapped(object? sender, TappedEventArgs e)
-    {
-        await ViewModel.NavigateBackCommand.ExecuteAsync(null);
     }
 }

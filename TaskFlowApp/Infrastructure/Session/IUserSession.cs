@@ -9,6 +9,7 @@ public interface IUserSession
     string? Role { get; }
     string? DisplayName { get; }
     string? Email { get; }
+    IReadOnlyList<string> DepartmentNames { get; }
 
     void SetRawTokens(string accessToken, string? refreshToken);
     void SetTokens(string accessToken, string? refreshToken, Guid? userIdOverride = null, Guid? companyIdOverride = null, string? roleOverride = null);
