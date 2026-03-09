@@ -391,7 +391,7 @@
                  HeightRequest="1"
                  HorizontalOptions="Fill" />
 
-        <Grid Grid.Row="4"
+        <Grid Grid.Row="4" IsVisible="False"
               ColumnDefinitions="*,*,*,*,*,*"
               BackgroundColor="#0F1E2D"
               Padding="0,6,0,18">
@@ -515,8 +515,15 @@
                 </Border>
             </VerticalStackLayout>
         </Grid>
-    </Grid>
+    
+        <controls:AppBottomNav Grid.Row="4"
+                               ActiveItem="Home" />
+
+        <controls:ProfileDrawer Grid.RowSpan="5"
+                                ActiveItem=""
+                                IsOpen="{Binding IsProfileMenuOpen}" /></Grid>
 </ContentPage>
+
 
 
 

@@ -1,4 +1,4 @@
-namespace TaskFlowApp.Infrastructure.Session;
+﻿namespace TaskFlowApp.Infrastructure.Session;
 
 public interface IUserSession
 {
@@ -7,6 +7,8 @@ public interface IUserSession
     Guid? UserId { get; }
     Guid? CompanyId { get; }
     string? Role { get; }
+    string? DisplayName { get; }
+    string? Email { get; }
 
     void SetRawTokens(string accessToken, string? refreshToken);
     void SetTokens(string accessToken, string? refreshToken, Guid? userIdOverride = null, Guid? companyIdOverride = null, string? roleOverride = null);

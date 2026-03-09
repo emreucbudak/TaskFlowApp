@@ -1,0 +1,250 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:TaskFlowApp.Controls"
+             x:Class="TaskFlowApp.Pages.ProfilePage"
+             BackgroundColor="#0D1B2A"
+             Shell.NavBarIsVisible="False">
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+        <Grid Grid.Row="0"
+              Padding="20,16,20,10"
+              ColumnDefinitions="Auto,*,Auto"
+              BackgroundColor="#0D1B2A">
+            <Border Grid.Column="0"
+                    BackgroundColor="#162030"
+                    Stroke="#2E4A67"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,6">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped" />
+                </Border.GestureRecognizers>
+                <Label Text="Geri"
+                       TextColor="White"
+                       FontSize="12"
+                       FontAttributes="Bold" />
+            </Border>
+
+            <Label Grid.Column="1"
+                   Text="Profilim"
+                   TextColor="White"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+
+            <Border Grid.Column="2"
+                    BackgroundColor="#17324D"
+                    Stroke="#4B82B5"
+                    StrokeThickness="1"
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="22" />
+                </Border.StrokeShape>
+                <Label Text="{Binding Initials}"
+                       TextColor="#dbeafe"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center" />
+            </Border>
+        </Grid>
+
+        <BoxView Grid.Row="1"
+                 Color="#1E2E3E"
+                 HeightRequest="1"
+                 HorizontalOptions="Fill" />
+
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Padding="20,14,20,20"
+                                 Spacing="16">
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="#2196F3" />
+
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="#f87171"
+                       FontSize="12" />
+
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#2E4A67"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 18"
+                        Padding="18">
+                    <Grid ColumnDefinitions="Auto,*"
+                          ColumnSpacing="14">
+                        <Border BackgroundColor="#17324D"
+                                Stroke="#4B82B5"
+                                StrokeThickness="1"
+                                WidthRequest="60"
+                                HeightRequest="60">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="30" />
+                            </Border.StrokeShape>
+                            <Label Text="{Binding Initials}"
+                                   TextColor="#dbeafe"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center"
+                                   VerticalTextAlignment="Center" />
+                        </Border>
+
+                        <VerticalStackLayout Grid.Column="1"
+                                             Spacing="4"
+                                             VerticalOptions="Center">
+                            <Label Text="{Binding DisplayName}"
+                                   TextColor="White"
+                                   FontSize="22"
+                                   FontAttributes="Bold" />
+                            <Label Text="{Binding RoleTitle}"
+                                   TextColor="#60A5FA"
+                                   FontSize="13"
+                                   FontAttributes="Bold" />
+                            <Label Text="{Binding Subtitle}"
+                                   TextColor="#9FB5CB"
+                                   FontSize="12" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#34506C"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="14">
+                    <Label Text="{Binding SummaryText}"
+                           TextColor="#D4E2F0"
+                           FontSize="12"
+                           LineBreakMode="WordWrap" />
+                </Border>
+
+                <Label Text="Hesap Ozetleri"
+                       TextColor="White"
+                       FontSize="16"
+                       FontAttributes="Bold" />
+
+                <Grid ColumnDefinitions="*,*,*"
+                      ColumnSpacing="10">
+                    <Border Grid.Column="0"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding PrimaryMetricTitle}"
+                                   TextColor="#9FB5CB"
+                                   FontSize="12" />
+                            <Label Text="{Binding PrimaryMetricValue}"
+                                   TextColor="White"
+                                   FontSize="24"
+                                   FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding SecondaryMetricTitle}"
+                                   TextColor="#9FB5CB"
+                                   FontSize="12" />
+                            <Label Text="{Binding SecondaryMetricValue}"
+                                   TextColor="White"
+                                   FontSize="24"
+                                   FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="2"
+                            BackgroundColor="#0F2338"
+                            Stroke="#2E4A67"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding TertiaryMetricTitle}"
+                                   TextColor="#9FB5CB"
+                                   FontSize="12" />
+                            <Label Text="{Binding TertiaryMetricValue}"
+                                   TextColor="White"
+                                   FontSize="24"
+                                   FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <Label Text="Detaylar"
+                       TextColor="White"
+                       FontSize="16"
+                       FontAttributes="Bold" />
+
+                <Label Text="{Binding DetailEmptyMessage}"
+                       TextColor="#9FB5CB"
+                       FontSize="12"
+                       IsVisible="{Binding HasNoDetails}" />
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding DetailItems}"
+                                     IsVisible="{Binding HasDetails}"
+                                     Spacing="8">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="#10283D"
+                                    Stroke="#2E4A67"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="12,10">
+                                <Grid ColumnDefinitions="Auto,*"
+                                      ColumnSpacing="12">
+                                    <Label Text="{Binding Title}"
+                                           TextColor="#8FB4D8"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Start" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Value}"
+                                           TextColor="White"
+                                           FontSize="12"
+                                           LineBreakMode="WordWrap" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <Label Text="Not"
+                       TextColor="White"
+                       FontSize="16"
+                       FontAttributes="Bold" />
+
+                <Border BackgroundColor="#0F2338"
+                        Stroke="#34506C"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="14">
+                    <Label Text="{Binding InsightText}"
+                           TextColor="#D4E2F0"
+                           FontSize="12"
+                           LineBreakMode="WordWrap" />
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <BoxView Grid.Row="3"
+                 Color="#1E2E3E"
+                 HeightRequest="1"
+                 HorizontalOptions="Fill" />
+
+        <controls:AppBottomNav Grid.Row="4"
+                               ActiveItem="Profile" />
+
+        <controls:ProfileDrawer Grid.RowSpan="5"
+                                ActiveItem="Profile"
+                                IsOpen="{Binding IsProfileMenuOpen}" />
+    </Grid>
+</ContentPage>

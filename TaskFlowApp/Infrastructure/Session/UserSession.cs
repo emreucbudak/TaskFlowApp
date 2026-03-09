@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 
 namespace TaskFlowApp.Infrastructure.Session;
@@ -35,11 +35,29 @@ public sealed class UserSession : IUserSession
         "roles"
     ];
 
+    private static readonly string[] DisplayNameClaimKeys =
+    [
+        "name",
+        "unique_name",
+        "preferred_username",
+        "given_name"
+    ];
+
+    private static readonly string[] EmailClaimKeys =
+    [
+        "email",
+        "preferred_username",
+        "upn",
+        "unique_name"
+    ];
+
     public string? AccessToken { get; private set; }
     public string? RefreshToken { get; private set; }
     public Guid? UserId { get; private set; }
     public Guid? CompanyId { get; private set; }
     public string? Role { get; private set; }
+    public string? DisplayName { get; private set; }
+    public string? Email { get; private set; }
 
     public void SetRawTokens(string accessToken, string? refreshToken)
     {
@@ -48,6 +66,8 @@ public sealed class UserSession : IUserSession
         UserId = null;
         CompanyId = null;
         Role = null;
+        DisplayName = ReadStringClaim(accessToken, DisplayNameClaimKeys);
+        Email = ReadStringClaim(accessToken, EmailClaimKeys);
     }
 
     public void SetTokens(
@@ -64,6 +84,8 @@ public sealed class UserSession : IUserSession
         Role = string.IsNullOrWhiteSpace(roleOverride)
             ? ReadRoleClaim(accessToken, RoleClaimKeys)
             : roleOverride;
+        DisplayName = ReadStringClaim(accessToken, DisplayNameClaimKeys);
+        Email = ReadStringClaim(accessToken, EmailClaimKeys);
     }
 
     public void Clear()
@@ -73,6 +95,8 @@ public sealed class UserSession : IUserSession
         UserId = null;
         CompanyId = null;
         Role = null;
+        DisplayName = null;
+        Email = null;
     }
 
     private static Guid? ReadGuidClaim(string jwtToken, IEnumerable<string> claimKeys)
@@ -176,6 +200,73 @@ public sealed class UserSession : IUserSession
                         if (!string.IsNullOrWhiteSpace(role))
                         {
                             return role;
+                        }
+                    }
+                }
+            }
+        }
+        catch
+        {
+            return null;
+        }
+
+        return null;
+    }
+
+    private static string? ReadStringClaim(string jwtToken, IEnumerable<string> claimKeys)
+    {
+        try
+        {
+            var tokenParts = jwtToken.Split('.');
+            if (tokenParts.Length < 2)
+            {
+                return null;
+            }
+
+            var payload = tokenParts[1].Replace('-', '+').Replace('_', '/');
+            switch (payload.Length % 4)
+            {
+                case 2:
+                    payload += "==";
+                    break;
+                case 3:
+                    payload += "=";
+                    break;
+            }
+
+            var jsonBytes = Convert.FromBase64String(payload);
+            using var document = JsonDocument.Parse(Encoding.UTF8.GetString(jsonBytes));
+            var root = document.RootElement;
+
+            foreach (var key in claimKeys)
+            {
+                if (!TryGetPropertyIgnoreCase(root, key, out var value))
+                {
+                    continue;
+                }
+
+                if (value.ValueKind == JsonValueKind.String)
+                {
+                    var stringValue = value.GetString()?.Trim();
+                    if (!string.IsNullOrWhiteSpace(stringValue))
+                    {
+                        return stringValue;
+                    }
+                }
+
+                if (value.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var element in value.EnumerateArray())
+                    {
+                        if (element.ValueKind != JsonValueKind.String)
+                        {
+                            continue;
+                        }
+
+                        var stringValue = element.GetString()?.Trim();
+                        if (!string.IsNullOrWhiteSpace(stringValue))
+                        {
+                            return stringValue;
                         }
                     }
                 }
