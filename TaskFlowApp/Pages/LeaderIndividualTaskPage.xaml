@@ -1,7 +1,8 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:controls="clr-namespace:TaskFlowApp.Controls"
              x:Class="TaskFlowApp.Pages.LeaderIndividualTaskPage"
              BackgroundColor="#0D1B2A"
              Shell.NavBarIsVisible="False">
@@ -72,22 +73,24 @@
 
                 <Label Text="{Binding ErrorMessage}"
                        TextColor="#f87171"
-                       FontSize="12" />
+                       FontSize="12"
+                       LineBreakMode="WordWrap" />
 
                 <Border BackgroundColor="#0F2338"
                         Stroke="#2E4A67"
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 16"
                         Padding="16"
-                        IsVisible="{Binding HasNoLeaderAccess}">
+                        IsVisible="{Binding HasNoManagementAccess}">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Erişim Yok"
+                        <Label Text="Erisim Yok"
                                TextColor="White"
                                FontSize="17"
                                FontAttributes="Bold" />
                         <Label Text="{Binding AccessMessage}"
                                TextColor="#94a3b8"
-                               FontSize="12" />
+                               FontSize="12"
+                               LineBreakMode="WordWrap" />
                     </VerticalStackLayout>
                 </Border>
 
@@ -96,13 +99,17 @@
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 18"
                         Padding="18"
-                        IsVisible="{Binding HasLeaderAccess}">
-                    <VerticalStackLayout Spacing="16">
+                        IsVisible="{Binding HasManagementAccess}">
+                    <VerticalStackLayout Spacing="18">
                         <VerticalStackLayout Spacing="4">
-                            <Label Text="Görev Atama"
+                            <Label Text="Gorev ve Grup Yonetimi"
                                    TextColor="White"
                                    FontSize="20"
                                    FontAttributes="Bold" />
+                            <Label Text="{Binding StatusText}"
+                                   TextColor="#94a3b8"
+                                   FontSize="12"
+                                   LineBreakMode="WordWrap" />
                         </VerticalStackLayout>
 
                         <Border BackgroundColor="#162030"
@@ -111,114 +118,323 @@
                                 StrokeShape="RoundRectangle 12"
                                 Padding="12">
                             <VerticalStackLayout Spacing="4">
-                                <Label Text="Aktif Departman"
+                                <Label Text="Yetki Alani"
                                        TextColor="#94a3b8"
                                        FontSize="11" />
                                 <Label Text="{Binding CurrentDepartmentName}"
                                        TextColor="White"
                                        FontSize="14"
-                                       FontAttributes="Bold" />
+                                       FontAttributes="Bold"
+                                       LineBreakMode="WordWrap" />
                             </VerticalStackLayout>
                         </Border>
 
-                        <Border BackgroundColor="#162030"
-                                Stroke="Transparent"
-                                StrokeThickness="0"
-                                StrokeShape="RoundRectangle 12"
-                                Padding="10,4">
-                            <Picker ItemsSource="{Binding EligibleUsers}"
-                                    SelectedItem="{Binding SelectedAssignedUser}"
-                                    ItemDisplayBinding="{Binding Name}"
-                                    Title="Kullanıcı Seç"
-                                    TitleColor="#94a3b8"
-                                    TextColor="White"
-                                    BackgroundColor="Transparent"
-                                    HandlerChanged="OnInputHandlerChanged" />
-                        </Border>
-
-                        <Border BackgroundColor="#162030"
-                                Stroke="Transparent"
-                                StrokeThickness="0"
-                                StrokeShape="RoundRectangle 12"
-                                Padding="10,4">
-                            <Picker ItemsSource="{Binding PriorityOptions}"
-                                    SelectedItem="{Binding SelectedPriority}"
-                                    ItemDisplayBinding="{Binding DisplayName}"
-                                    Title="Öncelik Seç"
-                                    TitleColor="#94a3b8"
-                                    TextColor="White"
-                                    BackgroundColor="Transparent"
-                                    HandlerChanged="OnInputHandlerChanged" />
-                        </Border>
-
-                        <Border BackgroundColor="#162030"
-                                Stroke="Transparent"
-                                StrokeThickness="0"
-                                StrokeShape="RoundRectangle 12"
-                                Padding="12,8">
-                            <Entry Text="{Binding TaskTitle}"
-                                   Placeholder="Görev Başlığı"
-                                   PlaceholderColor="#64748b"
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Bireysel Gorev Atama"
                                    TextColor="White"
-                                   BackgroundColor="Transparent"
-                                   ClearButtonVisibility="WhileEditing"
-                                   HandlerChanged="OnInputHandlerChanged" />
-                        </Border>
+                                   FontSize="16"
+                                   FontAttributes="Bold" />
 
-                        <Border BackgroundColor="#162030"
-                                Stroke="Transparent"
-                                StrokeThickness="0"
-                                StrokeShape="RoundRectangle 12"
-                                Padding="12">
-                            <Editor Text="{Binding Description}"
-                                    Placeholder="Görev Açıklaması"
-                                    PlaceholderColor="#64748b"
-                                    TextColor="White"
-                                    BackgroundColor="Transparent"
-                                    AutoSize="TextChanges"
-                                    MinimumHeightRequest="120"
-                                    HandlerChanged="OnInputHandlerChanged" />
-                        </Border>
+                            <Border BackgroundColor="#162030"
+                                    Stroke="Transparent"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="10,4">
+                                <Picker ItemsSource="{Binding EligibleUsers}"
+                                        SelectedItem="{Binding SelectedAssignedUser}"
+                                        ItemDisplayBinding="{Binding Name}"
+                                        Title="Kullanici sec"
+                                        TitleColor="#94a3b8"
+                                        TextColor="White"
+                                        BackgroundColor="Transparent"
+                                        HandlerChanged="OnInputHandlerChanged" />
+                            </Border>
 
-                        <Border BackgroundColor="#162030"
-                                Stroke="Transparent"
-                                StrokeThickness="0"
-                                StrokeShape="RoundRectangle 12"
-                                Padding="12,8">
-                            <VerticalStackLayout Spacing="6">
-                                <Label Text="Teslim Tarihi"
+                            <Border BackgroundColor="#162030"
+                                    Stroke="Transparent"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="10,4">
+                                <Picker ItemsSource="{Binding PriorityOptions}"
+                                        SelectedItem="{Binding SelectedPriority}"
+                                        ItemDisplayBinding="{Binding DisplayName}"
+                                        Title="Oncelik sec"
+                                        TitleColor="#94a3b8"
+                                        TextColor="White"
+                                        BackgroundColor="Transparent"
+                                        HandlerChanged="OnInputHandlerChanged" />
+                            </Border>
+
+                            <Border BackgroundColor="#162030"
+                                    Stroke="Transparent"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="12,8">
+                                <Entry Text="{Binding TaskTitle}"
+                                       Placeholder="Gorev basligi"
+                                       PlaceholderColor="#64748b"
+                                       TextColor="White"
+                                       BackgroundColor="Transparent"
+                                       ClearButtonVisibility="WhileEditing"
+                                       HandlerChanged="OnInputHandlerChanged" />
+                            </Border>
+
+                            <Border BackgroundColor="#162030"
+                                    Stroke="Transparent"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="12">
+                                <Editor Text="{Binding Description}"
+                                        Placeholder="Gorev aciklamasi"
+                                        PlaceholderColor="#64748b"
+                                        TextColor="White"
+                                        BackgroundColor="Transparent"
+                                        AutoSize="TextChanges"
+                                        MinimumHeightRequest="120"
+                                        HandlerChanged="OnInputHandlerChanged" />
+                            </Border>
+
+                            <Border BackgroundColor="#162030"
+                                    Stroke="Transparent"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="12,8">
+                                <VerticalStackLayout Spacing="6">
+                                    <Label Text="Teslim Tarihi"
+                                           TextColor="#94a3b8"
+                                           FontSize="11" />
+                                    <DatePicker Date="{Binding DeadlineDate}"
+                                                MinimumDate="{Binding MinimumDeadlineDate}"
+                                                TextColor="White"
+                                                BackgroundColor="Transparent"
+                                                HandlerChanged="OnInputHandlerChanged" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Grid ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="12">
+                                <Button Grid.Column="0"
+                                        Text="Gorev Olustur"
+                                        Command="{Binding CreateTaskCommand}"
+                                        BackgroundColor="#2563EB"
+                                        TextColor="White"
+                                        CornerRadius="12"
+                                        HeightRequest="46" />
+
+                                <ActivityIndicator Grid.Column="1"
+                                                   WidthRequest="24"
+                                                   HeightRequest="24"
+                                                   IsRunning="{Binding IsCreatingTask}"
+                                                   IsVisible="{Binding IsCreatingTask}"
+                                                   Color="#dbeafe"
+                                                   VerticalOptions="Center" />
+                            </Grid>
+
+                            <Label Text="{Binding CreateStatus}"
+                                   TextColor="#86efac"
+                                   FontSize="11"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+
+                        <BoxView Color="#1E2E3E"
+                                 HeightRequest="1"
+                                 HorizontalOptions="Fill" />
+
+                        <VerticalStackLayout Spacing="12"
+                                             IsVisible="{Binding CanCreateGroups}">
+                            <VerticalStackLayout Spacing="3">
+                                <Label Text="Grup Olusturma"
+                                       TextColor="White"
+                                       FontSize="16"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding GroupCreateHelperText}"
                                        TextColor="#94a3b8"
-                                       FontSize="11" />
-                                <DatePicker Date="{Binding DeadlineDate}"
-                                            MinimumDate="{Binding MinimumDeadlineDate}"
-                                            TextColor="White"
-                                            BackgroundColor="Transparent"
-                                            HandlerChanged="OnInputHandlerChanged" />
+                                       FontSize="11"
+                                       LineBreakMode="WordWrap" />
                             </VerticalStackLayout>
-                        </Border>
 
-                        <Grid ColumnDefinitions="*,Auto"
-                              ColumnSpacing="12">
-                            <Button Grid.Column="0"
-                                    Text="Görev Oluştur"
-                                    Command="{Binding CreateTaskCommand}"
-                                    BackgroundColor="#2563EB"
-                                    TextColor="White"
-                                    CornerRadius="12"
-                                    HeightRequest="46" />
+                            <Border BackgroundColor="#162030"
+                                    Stroke="Transparent"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="10,4"
+                                    IsVisible="{Binding ShowGroupDepartmentPicker}">
+                                <Picker ItemsSource="{Binding ManagedDepartments}"
+                                        SelectedItem="{Binding SelectedManagedDepartment}"
+                                        ItemDisplayBinding="{Binding DepartmentName}"
+                                        Title="Departman sec"
+                                        TitleColor="#94a3b8"
+                                        TextColor="White"
+                                        BackgroundColor="Transparent"
+                                        HandlerChanged="OnInputHandlerChanged" />
+                            </Border>
 
-                            <ActivityIndicator Grid.Column="1"
-                                               WidthRequest="24"
-                                               HeightRequest="24"
-                                               IsRunning="{Binding IsCreatingTask}"
-                                               IsVisible="{Binding IsCreatingTask}"
-                                               Color="#dbeafe"
-                                               VerticalOptions="Center" />
-                        </Grid>
+                            <Border BackgroundColor="#162030"
+                                    Stroke="Transparent"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="12,8">
+                                <Entry Text="{Binding GroupNameInput}"
+                                       Placeholder="Grup adi"
+                                       PlaceholderColor="#64748b"
+                                       TextColor="White"
+                                       BackgroundColor="Transparent"
+                                       ClearButtonVisibility="WhileEditing"
+                                       HandlerChanged="OnInputHandlerChanged" />
+                            </Border>
 
-                        <Label Text="{Binding CreateStatus}"
-                               TextColor="#86efac"
-                               FontSize="11" />
+                            <CollectionView ItemsSource="{Binding GroupEligibleUsers}"
+                                            SelectionMode="None"
+                                            HeightRequest="220">
+                                <CollectionView.ItemsLayout>
+                                    <LinearItemsLayout Orientation="Vertical"
+                                                       ItemSpacing="8" />
+                                </CollectionView.ItemsLayout>
+                                <CollectionView.EmptyView>
+                                    <Label Text="Secilebilecek kullanici bulunmuyor."
+                                           FontSize="11"
+                                           TextColor="#94a3b8"
+                                           HorizontalTextAlignment="Center"
+                                           Margin="0,12,0,0" />
+                                </CollectionView.EmptyView>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BackgroundColor="#162030"
+                                                Stroke="#203347"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 12"
+                                                Padding="10">
+                                            <Grid ColumnDefinitions="*,Auto"
+                                                  ColumnSpacing="10">
+                                                <VerticalStackLayout Grid.Column="0"
+                                                                     Spacing="2">
+                                                    <Label Text="{Binding Name}"
+                                                           TextColor="White"
+                                                           FontSize="13"
+                                                           FontAttributes="Bold"
+                                                           LineBreakMode="TailTruncation" />
+                                                    <Label Text="{Binding DepartmentName}"
+                                                           TextColor="#94a3b8"
+                                                           FontSize="11"
+                                                           LineBreakMode="TailTruncation" />
+                                                </VerticalStackLayout>
+
+                                                <CheckBox Grid.Column="1"
+                                                          IsChecked="{Binding IsSelected}"
+                                                          Color="#3b82f6"
+                                                          VerticalOptions="Center" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+
+                            <Grid ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="12">
+                                <Button Grid.Column="0"
+                                        Text="Grup Olustur"
+                                        Command="{Binding CreateGroupCommand}"
+                                        BackgroundColor="#2563EB"
+                                        TextColor="White"
+                                        CornerRadius="12"
+                                        HeightRequest="46" />
+
+                                <ActivityIndicator Grid.Column="1"
+                                                   WidthRequest="24"
+                                                   HeightRequest="24"
+                                                   IsRunning="{Binding IsCreatingGroup}"
+                                                   IsVisible="{Binding IsCreatingGroup}"
+                                                   Color="#dbeafe"
+                                                   VerticalOptions="Center" />
+                            </Grid>
+
+                            <Label Text="{Binding GroupCreationStatus}"
+                                   TextColor="#86efac"
+                                   FontSize="11"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+
+                        <BoxView Color="#1E2E3E"
+                                 HeightRequest="1"
+                                 HorizontalOptions="Fill" />
+
+                        <VerticalStackLayout Spacing="12">
+                            <VerticalStackLayout Spacing="3">
+                                <Label Text="Grup Silme"
+                                       TextColor="White"
+                                       FontSize="16"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding GroupDeleteHelperText}"
+                                       TextColor="#94a3b8"
+                                       FontSize="11"
+                                       LineBreakMode="WordWrap" />
+                            </VerticalStackLayout>
+
+                            <Border BackgroundColor="#162030"
+                                    Stroke="Transparent"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="10,4">
+                                <Picker ItemsSource="{Binding AvailableGroups}"
+                                        SelectedItem="{Binding SelectedGroupToDelete}"
+                                        ItemDisplayBinding="{Binding DisplayName}"
+                                        Title="Grup sec"
+                                        TitleColor="#94a3b8"
+                                        TextColor="White"
+                                        BackgroundColor="Transparent"
+                                        IsEnabled="{Binding CanDeleteGroups}"
+                                        HandlerChanged="OnInputHandlerChanged" />
+                            </Border>
+
+                            <Border BackgroundColor="#162030"
+                                    Stroke="#203347"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="12"
+                                    IsVisible="{Binding HasSelectedGroupToDelete}">
+                                <VerticalStackLayout Spacing="6">
+                                    <Label Text="Departmanlar"
+                                           TextColor="#94a3b8"
+                                           FontSize="11" />
+                                    <Label Text="{Binding SelectedDeleteGroupDepartmentsText}"
+                                           TextColor="White"
+                                           FontSize="13"
+                                           LineBreakMode="WordWrap" />
+                                    <Label Text="Uyeler"
+                                           TextColor="#94a3b8"
+                                           FontSize="11" />
+                                    <Label Text="{Binding SelectedDeleteGroupMembersText}"
+                                           TextColor="White"
+                                           FontSize="13"
+                                           LineBreakMode="WordWrap" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Grid ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="12">
+                                <Button Grid.Column="0"
+                                        Text="Grubu Sil"
+                                        Command="{Binding DeleteSelectedGroupCommand}"
+                                        IsEnabled="{Binding CanUseDeleteGroupForm}"
+                                        BackgroundColor="#DC2626"
+                                        TextColor="White"
+                                        CornerRadius="12"
+                                        HeightRequest="46" />
+
+                                <ActivityIndicator Grid.Column="1"
+                                                   WidthRequest="24"
+                                                   HeightRequest="24"
+                                                   IsRunning="{Binding IsDeletingGroup}"
+                                                   IsVisible="{Binding IsDeletingGroup}"
+                                                   Color="#fecaca"
+                                                   VerticalOptions="Center" />
+                            </Grid>
+
+                            <Label Text="{Binding GroupDeletionStatus}"
+                                   TextColor="#fca5a5"
+                                   FontSize="11"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
                     </VerticalStackLayout>
                 </Border>
             </VerticalStackLayout>
@@ -229,7 +445,7 @@
                  HeightRequest="1"
                  HorizontalOptions="Fill" />
 
-        <FlexLayout Grid.Row="4"
+        <FlexLayout Grid.Row="4" IsVisible="False"
                     Direction="Row"
                     JustifyContent="SpaceAround"
                     AlignItems="Center"
@@ -258,7 +474,7 @@
 
             <VerticalStackLayout HorizontalOptions="Center"
                                  Spacing="2"
-                                 IsVisible="{Binding CanAccessReportsPage}">
+                                 IsVisible="{Binding ShowReportsNavigation}">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnReportsTapped" />
                 </VerticalStackLayout.GestureRecognizers>
@@ -299,7 +515,7 @@
 
             <VerticalStackLayout HorizontalOptions="Center"
                                  Spacing="2"
-                                 IsVisible="{Binding CanAccessReportsPage}">
+                                 IsVisible="{Binding ShowManagementNavigation}">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnLeaderTasksTapped" />
                 </VerticalStackLayout.GestureRecognizers>
@@ -383,5 +599,15 @@
                 </Border>
             </VerticalStackLayout>
         </FlexLayout>
-    </Grid>
+    
+        <controls:AppBottomNav Grid.Row="4"
+                               ActiveItem="" />
+
+        <controls:ProfileDrawer Grid.RowSpan="5"
+                                ActiveItem="Leader"
+                                IsOpen="{Binding IsProfileMenuOpen}" /></Grid>
 </ContentPage>
+
+
+
+

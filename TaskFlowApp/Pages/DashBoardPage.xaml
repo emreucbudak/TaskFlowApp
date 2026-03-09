@@ -1,7 +1,8 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:controls="clr-namespace:TaskFlowApp.Controls"
              x:Class="TaskFlowApp.Pages.DashBoardPage"
              BackgroundColor="#0D1B2A"
              Shell.NavBarIsVisible="False">
@@ -298,7 +299,7 @@
                  HeightRequest="1"
                  HorizontalOptions="Fill" />
 
-        <FlexLayout Grid.Row="4"
+        <FlexLayout Grid.Row="4" IsVisible="False"
                     Direction="Row"
                     JustifyContent="SpaceAround"
                     AlignItems="Center"
@@ -453,7 +454,16 @@
                 </Border>
             </VerticalStackLayout>
         </FlexLayout>
-    </Grid>
+    
+        <controls:AppBottomNav Grid.Row="4"
+                               ActiveItem="Home" />
+
+        <controls:ProfileDrawer Grid.RowSpan="5"
+                                ActiveItem=""
+                                IsOpen="{Binding IsProfileMenuOpen}" /></Grid>
 </ContentPage>
+
+
+
 
 

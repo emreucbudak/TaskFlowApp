@@ -1,7 +1,8 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:controls="clr-namespace:TaskFlowApp.Controls"
              x:Name="SubscriptionsPage"
              x:Class="TaskFlowApp.Pages.CompanySubscriptionsPage"
              BackgroundColor="#0D1B2A"
@@ -86,10 +87,10 @@
                         <Label Text="{Binding ActivePlanName, StringFormat='Aktif plan: {0}'}"
                                FontSize="13"
                                TextColor="#94a3b8" />
-                        <Label Text="{Binding ActivePlanPriceText, StringFormat='Plan ücreti: {0}'}"
+                        <Label Text="{Binding ActivePlanPriceText, StringFormat='Plan Ã¼creti: {0}'}"
                                FontSize="13"
                                TextColor="#94a3b8" />
-                        <Label Text="{Binding ActivePlanStartDateText, StringFormat='Güncel abonelik başlangıç tarihi: {0}'}"
+                        <Label Text="{Binding ActivePlanStartDateText, StringFormat='GÃ¼ncel abonelik baÅŸlangÄ±Ã§ tarihi: {0}'}"
                                FontSize="13"
                                TextColor="#94a3b8" />
                     </VerticalStackLayout>
@@ -101,14 +102,14 @@
                         StrokeShape="RoundRectangle 14"
                         Padding="16,14">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="Plan Hakları ve Kalan Kullanım"
+                        <Label Text="Plan HaklarÄ± ve Kalan KullanÄ±m"
                                FontSize="18"
                                FontAttributes="Bold"
                                TextColor="White" />
                         <Grid ColumnDefinitions="2*,*,*,*"
                               Padding="0,2,0,2">
                             <Label Grid.Column="0"
-                                   Text="Özellik"
+                                   Text="Ã–zellik"
                                    FontSize="12"
                                    FontAttributes="Bold"
                                    TextColor="#e2e8f0" />
@@ -119,7 +120,7 @@
                                    TextColor="#e2e8f0"
                                    HorizontalTextAlignment="Center" />
                             <Label Grid.Column="2"
-                                   Text="Kullanım"
+                                   Text="KullanÄ±m"
                                    FontSize="12"
                                    FontAttributes="Bold"
                                    TextColor="#e2e8f0"
@@ -150,7 +151,7 @@
                                             <Label.Triggers>
                                                 <DataTrigger TargetType="Label"
                                                              Binding="{Binding Limit}"
-                                                             Value="✓">
+                                                             Value="âœ“">
                                                     <Setter Property="TextColor"
                                                             Value="#22c55e" />
                                                 </DataTrigger>
@@ -164,7 +165,7 @@
                                             <Label.Triggers>
                                                 <DataTrigger TargetType="Label"
                                                              Binding="{Binding Usage}"
-                                                             Value="✓">
+                                                             Value="âœ“">
                                                     <Setter Property="TextColor"
                                                             Value="#22c55e" />
                                                 </DataTrigger>
@@ -178,7 +179,7 @@
                                             <Label.Triggers>
                                                 <DataTrigger TargetType="Label"
                                                              Binding="{Binding Remaining}"
-                                                             Value="✓">
+                                                             Value="âœ“">
                                                     <Setter Property="TextColor"
                                                             Value="#22c55e" />
                                                 </DataTrigger>
@@ -197,14 +198,14 @@
                         StrokeShape="RoundRectangle 14"
                         Padding="16,14">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="Plan Değiştir"
+                        <Label Text="Plan DeÄŸiÅŸtir"
                                FontSize="18"
                                FontAttributes="Bold"
                                TextColor="White" />
-                        <Label Text="Uyarı: Planınızı değiştirirseniz önceki verileriniz silinir."
+                        <Label Text="UyarÄ±: PlanÄ±nÄ±zÄ± deÄŸiÅŸtirirseniz Ã¶nceki verileriniz silinir."
                                FontSize="12"
                                TextColor="#fca5a5" />
-                        <Label Text="{Binding PendingPaymentPlanName, StringFormat='Ödeme doğrulaması bekleniyor: {0}'}"
+                        <Label Text="{Binding PendingPaymentPlanName, StringFormat='Ã–deme doÄŸrulamasÄ± bekleniyor: {0}'}"
                                IsVisible="{Binding IsAwaitingPaymentConfirmation}"
                                FontSize="12"
                                TextColor="#93c5fd" />
@@ -221,37 +222,37 @@
                                            FontAttributes="Bold"
                                            TextColor="#e2e8f0" />
                                     <Label Grid.Column="1"
-                                           Text="Ücret"
+                                           Text="Ãœcret"
                                            FontSize="12"
                                            FontAttributes="Bold"
                                            TextColor="#e2e8f0"
                                            HorizontalTextAlignment="Center" />
                                     <Label Grid.Column="2"
-                                           Text="Kullanıcı"
+                                           Text="KullanÄ±cÄ±"
                                            FontSize="12"
                                            FontAttributes="Bold"
                                            TextColor="#e2e8f0"
                                            HorizontalTextAlignment="Center" />
                                     <Label Grid.Column="3"
-                                           Text="Takım"
+                                           Text="TakÄ±m"
                                            FontSize="12"
                                            FontAttributes="Bold"
                                            TextColor="#e2e8f0"
                                            HorizontalTextAlignment="Center" />
                                     <Label Grid.Column="4"
-                                           Text="Bireysel Görev"
+                                           Text="Bireysel GÃ¶rev"
                                            FontSize="12"
                                            FontAttributes="Bold"
                                            TextColor="#e2e8f0"
                                            HorizontalTextAlignment="Center" />
                                     <Label Grid.Column="5"
-                                           Text="İç Raporlama"
+                                           Text="Ä°Ã§ Raporlama"
                                            FontSize="12"
                                            FontAttributes="Bold"
                                            TextColor="#e2e8f0"
                                            HorizontalTextAlignment="Center" />
                                     <Label Grid.Column="6"
-                                           Text="İşlem"
+                                           Text="Ä°ÅŸlem"
                                            FontSize="12"
                                            FontAttributes="Bold"
                                            TextColor="#e2e8f0"
@@ -336,7 +337,7 @@
 
         <BoxView Grid.Row="3" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
 
-        <Grid Grid.Row="4"
+        <Grid Grid.Row="4" IsVisible="False"
               ColumnDefinitions="*,*,*,*,*,*"
               BackgroundColor="#0F1E2D"
               Padding="0,6,0,18">
@@ -396,5 +397,16 @@
                 </Border>
             </VerticalStackLayout>
         </Grid>
-    </Grid>
+    
+        <controls:AppBottomNav Grid.Row="4"
+                               ActiveItem="Notifications" />
+
+        <controls:ProfileDrawer Grid.RowSpan="5"
+                                ActiveItem=""
+                                IsOpen="{Binding IsProfileMenuOpen}" /></Grid>
 </ContentPage>
+
+
+
+
+

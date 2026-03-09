@@ -23,8 +23,43 @@ public abstract partial class PageViewModelBase(
     public bool CanAccessReportsPage
     {
         get => canAccessReportsPage;
-        protected set => SetProperty(ref canAccessReportsPage, value);
+        protected set
+        {
+            if (!SetProperty(ref canAccessReportsPage, value))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(ShowReportsNavigation));
+            OnPropertyChanged(nameof(ShowLeaderManagementNavigation));
+            OnPropertyChanged(nameof(AccountRoleLabel));
+            OnPropertyChanged(nameof(CurrentUserSupportText));
+        }
     }
+
+    public bool IsCompanyUser => string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase);
+    public bool IsWorkerUser => string.Equals(UserSession.Role, "worker", StringComparison.OrdinalIgnoreCase);
+    public bool ShowReportsNavigation => IsCompanyUser || CanAccessReportsPage;
+    public bool ShowLeaderManagementNavigation => IsWorkerUser && CanAccessReportsPage;
+    public bool ShowGroupNavigation => IsWorkerUser;
+    public string NotificationsMenuTitle => IsCompanyUser ? "Abonelikler" : "Bildirimler";
+    public string NotificationsMenuDescription => IsCompanyUser
+        ? "Planını ve abonelik detaylarını yönet."
+        : "Bildirim akışını tek ekranda takip et.";
+    public string AccountRoleLabel => IsCompanyUser
+        ? "Şirket Hesabı"
+        : CanAccessReportsPage
+            ? "Departman Lideri"
+            : "Çalışan Hesabı";
+    public string CurrentUserDisplayName => !string.IsNullOrWhiteSpace(UserSession.DisplayName)
+        ? UserSession.DisplayName!.Trim()
+        : IsCompanyUser
+            ? "Şirket Yöneticisi"
+            : "TaskFlow Kullanıcısı";
+    public string CurrentUserSupportText => !string.IsNullOrWhiteSpace(UserSession.Email)
+        ? UserSession.Email!.Trim()
+        : AccountRoleLabel;
+    public string CurrentUserInitials => BuildInitials(CurrentUserDisplayName);
 
     [ObservableProperty]
     private bool isBusy;
@@ -34,6 +69,9 @@ public abstract partial class PageViewModelBase(
 
     [ObservableProperty]
     private string errorMessage = string.Empty;
+
+    [ObservableProperty]
+    private bool isProfileMenuOpen;
 
     protected const string GenericConnectionErrorMessage = "Su anda islem gerceklestirilemiyor. Lutfen tekrar deneyin.";
     protected const string GenericLoadErrorMessage = "Veriler su anda yuklenemiyor. Lutfen tekrar deneyin.";
@@ -52,7 +90,7 @@ public abstract partial class PageViewModelBase(
 
     protected async Task<WorkerReportAccessState> LoadWorkerReportAccessStateAsync(CancellationToken cancellationToken = default)
     {
-        if (!string.Equals(UserSession.Role, "worker", StringComparison.OrdinalIgnoreCase))
+        if (!IsWorkerUser)
         {
             CanAccessReportsPage = false;
             return WorkerReportAccessState.None;
@@ -73,9 +111,23 @@ public abstract partial class PageViewModelBase(
     }
 
     [RelayCommand]
+    private void ToggleProfileMenu()
+    {
+        IsProfileMenuOpen = !IsProfileMenuOpen;
+    }
+
+    [RelayCommand]
+    private void CloseProfileMenu()
+    {
+        IsProfileMenuOpen = false;
+    }
+
+    [RelayCommand]
     private Task NavigateHomeAsync()
     {
-        var homeRoute = string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase)
+        CloseProfileMenu();
+
+        var homeRoute = IsCompanyUser
             ? "CompanyDashboardPage"
             : "DashBoardPage";
 
@@ -85,7 +137,9 @@ public abstract partial class PageViewModelBase(
     [RelayCommand]
     private Task NavigateReportsAsync()
     {
-        var reportsRoute = string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase)
+        CloseProfileMenu();
+
+        var reportsRoute = IsCompanyUser
             ? "CompanyReportsPage"
             : "ReportsPage";
 
@@ -95,7 +149,9 @@ public abstract partial class PageViewModelBase(
     [RelayCommand]
     private Task NavigateTasksAsync()
     {
-        var tasksRoute = string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase)
+        CloseProfileMenu();
+
+        var tasksRoute = IsCompanyUser
             ? "CompanyTasksPage"
             : "TasksPage";
 
@@ -105,7 +161,9 @@ public abstract partial class PageViewModelBase(
     [RelayCommand]
     private Task NavigateLeaderTasksAsync()
     {
-        if (!string.Equals(UserSession.Role, "worker", StringComparison.OrdinalIgnoreCase) || !CanAccessReportsPage)
+        CloseProfileMenu();
+
+        if (!IsWorkerUser || !CanAccessReportsPage)
         {
             return Task.CompletedTask;
         }
@@ -116,7 +174,9 @@ public abstract partial class PageViewModelBase(
     [RelayCommand]
     private Task NavigateMessagesAsync()
     {
-        var employeesRoute = string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase)
+        CloseProfileMenu();
+
+        var employeesRoute = IsCompanyUser
             ? "CompanyEmployeesPage"
             : "MessagesPage";
 
@@ -126,7 +186,9 @@ public abstract partial class PageViewModelBase(
     [RelayCommand]
     private Task NavigateNotificationsAsync()
     {
-        var subscriptionsRoute = string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase)
+        CloseProfileMenu();
+
+        var subscriptionsRoute = IsCompanyUser
             ? "CompanySubscriptionsPage"
             : "NotificationsPage";
 
@@ -134,11 +196,48 @@ public abstract partial class PageViewModelBase(
     }
 
     [RelayCommand]
+    private Task NavigateGroupDetailsAsync()
+    {
+        CloseProfileMenu();
+
+        if (!IsWorkerUser)
+        {
+            return Task.CompletedTask;
+        }
+
+        return NavigationService.GoToAsync("GroupDetailsPage");
+    }
+
+    [RelayCommand]
+    private Task NavigateProfileAsync()
+    {
+        CloseProfileMenu();
+        return NavigationService.GoToAsync("ProfilePage");
+    }
+
+    [RelayCommand]
     private async Task LogoutAsync()
     {
+        CloseProfileMenu();
         await RealtimeConnectionManager.DisconnectAllAsync();
         UserSession.Clear();
         CanAccessReportsPage = false;
         await NavigationService.GoToRootAsync("MainPage");
     }
+
+    protected static string BuildInitials(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return "TF";
+        }
+
+        var initials = string.Concat(value
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(part => char.ToUpperInvariant(part[0])));
+
+        return string.IsNullOrWhiteSpace(initials) ? "TF" : initials;
+    }
 }
+

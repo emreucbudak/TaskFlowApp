@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:controls="clr-namespace:TaskFlowApp.Controls"
              x:Class="TaskFlowApp.Pages.CompanyTasksPage"
              BackgroundColor="#0D1B2A"
              Shell.NavBarIsVisible="False">
@@ -372,7 +373,7 @@
 
         <BoxView Grid.Row="3" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
 
-        <Grid Grid.Row="4"
+        <Grid Grid.Row="4" IsVisible="False"
               ColumnDefinitions="*,*,*,*,*,*"
               BackgroundColor="#0F1E2D"
               Padding="0,6,0,18">
@@ -432,8 +433,19 @@
                 </Border>
             </VerticalStackLayout>
         </Grid>
-    </Grid>
+    
+        <controls:AppBottomNav Grid.Row="4"
+                               ActiveItem="" />
+
+        <controls:ProfileDrawer Grid.RowSpan="5"
+                                ActiveItem="Tasks"
+                                IsOpen="{Binding IsProfileMenuOpen}" /></Grid>
 </ContentPage>
+
+
+
+
+
 
 
 

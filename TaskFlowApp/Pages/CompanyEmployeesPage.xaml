@@ -1,7 +1,8 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:controls="clr-namespace:TaskFlowApp.Controls"
              x:Class="TaskFlowApp.Pages.CompanyEmployeesPage"
              BackgroundColor="#0D1B2A"
              Shell.NavBarIsVisible="False">
@@ -89,7 +90,7 @@
                             Padding="12,10"
                             VerticalOptions="Start">
                         <VerticalStackLayout Spacing="8">
-                            <Label Text="Çalışan Ekle"
+                            <Label Text="Ã‡alÄ±ÅŸan Ekle"
                                    FontSize="14"
                                    FontAttributes="Bold"
                                    TextColor="White" />
@@ -127,7 +128,7 @@
                                     StrokeShape="RoundRectangle 8"
                                     Stroke="Transparent"
                                     Padding="4,0">
-                                <Entry Placeholder="Şifre"
+                                <Entry Placeholder="Åifre"
                                        Text="{Binding WorkerPasswordInput}"
                                        IsPassword="True"
                                        TextColor="White"
@@ -168,7 +169,7 @@
                                 </Grid>
                             </Border>
 
-                            <Button Text="Çalışan Ekle"
+                            <Button Text="Ã‡alÄ±ÅŸan Ekle"
                                     Command="{Binding AddWorkerCommand}"
                                     BackgroundColor="#2196F3"
                                     TextColor="White"
@@ -186,7 +187,7 @@
                             Padding="12,10"
                             VerticalOptions="End">
                         <VerticalStackLayout Spacing="8">
-                            <Label Text="Çalışan Şifresi Değiştir"
+                            <Label Text="Ã‡alÄ±ÅŸan Åifresi DeÄŸiÅŸtir"
                                    FontSize="14"
                                    FontAttributes="Bold"
                                    TextColor="White" />
@@ -228,7 +229,7 @@
                                     StrokeShape="RoundRectangle 8"
                                     Stroke="Transparent"
                                     Padding="4,0">
-                                <Entry Placeholder="Yeni Şifre"
+                                <Entry Placeholder="Yeni Åifre"
                                        Text="{Binding NewPasswordInput}"
                                        IsPassword="True"
                                        TextColor="White"
@@ -238,11 +239,11 @@
                                        HeightRequest="40" />
                             </Border>
 
-                            <Label Text="Şifre: en az 8 karakter, büyük harf, küçük harf ve rakam içermeli."
+                            <Label Text="Åifre: en az 8 karakter, bÃ¼yÃ¼k harf, kÃ¼Ã§Ã¼k harf ve rakam iÃ§ermeli."
                                    FontSize="12"
                                    TextColor="#94a3b8" />
 
-                            <Button Text="Şifreyi Güncelle"
+                            <Button Text="Åifreyi GÃ¼ncelle"
                                     Command="{Binding ChangeWorkerPasswordCommand}"
                                     BackgroundColor="#2196F3"
                                     TextColor="White"
@@ -263,7 +264,7 @@
                             Padding="12,10"
                             VerticalOptions="Start">
                         <VerticalStackLayout Spacing="8">
-                            <Label Text="Çalışan Transfer Et"
+                            <Label Text="Ã‡alÄ±ÅŸan Transfer Et"
                                    FontSize="14"
                                    FontAttributes="Bold"
                                    TextColor="White" />
@@ -360,7 +361,7 @@
                                         StrokeShape="RoundRectangle 8"
                                         Stroke="Transparent"
                                         Padding="4,0">
-                                    <Entry Placeholder="Departman Adı (2-10)"
+                                    <Entry Placeholder="Departman AdÄ± (2-10)"
                                            Text="{Binding DepartmentNameInput}"
                                            TextColor="White"
                                            PlaceholderColor="#64748b"
@@ -386,7 +387,7 @@
                                 Padding="12,10"
                                 VerticalOptions="Start">
                             <VerticalStackLayout Spacing="8">
-                                <Label Text="Çalışan Sil"
+                                <Label Text="Ã‡alÄ±ÅŸan Sil"
                                        FontSize="14"
                                        FontAttributes="Bold"
                                        TextColor="White" />
@@ -424,7 +425,7 @@
                                     </Grid>
                                 </Border>
 
-                                <Button Text="Çalışan Sil"
+                                <Button Text="Ã‡alÄ±ÅŸan Sil"
                                         Command="{Binding RemoveWorkerCommand}"
                                         BackgroundColor="#ef4444"
                                         TextColor="White"
@@ -452,7 +453,7 @@
         <BoxView Grid.Row="3" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
 
         <!-- BOTTOM NAV BAR -->
-        <Grid Grid.Row="4"
+        <Grid Grid.Row="4" IsVisible="False"
               ColumnDefinitions="*,*,*,*,*,*"
               BackgroundColor="#0F1E2D"
               Padding="0,8,0,20">
@@ -514,5 +515,13 @@
             </VerticalStackLayout>
 
         </Grid>
-    </Grid>
+    
+        <controls:AppBottomNav Grid.Row="4"
+                               ActiveItem="Secondary" />
+
+        <controls:ProfileDrawer Grid.RowSpan="5"
+                                ActiveItem=""
+                                IsOpen="{Binding IsProfileMenuOpen}" /></Grid>
 </ContentPage>
+
+

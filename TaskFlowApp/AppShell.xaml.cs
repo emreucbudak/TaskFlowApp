@@ -1,4 +1,4 @@
-using TaskFlowApp.Pages;
+﻿using TaskFlowApp.Pages;
 
 namespace TaskFlowApp
 {
@@ -8,6 +8,7 @@ namespace TaskFlowApp
         {
             InitializeComponent();
             Routing.RegisterRoute(nameof(GroupDetailsPage), typeof(GroupDetailsPage));
+            Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage));
         }
     }
 }
