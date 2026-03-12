@@ -1,32 +1,90 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
-<ResourceDictionary 
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Note: For Android please see also Platforms\Android\Resources\values\colors.xml -->
+    <!-- ── Microsoft Teams / Jira Fluent Palette ── -->
 
-    <Color x:Key="Primary">#512BD4</Color>
-    <Color x:Key="PrimaryDark">#ac99ea</Color>
-    <Color x:Key="PrimaryDarkText">#242424</Color>
-    <Color x:Key="Secondary">#DFD8F7</Color>
-    <Color x:Key="SecondaryDarkText">#9880e5</Color>
-    <Color x:Key="Tertiary">#2B0B98</Color>
+    <!-- Primary Brand -->
+    <Color x:Key="Primary">#0078D4</Color>
+    <Color x:Key="PrimaryDark">#106EBE</Color>
+    <Color x:Key="PrimaryDarkText">#323130</Color>
+    <Color x:Key="PrimaryLight">#EBF3FC</Color>
+    <Color x:Key="Secondary">#605E5C</Color>
+    <Color x:Key="SecondaryDarkText">#605E5C</Color>
+    <Color x:Key="Tertiary">#0078D4</Color>
 
-    <Color x:Key="White">White</Color>
-    <Color x:Key="Black">Black</Color>
-    <Color x:Key="Magenta">#D600AA</Color>
-    <Color x:Key="MidnightBlue">#190649</Color>
-    <Color x:Key="OffBlack">#1f1f1f</Color>
+    <!-- Neutrals -->
+    <Color x:Key="White">#FFFFFF</Color>
+    <Color x:Key="Black">#000000</Color>
+    <Color x:Key="PageBackground">#F5F5F5</Color>
+    <Color x:Key="SidebarBackground">#FAF9F8</Color>
+    <Color x:Key="CardBackground">#FFFFFF</Color>
+    <Color x:Key="SurfaceSecondary">#F3F2F1</Color>
 
-    <Color x:Key="Gray100">#E1E1E1</Color>
-    <Color x:Key="Gray200">#C8C8C8</Color>
-    <Color x:Key="Gray300">#ACACAC</Color>
-    <Color x:Key="Gray400">#919191</Color>
-    <Color x:Key="Gray500">#6E6E6E</Color>
-    <Color x:Key="Gray600">#404040</Color>
-    <Color x:Key="Gray900">#212121</Color>
-    <Color x:Key="Gray950">#141414</Color>
+    <!-- Text -->
+    <Color x:Key="TextPrimary">#323130</Color>
+    <Color x:Key="TextSecondary">#605E5C</Color>
+    <Color x:Key="TextTertiary">#A19F9D</Color>
+    <Color x:Key="TextOnPrimary">#FFFFFF</Color>
+    <Color x:Key="TextLink">#0078D4</Color>
 
+    <!-- Borders -->
+    <Color x:Key="BorderLight">#EDEBE9</Color>
+    <Color x:Key="BorderMedium">#C8C6C4</Color>
+    <Color x:Key="BorderDark">#8A8886</Color>
+    <Color x:Key="BorderFocused">#0078D4</Color>
+
+    <!-- Semantic -->
+    <Color x:Key="Success">#107C10</Color>
+    <Color x:Key="SuccessBackground">#DFF6DD</Color>
+    <Color x:Key="Warning">#FFB900</Color>
+    <Color x:Key="WarningBackground">#FFF4CE</Color>
+    <Color x:Key="Error">#A4262C</Color>
+    <Color x:Key="ErrorBackground">#FDE7E9</Color>
+    <Color x:Key="Info">#0078D4</Color>
+    <Color x:Key="InfoBackground">#EBF3FC</Color>
+
+    <!-- Status Chips -->
+    <Color x:Key="StatusActive">#107C10</Color>
+    <Color x:Key="StatusActiveBackground">#DFF6DD</Color>
+    <Color x:Key="StatusPending">#FFB900</Color>
+    <Color x:Key="StatusPendingBackground">#FFF4CE</Color>
+    <Color x:Key="StatusOverdue">#A4262C</Color>
+    <Color x:Key="StatusOverdueBackground">#FDE7E9</Color>
+
+    <!-- Grays (Fluent UI) -->
+    <Color x:Key="Gray50">#FAF9F8</Color>
+    <Color x:Key="Gray100">#F3F2F1</Color>
+    <Color x:Key="Gray200">#EDEBE9</Color>
+    <Color x:Key="Gray300">#C8C6C4</Color>
+    <Color x:Key="Gray400">#A19F9D</Color>
+    <Color x:Key="Gray500">#8A8886</Color>
+    <Color x:Key="Gray600">#605E5C</Color>
+    <Color x:Key="Gray900">#323130</Color>
+    <Color x:Key="Gray950">#201F1E</Color>
+
+    <!-- Header / Navigation -->
+    <Color x:Key="HeaderBackground">#0078D4</Color>
+    <Color x:Key="NavBackground">#FFFFFF</Color>
+    <Color x:Key="NavActiveBackground">#EBF3FC</Color>
+    <Color x:Key="NavActiveText">#0078D4</Color>
+    <Color x:Key="NavInactiveText">#605E5C</Color>
+    <Color x:Key="BottomNavBackground">#FFFFFF</Color>
+
+    <!-- Priority Colors -->
+    <Color x:Key="PriorityHigh">#A4262C</Color>
+    <Color x:Key="PriorityHighBg">#FDE7E9</Color>
+    <Color x:Key="PriorityMedium">#FFB900</Color>
+    <Color x:Key="PriorityMediumBg">#FFF4CE</Color>
+    <Color x:Key="PriorityLow">#107C10</Color>
+    <Color x:Key="PriorityLowBg">#DFF6DD</Color>
+
+    <!-- Category Colors -->
+    <Color x:Key="CategoryAccent">#5B5FC7</Color>
+    <Color x:Key="CategoryAccentBg">#F0F0FF</Color>
+
+    <!-- Brushes -->
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
     <SolidColorBrush x:Key="TertiaryBrush" Color="{StaticResource Tertiary}"/>
@@ -41,4 +99,9 @@
     <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
     <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
     <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
+
+    <!-- Legacy keys kept for Styles.xaml compatibility -->
+    <Color x:Key="Magenta">#D600AA</Color>
+    <Color x:Key="MidnightBlue">#190649</Color>
+    <Color x:Key="OffBlack">#1f1f1f</Color>
 </ResourceDictionary>

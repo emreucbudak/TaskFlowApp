@@ -1,178 +1,76 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
              xmlns:controls="clr-namespace:TaskFlowApp.Controls"
              x:Class="TaskFlowApp.Pages.CompanyReportsPage"
-             BackgroundColor="#0D1B2A"
+             BackgroundColor="#EEF2FF"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto,Auto">
-        <Grid Grid.Row="0"
-              Padding="20,16,20,10"
-              ColumnDefinitions="Auto,*,Auto"
-              BackgroundColor="#0D1B2A">
-            <Image Grid.Column="0"
-                   Source="https://www.logoai.com/uploads/icon/2021/08/06/732ca933-7df8-43e8-b085-69466243c919.png"
-                   WidthRequest="32"
-                   HeightRequest="32"
-                   Aspect="AspectFit"
-                   VerticalOptions="Center" />
+    <Grid RowDefinitions="Auto,*,Auto,Auto,Auto,Auto">
 
-            <Grid Grid.Column="2"
-                  WidthRequest="44"
-                  HeightRequest="44"
-                  HorizontalOptions="End"
-                  VerticalOptions="Center">
-                <Ellipse WidthRequest="44"
-                         HeightRequest="44"
-                         Stroke="#3A5068"
-                         StrokeThickness="1.5"
-                         Fill="#1A3A5C"
-                         HorizontalOptions="Center"
-                         VerticalOptions="Center" />
-                <Grid WidthRequest="44"
-                      HeightRequest="44"
-                      HorizontalOptions="Center"
-                      VerticalOptions="Center">
-                    <Ellipse WidthRequest="16"
-                             HeightRequest="16"
-                             Fill="#5B8DB8"
-                             HorizontalOptions="Center"
-                             VerticalOptions="Start"
-                             Margin="0,10,0,0" />
-                    <Ellipse WidthRequest="28"
-                             HeightRequest="20"
-                             Fill="#5B8DB8"
-                             HorizontalOptions="Center"
-                             VerticalOptions="End"
-                             Margin="0,0,0,2" />
-                </Grid>
-                <Ellipse WidthRequest="12"
-                         HeightRequest="12"
-                         Fill="#4CAF50"
-                         Stroke="#0D1B2A"
-                         StrokeThickness="2"
-                         HorizontalOptions="End"
-                         VerticalOptions="End"
-                         Margin="0,0,1,1" />
-            </Grid>
+        <!-- HEADER BAR -->
+        <Grid Grid.Row="0" Padding="20,12,20,12" ColumnDefinitions="Auto,*,Auto" BackgroundColor="#FFFFFF">
+            <Label Grid.Column="0" Text="TaskFlow" FontSize="20" FontAttributes="Bold" TextColor="#1E1B4B" VerticalOptions="Center" />
+            <Border Grid.Column="2" BackgroundColor="#4F46E5" Stroke="Transparent" WidthRequest="36" HeightRequest="36" HorizontalOptions="End" VerticalOptions="Center">
+                <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                <Label Text="{Binding CurrentUserInitials}" TextColor="White" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+            </Border>
         </Grid>
 
-        <BoxView Grid.Row="1" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
-
-        <ScrollView Grid.Row="2">
-            <VerticalStackLayout Padding="20,14,20,20" Spacing="14">
+        <!-- SCROLLABLE CONTENT -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20,16,20,20" Spacing="16">
                 <ActivityIndicator
                     IsRunning="{Binding IsBusy}"
                     IsVisible="{Binding IsBusy}"
-                    Color="#2196F3" />
+                    Color="#4F46E5" />
 
                 <Label
                     Text="{Binding ErrorMessage}"
-                    TextColor="#f87171"
+                    TextColor="#A4262C"
                     FontSize="12" />
 
-                <CollectionView ItemsSource="{Binding Reports}"
-                                SelectionMode="None">
+                <!-- Section Header -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                    <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" VerticalOptions="Center" CornerRadius="2" />
+                    <Label Grid.Column="1" Text="Raporlar" TextColor="#1E1B4B" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+
+                <CollectionView ItemsSource="{Binding Reports}" SelectionMode="None">
                     <CollectionView.ItemsLayout>
-                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.EmptyView>
-                        <Label Text="Rapor bulunamadı."
-                               FontSize="12"
-                               TextColor="#94a3b8"
-                               HorizontalTextAlignment="Center"
-                               Margin="0,10,0,0" />
+                        <Label Text="Rapor bulunamadı." FontSize="12" TextColor="#94A3B8" HorizontalTextAlignment="Center" Margin="0,10,0,0" />
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border BackgroundColor="#0F2338"
-                                    Stroke="#2E4A67"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 14"
-                                    Margin="0,0,0,0"
-                                    Padding="12">
-                                <VerticalStackLayout Spacing="8">
-                                    <Label Text="{Binding Title}"
-                                           TextColor="White"
-                                           FontSize="15"
-                                           FontAttributes="Bold" />
-                                    <Label Text="{Binding Description}"
-                                           TextColor="#94a3b8"
-                                           FontSize="12"
-                                           LineBreakMode="TailTruncation"
-                                           MaxLines="2"
-                                           Margin="0,0,0,10" />
+                            <Border BackgroundColor="#FFFFFF" Stroke="#E0E7FF" StrokeShape="RoundRectangle 12" Padding="0">
+                                <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
+                                <Grid ColumnDefinitions="4,*">
+                                    <!-- Left accent strip -->
+                                    <BoxView Grid.Column="0" Color="#4F46E5" WidthRequest="4" HorizontalOptions="Start" VerticalOptions="Fill" />
+                                    <VerticalStackLayout Grid.Column="1" Padding="12" Spacing="8">
+                                        <Label Text="{Binding Title}" TextColor="#1E1B4B" FontSize="15" FontAttributes="Bold" />
+                                        <Label Text="{Binding Description}" TextColor="#64748B" FontSize="12" LineBreakMode="TailTruncation" MaxLines="2" Margin="0,0,0,6" />
 
-                                    <FlexLayout Wrap="Wrap"
-                                                Direction="Row"
-                                                AlignItems="Center"
-                                                JustifyContent="Start">
-                                        <Border BackgroundColor="#0F2D46"
-                                                Stroke="#3b82f6"
-                                                StrokeThickness="1"
-                                                StrokeShape="RoundRectangle 8"
-                                                Padding="6,4"
-                                                Margin="0,0,6,6">
-                                            <Grid ColumnDefinitions="Auto,*"
-                                                  ColumnSpacing="4">
-                                                <Image Grid.Column="0"
-                                                       Source="{mi:MaterialOutlined Icon=AccessTime}"
-                                                       WidthRequest="12"
-                                                       HeightRequest="12"
-                                                       Aspect="AspectFit"
-                                                       VerticalOptions="Center" />
-                                                <Label Grid.Column="1"
-                                                       Text="{Binding CreatedAt, StringFormat='Oluşturma: {0:dd.MM.yyyy HH:mm}'}"
-                                                       TextColor="#bfdbfe"
-                                                       FontSize="11" />
-                                            </Grid>
-                                        </Border>
-
-                                        <Border BackgroundColor="#102D22"
-                                                Stroke="#22c55e"
-                                                StrokeThickness="1"
-                                                StrokeShape="RoundRectangle 8"
-                                                Padding="6,4"
-                                                Margin="0,0,6,6">
-                                            <Grid ColumnDefinitions="Auto,*"
-                                                  ColumnSpacing="4">
-                                                <Image Grid.Column="0"
-                                                       Source="{mi:MaterialOutlined Icon=Info}"
-                                                       WidthRequest="12"
-                                                       HeightRequest="12"
-                                                       Aspect="AspectFit"
-                                                       VerticalOptions="Center" />
-                                                <Label Grid.Column="1"
-                                                       Text="{Binding ReportStatusName, StringFormat='Durum: {0}'}"
-                                                       TextColor="#bbf7d0"
-                                                       FontSize="11" />
-                                            </Grid>
-                                        </Border>
-
-                                        <Border BackgroundColor="#30230E"
-                                                Stroke="#f59e0b"
-                                                StrokeThickness="1"
-                                                StrokeShape="RoundRectangle 8"
-                                                Padding="6,4"
-                                                Margin="0,0,6,6">
-                                            <Grid ColumnDefinitions="Auto,*"
-                                                  ColumnSpacing="4">
-                                                <Image Grid.Column="0"
-                                                       Source="{mi:MaterialOutlined Icon=Category}"
-                                                       WidthRequest="12"
-                                                       HeightRequest="12"
-                                                       Aspect="AspectFit"
-                                                       VerticalOptions="Center" />
-                                                <Label Grid.Column="1"
-                                                       Text="{Binding ReportTopicName, StringFormat='Konu: {0}'}"
-                                                       TextColor="#fde68a"
-                                                       FontSize="11" />
-                                            </Grid>
-                                        </Border>
-                                    </FlexLayout>
-                                </VerticalStackLayout>
+                                        <FlexLayout Wrap="Wrap" Direction="Row" AlignItems="Center" JustifyContent="Start">
+                                            <!-- Created date pill -->
+                                            <Border BackgroundColor="#E0E7FF" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="8,4" Margin="0,0,6,6">
+                                                <Label Text="{Binding CreatedAt, StringFormat='Oluşturma: {0:dd.MM.yyyy HH:mm}'}" TextColor="#4F46E5" FontSize="11" />
+                                            </Border>
+                                            <!-- Status pill -->
+                                            <Border BackgroundColor="#DFF6DD" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="8,4" Margin="0,0,6,6">
+                                                <Label Text="{Binding ReportStatusName, StringFormat='Durum: {0}'}" TextColor="#107C10" FontSize="11" />
+                                            </Border>
+                                            <!-- Topic pill -->
+                                            <Border BackgroundColor="#F0F0FF" Stroke="Transparent" StrokeShape="RoundRectangle 12" Padding="8,4" Margin="0,0,6,6">
+                                                <Label Text="{Binding ReportTopicName, StringFormat='Konu: {0}'}" TextColor="#5B5FC7" FontSize="11" />
+                                            </Border>
+                                        </FlexLayout>
+                                    </VerticalStackLayout>
+                                </Grid>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -180,22 +78,23 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <Border Grid.Row="3"
+        <!-- PAGINATION BAR -->
+        <Border Grid.Row="2"
                 Margin="20,8,20,8"
-                BackgroundColor="#0F2338"
-                Stroke="#2E4A67"
-                StrokeThickness="1"
-                StrokeShape="RoundRectangle 12"
+                BackgroundColor="#FFFFFF"
+                Stroke="Transparent"
+                StrokeShape="RoundRectangle 4"
                 Padding="12">
+            <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <Button Grid.Column="0"
                         Text=""
                         ImageSource="{mi:MaterialOutlined Icon=ArrowBack}"
                         Command="{Binding PreviousPageCommand}"
                         IsEnabled="{Binding CanGoPrevious}"
-                        BackgroundColor="#1A3A5C"
+                        BackgroundColor="#4F46E5"
                         TextColor="White"
-                        CornerRadius="8"
+                        CornerRadius="4"
                         HeightRequest="36"
                         WidthRequest="44"
                         Padding="0" />
@@ -203,34 +102,33 @@
                        Text="{Binding PageInfoText}"
                        HorizontalTextAlignment="Center"
                        VerticalTextAlignment="Center"
-                       TextColor="#cbd5e1"
+                       TextColor="#64748B"
                        FontSize="13" />
                 <Button Grid.Column="2"
                         Text=""
                         ImageSource="{mi:MaterialOutlined Icon=ArrowForward}"
                         Command="{Binding NextPageCommand}"
                         IsEnabled="{Binding CanGoNext}"
-                        BackgroundColor="#1A3A5C"
+                        BackgroundColor="#4F46E5"
                         TextColor="White"
-                        CornerRadius="8"
+                        CornerRadius="4"
                         HeightRequest="36"
                         WidthRequest="44"
                         Padding="0" />
             </Grid>
         </Border>
 
-        <BoxView Grid.Row="4" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
-
-        <Grid Grid.Row="5" IsVisible="False"
+        <!-- HIDDEN OLD NAV -->
+        <Grid Grid.Row="4" IsVisible="False"
               ColumnDefinitions="*,*,*,*,*,*"
-              BackgroundColor="#0F1E2D"
+              BackgroundColor="#FFFFFF"
               Padding="0,6,0,18">
 
             <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnHomeTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                <Border BackgroundColor="#EEF2FF" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
                     <Image Source="{mi:MaterialOutlined Icon=Home}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
@@ -239,7 +137,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnMessagesTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                <Border BackgroundColor="#EEF2FF" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
                     <Image Source="{mi:MaterialOutlined Icon=ManageAccounts}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
@@ -248,7 +146,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnNotificationsTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                <Border BackgroundColor="#EEF2FF" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
                     <Image Source="{mi:MaterialOutlined Icon=Subscriptions}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
@@ -257,7 +155,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTasksTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                <Border BackgroundColor="#EEF2FF" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
                     <Image Source="{mi:MaterialOutlined Icon=Checklist}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
@@ -266,31 +164,27 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnReportsTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                <Border BackgroundColor="#EEF2FF" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
                     <Image Source="{mi:MaterialOutlined Icon=InsertChartOutlined}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
-                <BoxView Color="#2196F3" WidthRequest="4" HeightRequest="3" CornerRadius="1.5" HorizontalOptions="Center" />
+                <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="3" CornerRadius="1.5" HorizontalOptions="Center" />
             </VerticalStackLayout>
 
             <VerticalStackLayout Grid.Column="5" HorizontalOptions="Center" Spacing="3">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnLogoutTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
+                <Border BackgroundColor="#EEF2FF" StrokeShape="RoundRectangle 8" Stroke="Transparent" WidthRequest="38" HeightRequest="28" HorizontalOptions="Center">
                     <Image Source="{mi:MaterialOutlined Icon=Logout}" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
             </VerticalStackLayout>
         </Grid>
-    
+
         <controls:AppBottomNav Grid.Row="5"
                                ActiveItem="" />
 
         <controls:ProfileDrawer Grid.RowSpan="6"
                                 ActiveItem="Reports"
-                                IsOpen="{Binding IsProfileMenuOpen}" /></Grid>
+                                IsOpen="{Binding IsProfileMenuOpen}" />
+    </Grid>
 </ContentPage>
-
-
-
-
-

@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:TaskFlowApp"
     xmlns:pages="clr-namespace:TaskFlowApp.Pages"
     Title=""
-    BackgroundColor="#0D1B2A"
+    BackgroundColor="#F5F5F5"
     IsVisible="False"
     FlyoutBehavior="Disabled">
 

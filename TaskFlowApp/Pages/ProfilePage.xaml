@@ -4,19 +4,20 @@
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
              xmlns:controls="clr-namespace:TaskFlowApp.Controls"
              x:Class="TaskFlowApp.Pages.ProfilePage"
-             BackgroundColor="#0D1B2A"
+             BackgroundColor="#EEF2FF"
              Shell.NavBarIsVisible="False">
-    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Blue Header with back button -->
         <Grid Grid.Row="0"
-              Padding="20,16,20,10"
+              Padding="16,12,16,12"
               ColumnDefinitions="Auto,*,Auto"
-              BackgroundColor="#0D1B2A">
+              BackgroundColor="#4F46E5">
             <Border Grid.Column="0"
-                    BackgroundColor="#162030"
-                    Stroke="#2E4A67"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 12"
-                    WidthRequest="44"
+                    BackgroundColor="Transparent"
+                    Stroke="Transparent"
+                    StrokeShape="RoundRectangle 8"
+                    WidthRequest="40"
                     HeightRequest="40"
                     Padding="0"
                     HorizontalOptions="Start"
@@ -25,8 +26,8 @@
                     <TapGestureRecognizer Command="{Binding NavigateBackCommand}" />
                 </Border.GestureRecognizers>
                 <Image Source="{mi:MaterialOutlined Icon=ArrowBack}"
-                       WidthRequest="18"
-                       HeightRequest="18"
+                       WidthRequest="20"
+                       HeightRequest="20"
                        HorizontalOptions="Center"
                        VerticalOptions="Center" />
             </Border>
@@ -39,58 +40,56 @@
                    HorizontalOptions="Center"
                    VerticalOptions="Center" />
 
+            <!-- Avatar: white circle with blue initials -->
             <Border Grid.Column="2"
-                    BackgroundColor="#17324D"
-                    Stroke="#4B82B5"
-                    StrokeThickness="1"
-                    WidthRequest="44"
-                    HeightRequest="44"
+                    BackgroundColor="White"
+                    Stroke="Transparent"
+                    WidthRequest="36"
+                    HeightRequest="36"
                     HorizontalOptions="End"
                     VerticalOptions="Center">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="22" />
+                    <RoundRectangle CornerRadius="18" />
                 </Border.StrokeShape>
                 <Label Text="{Binding Initials}"
-                       TextColor="#DBEAFE"
+                       TextColor="#4F46E5"
                        FontAttributes="Bold"
                        HorizontalTextAlignment="Center"
                        VerticalTextAlignment="Center" />
             </Border>
         </Grid>
 
-        <BoxView Grid.Row="1"
-                 Color="#1E2E3E"
-                 HeightRequest="1"
-                 HorizontalOptions="Fill" />
-
-        <ScrollView Grid.Row="2">
+        <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="20,14,20,20"
                                  Spacing="16">
                 <ActivityIndicator IsRunning="{Binding IsBusy}"
                                    IsVisible="{Binding IsBusy}"
-                                   Color="#2196F3" />
+                                   Color="#4F46E5" />
 
                 <Label Text="{Binding ErrorMessage}"
-                       TextColor="#F87171"
+                       TextColor="#A4262C"
                        FontSize="12" />
 
-                <Border BackgroundColor="#0F2338"
-                        Stroke="#2E4A67"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 18"
+                <!-- User Info Card -->
+                <Border BackgroundColor="#FFFFFF"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 4"
                         Padding="18">
+                    <Border.Shadow>
+                        <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
+                    </Border.Shadow>
                     <Grid ColumnDefinitions="Auto,*"
                           ColumnSpacing="14">
-                        <Border BackgroundColor="#17324D"
-                                Stroke="#4B82B5"
-                                StrokeThickness="1"
+                        <!-- Avatar circle: blue with white initials -->
+                        <Border BackgroundColor="#4F46E5"
+                                Stroke="Transparent"
                                 WidthRequest="60"
                                 HeightRequest="60">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="30" />
                             </Border.StrokeShape>
                             <Label Text="{Binding Initials}"
-                                   TextColor="#DBEAFE"
+                                   TextColor="White"
                                    FontSize="20"
                                    FontAttributes="Bold"
                                    HorizontalTextAlignment="Center"
@@ -101,74 +100,88 @@
                                              Spacing="4"
                                              VerticalOptions="Center">
                             <Label Text="{Binding DisplayName}"
-                                   TextColor="White"
+                                   TextColor="#1E1B4B"
                                    FontSize="22"
                                    FontAttributes="Bold" />
                             <Label Text="{Binding RoleTitle}"
-                                   TextColor="#60A5FA"
+                                   TextColor="#4F46E5"
                                    FontSize="13"
                                    FontAttributes="Bold" />
                             <Label Text="{Binding Subtitle}"
-                                   TextColor="#9FB5CB"
+                                   TextColor="#64748B"
                                    FontSize="12"
                                    IsVisible="{Binding HasSubtitle}" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
 
-                <Label Text="Hesap Özeti"
-                       TextColor="White"
-                       FontSize="16"
-                       FontAttributes="Bold" />
+                <!-- Section Header: Hesap Ozeti -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Hesap &#214;zeti" TextColor="#1E1B4B" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
 
                 <Grid ColumnDefinitions="*,*"
                       ColumnSpacing="10">
+                    <!-- Primary Metric Card -->
                     <Border Grid.Column="0"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="6">
-                            <Label Text="{Binding PrimaryMetricTitle}"
-                                   TextColor="#9FB5CB"
-                                   FontSize="12" />
-                            <Label Text="{Binding PrimaryMetricValue}"
-                                   TextColor="White"
-                                   FontSize="18"
-                                   FontAttributes="Bold"
-                                   LineBreakMode="WordWrap"
-                                   MaxLines="2" />
+                            BackgroundColor="#FFFFFF"
+                            Stroke="Transparent"
+                            StrokeShape="RoundRectangle 4"
+                            Padding="0">
+                        <Border.Shadow>
+                            <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
+                        </Border.Shadow>
+                        <VerticalStackLayout Spacing="0">
+                            <BoxView Color="#4F46E5" HeightRequest="3" HorizontalOptions="Fill" CornerRadius="4,4,0,0" />
+                            <VerticalStackLayout Padding="14" Spacing="6">
+                                <Label Text="{Binding PrimaryMetricTitle}"
+                                       TextColor="#64748B"
+                                       FontSize="12" />
+                                <Label Text="{Binding PrimaryMetricValue}"
+                                       TextColor="#1E1B4B"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       LineBreakMode="WordWrap"
+                                       MaxLines="2" />
+                            </VerticalStackLayout>
                         </VerticalStackLayout>
                     </Border>
 
+                    <!-- Secondary Metric Card -->
                     <Border Grid.Column="1"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="6">
-                            <Label Text="{Binding SecondaryMetricTitle}"
-                                   TextColor="#9FB5CB"
-                                   FontSize="12" />
-                            <Label Text="{Binding SecondaryMetricValue}"
-                                   TextColor="White"
-                                   FontSize="18"
-                                   FontAttributes="Bold"
-                                   LineBreakMode="WordWrap"
-                                   MaxLines="2" />
+                            BackgroundColor="#FFFFFF"
+                            Stroke="Transparent"
+                            StrokeShape="RoundRectangle 4"
+                            Padding="0">
+                        <Border.Shadow>
+                            <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
+                        </Border.Shadow>
+                        <VerticalStackLayout Spacing="0">
+                            <BoxView Color="#107C10" HeightRequest="3" HorizontalOptions="Fill" CornerRadius="4,4,0,0" />
+                            <VerticalStackLayout Padding="14" Spacing="6">
+                                <Label Text="{Binding SecondaryMetricTitle}"
+                                       TextColor="#64748B"
+                                       FontSize="12" />
+                                <Label Text="{Binding SecondaryMetricValue}"
+                                       TextColor="#1E1B4B"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       LineBreakMode="WordWrap"
+                                       MaxLines="2" />
+                            </VerticalStackLayout>
                         </VerticalStackLayout>
                     </Border>
                 </Grid>
 
-                <Label Text="Detaylar"
-                       TextColor="White"
-                       FontSize="16"
-                       FontAttributes="Bold" />
+                <!-- Section Header: Detaylar -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Detaylar" TextColor="#1E1B4B" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
 
                 <Label Text="{Binding DetailEmptyMessage}"
-                       TextColor="#9FB5CB"
+                       TextColor="#94A3B8"
                        FontSize="12"
                        IsVisible="{Binding HasNoDetails}" />
 
@@ -177,21 +190,23 @@
                                      Spacing="8">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <Border BackgroundColor="#10283D"
-                                    Stroke="#2E4A67"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 12"
+                            <Border BackgroundColor="#FFFFFF"
+                                    Stroke="Transparent"
+                                    StrokeShape="RoundRectangle 4"
                                     Padding="12,10">
+                                <Border.Shadow>
+                                    <Shadow Brush="#204F46E5" Offset="0,1" Radius="4" />
+                                </Border.Shadow>
                                 <Grid ColumnDefinitions="Auto,*"
                                       ColumnSpacing="12">
                                     <Label Text="{Binding Title}"
-                                           TextColor="#8FB4D8"
+                                           TextColor="#64748B"
                                            FontSize="12"
                                            FontAttributes="Bold"
                                            VerticalOptions="Start" />
                                     <Label Grid.Column="1"
                                            Text="{Binding Value}"
-                                           TextColor="White"
+                                           TextColor="#1E1B4B"
                                            FontSize="12"
                                            LineBreakMode="WordWrap" />
                                 </Grid>
@@ -202,19 +217,11 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <BoxView Grid.Row="3"
-                 Color="#1E2E3E"
-                 HeightRequest="1"
-                 HorizontalOptions="Fill" />
-
-        <controls:AppBottomNav Grid.Row="4"
+        <controls:AppBottomNav Grid.Row="2"
                                ActiveItem="Profile" />
 
-        <controls:ProfileDrawer Grid.RowSpan="5"
+        <controls:ProfileDrawer Grid.RowSpan="3"
                                 ActiveItem="Profile"
                                 IsOpen="{Binding IsProfileMenuOpen}" />
     </Grid>
 </ContentPage>
-
-
-

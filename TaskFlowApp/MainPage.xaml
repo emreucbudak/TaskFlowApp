@@ -1,187 +1,204 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
              x:Class="TaskFlowApp.MainPage"
              Title=""
-             BackgroundColor="#0D1B2A"
+             BackgroundColor="#EEF2FF"
              Shell.NavBarIsVisible="False">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-
-            <!-- Renkler -->
-            <Color x:Key="Primary">#137fec</Color>
-            <Color x:Key="Surface">#1e293b</Color>
-            <Color x:Key="BorderColor">#334155</Color>
-            <Color x:Key="PlaceholderColor">#64748b</Color>
-            <Color x:Key="LabelColor">#cbd5e1</Color>
-            <Color x:Key="SubtitleColor">#94a3b8</Color>
-            <Color x:Key="IconGray">#9CA3AF</Color>
-
-            <!-- Entry Stili -->
-            <Style x:Key="ModernEntry" TargetType="Entry">
-                <Setter Property="TextColor" Value="White"/>
-                <Setter Property="PlaceholderColor" Value="#64748b"/>
-                <Setter Property="BackgroundColor" Value="Transparent"/>
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="HeightRequest" Value="52"/>
-                <Setter Property="VerticalOptions" Value="Center"/>
-            </Style>
-
-            <!-- Şifre Entry Stili -->
-            <Style x:Key="ModernPasswordEntry" TargetType="Entry" BasedOn="{StaticResource ModernEntry}">
-                <Setter Property="IsPassword" Value="True"/>
-            </Style>
-
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
-    <ScrollView>
-        <VerticalStackLayout HorizontalOptions="Fill"
+    <ScrollView VerticalOptions="Center">
+        <VerticalStackLayout HorizontalOptions="Center"
                              VerticalOptions="Center"
-                             Padding="24,48"
-                             Spacing="12"
-                             MaximumWidthRequest="520">
+                             Padding="16,24"
+                             Spacing="0"
+                             WidthRequest="480">
 
-                <!-- ── Logo & Başlık Bölümü ── -->
-                <VerticalStackLayout HorizontalOptions="Center"
-                                     Spacing="6"
-                                     Margin="0,0,0,56">
+            <!-- ══ Main Card Container ══ -->
+            <Border BackgroundColor="#FFFFFF"
+                    Stroke="#E0E7FF"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 16"
+                    HorizontalOptions="Fill">
+                <Border.Shadow>
+                    <Shadow Brush="#204F46E5" Offset="0,12" Radius="40" />
+                </Border.Shadow>
 
-                    <!-- Görsel kutusu -->
-                    <Border HeightRequest="96"
-                            WidthRequest="96"
-                            HorizontalOptions="Center"
-                            Margin="0,0,0,24"
-                            BackgroundColor="{StaticResource Surface}"
-                            Stroke="{StaticResource BorderColor}"
-                            StrokeThickness="1">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="20"/>
-                        </Border.StrokeShape>
-                    <Image Source="https://www.logoai.com/uploads/icon/2021/08/06/732ca933-7df8-43e8-b085-69466243c919.png"
-                               Aspect="AspectFit"
-                               HeightRequest="64"
-                               WidthRequest="64"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center" />
-                    </Border>
+                <VerticalStackLayout Spacing="0">
 
-                    <!-- Başlık -->
-                    <Label Text="Tekrar Hoş Geldiniz"
-                           FontSize="28"
-                           FontAttributes="Bold"
-                           TextColor="White"
-                           HorizontalOptions="Center"
-                           Margin="0,0,0,12"/>
-                </VerticalStackLayout>
+                    <!-- ── Header / Logo Section ── -->
+                    <VerticalStackLayout HorizontalOptions="Center"
+                                         Spacing="4"
+                                         Padding="32,28,32,20">
 
-                <!-- ── Form Bölümü ── -->
-                <VerticalStackLayout Spacing="28"
-                                     HorizontalOptions="Fill">
-
-                    <!-- Email Alanı -->
-                    <VerticalStackLayout Spacing="12">
-                        <Label Text="E-posta Adresi"
-                               FontSize="13"
-                               FontAttributes="Bold"
-                               TextColor="{StaticResource LabelColor}"
-                               Margin="4,0,0,0"/>
-                        <Border BackgroundColor="{StaticResource Surface}"
+                        <!-- Logo Icon -->
+                        <Border BackgroundColor="#4F46E5"
                                 Stroke="Transparent"
                                 StrokeThickness="0"
-                                HorizontalOptions="Fill"
-                                Padding="14,0,14,0">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="24"/>
-                            </Border.StrokeShape>
-                            <Grid ColumnDefinitions="Auto,*">
-                                    <Label Grid.Column="0"
-                                           Text="✉"
-                                           FontSize="16"
-                                           TextColor="{StaticResource IconGray}"
-                                           VerticalOptions="Center"
-                                           Margin="0,0,10,0"/>
-                                    <Entry Grid.Column="1"
-                                           Style="{StaticResource ModernEntry}"
-                                           Placeholder="ornek@sirket.com"
+                                StrokeShape="RoundRectangle 14"
+                                WidthRequest="64"
+                                HeightRequest="64"
+                                HorizontalOptions="Center"
+                                Margin="0,0,0,16">
+                            <Border.Shadow>
+                                <Shadow Brush="#404F46E5" Offset="0,6" Radius="16" />
+                            </Border.Shadow>
+                            <Image Source="{mi:MaterialOutlined Icon=AccountTree}"
+                                   WidthRequest="34"
+                                   HeightRequest="34"
+                                   Aspect="AspectFit"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+
+                        <!-- Brand Name -->
+                        <Label Text="TaskFlow"
+                               FontSize="26"
+                               FontAttributes="Bold"
+                               TextColor="#1E1B4B"
+                               HorizontalTextAlignment="Center" />
+
+                    </VerticalStackLayout>
+
+                    <!-- ── Form Section ── -->
+                    <VerticalStackLayout Spacing="20"
+                                         Padding="32,0,32,24">
+
+                        <!-- Email Field -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="E-posta"
+                                   FontSize="13"
+                                   FontAttributes="Bold"
+                                   TextColor="#334155"
+                                   Margin="4,0,0,0" />
+                            <Border BackgroundColor="#F8FAFC"
+                                    Stroke="#C7D2FE"
+                                    StrokeThickness="1.5"
+                                    HorizontalOptions="Fill"
+                                    HeightRequest="50"
+                                    Padding="14,0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+                                <Border.Shadow>
+                                    <Shadow Brush="#08000000" Offset="0,2" Radius="4" />
+                                </Border.Shadow>
+                                <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                                    <Image Source="{mi:MaterialOutlined Icon=Mail, IconColor=#94A3B8}"
+                                           WidthRequest="20"
+                                           HeightRequest="20"
+                                           VerticalOptions="Center" />
+                                    <Entry Placeholder="isim@sirket.com"
+                                           PlaceholderColor="#94A3B8"
+                                           TextColor="#0F172A"
+                                           FontSize="14"
+                                           BackgroundColor="Transparent"
                                            Keyboard="Email"
                                            Text="{Binding Email}"
-                                           HandlerChanged="OnEntryHandlerChanged"
-                                           x:Name="EmailEntry"/>
-                            </Grid>
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <!-- Şifre Alanı -->
-                    <VerticalStackLayout Spacing="12">
-                        <Label Text="Şifre"
-                               FontSize="13"
-                               FontAttributes="Bold"
-                               TextColor="{StaticResource LabelColor}"
-                               Margin="4,0,0,0"/>
-                        <Border BackgroundColor="{StaticResource Surface}"
-                                Stroke="Transparent"
-                                StrokeThickness="0"
-                                HorizontalOptions="Fill"
-                                Padding="14,0,14,0">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="24"/>
-                            </Border.StrokeShape>
-                            <Grid ColumnDefinitions="Auto,*,Auto">
-                                    <Label Grid.Column="0"
-                                           Text="🔒"
-                                           FontSize="15"
-                                           TextColor="{StaticResource IconGray}"
                                            VerticalOptions="Center"
-                                           Margin="0,0,10,0"/>
-                                    <Entry Grid.Column="1"
-                                           Style="{StaticResource ModernPasswordEntry}"
-                                           Placeholder="Şifrenizi girin"
-                                           Text="{Binding Password}"
-                                           IsPassword="{Binding IsPasswordHidden}"
+                                           HorizontalOptions="FillAndExpand"
                                            HandlerChanged="OnEntryHandlerChanged"
-                                           x:Name="PasswordEntry"/>
-                                    <Label Grid.Column="2"
-                                           Text="{Binding PasswordVisibilityIcon}"
-                                           FontSize="15"
-                                           TextColor="{StaticResource IconGray}"
-                                           VerticalOptions="Center">
-                                        <Label.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding TogglePasswordVisibilityCommand}"/>
-                                        </Label.GestureRecognizers>
-                                    </Label>
-                            </Grid>
-                        </Border>
+                                           x:Name="EmailEntry" />
+                                </HorizontalStackLayout>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Password Field -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="&#350;ifre"
+                                   FontSize="13"
+                                   FontAttributes="Bold"
+                                   TextColor="#334155"
+                                   Margin="4,0,0,0" />
+                            <Border BackgroundColor="#F8FAFC"
+                                    Stroke="#C7D2FE"
+                                    StrokeThickness="1.5"
+                                    HorizontalOptions="Fill"
+                                    HeightRequest="50"
+                                    Padding="14,0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+                                <Border.Shadow>
+                                    <Shadow Brush="#08000000" Offset="0,2" Radius="4" />
+                                </Border.Shadow>
+                                <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                                    <Image Source="{mi:MaterialOutlined Icon=Lock, IconColor=#94A3B8}"
+                                           WidthRequest="20"
+                                           HeightRequest="20"
+                                           VerticalOptions="Center" />
+                                    <Entry Grid.Column="1"
+                                           Placeholder="&#350;ifrenizi girin"
+                                           PlaceholderColor="#94A3B8"
+                                           TextColor="#0F172A"
+                                           FontSize="14"
+                                           BackgroundColor="Transparent"
+                                           IsPassword="{Binding IsPasswordHidden}"
+                                           Text="{Binding Password}"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="FillAndExpand"
+                                           Margin="10,0,0,0"
+                                           HandlerChanged="OnEntryHandlerChanged"
+                                           x:Name="PasswordEntry" />
+                                    <Border Grid.Column="2"
+                                            BackgroundColor="Transparent"
+                                            Stroke="Transparent"
+                                            StrokeThickness="0"
+                                            WidthRequest="36"
+                                            HeightRequest="36"
+                                            VerticalOptions="Center">
+                                        <Image Source="{mi:MaterialOutlined Icon=Visibility}"
+                                               WidthRequest="20"
+                                               HeightRequest="20"
+                                               Opacity="0.5"
+                                               Aspect="AspectFit"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center">
+                                            <Image.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding TogglePasswordVisibilityCommand}" />
+                                            </Image.GestureRecognizers>
+                                        </Image>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Sign In Button -->
+                        <Button Text="Giri&#351; Yap"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                TextColor="White"
+                                HeightRequest="50"
+                                CornerRadius="12"
+                                HorizontalOptions="Fill"
+                                BackgroundColor="#4F46E5"
+                                Command="{Binding LoginCommand}">
+                            <Button.Shadow>
+                                <Shadow Brush="#504F46E5" Offset="0,4" Radius="12" />
+                            </Button.Shadow>
+                        </Button>
+
+                        <!-- Error Message -->
+                        <Label Text="{Binding ErrorMessage}"
+                               TextColor="#DC2626"
+                               FontSize="13"
+                               HorizontalTextAlignment="Center"
+                               LineBreakMode="WordWrap" />
+
                     </VerticalStackLayout>
 
-                    <!-- Giriş Butonu -->
-                    <Button Text="Giriş Yap"
-                            FontSize="15"
-                            FontAttributes="Bold"
-                            TextColor="White"
-                            HeightRequest="52"
-                            CornerRadius="24"
-                            Margin="0,14,0,0"
-                            HorizontalOptions="Fill"
-                            Command="{Binding LoginCommand}">
-                        <Button.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="#137fec" Offset="0.0"/>
-                                <GradientStop Color="#2563eb" Offset="1.0"/>
-                            </LinearGradientBrush>
-                        </Button.Background>
-                    </Button>
-
-                    <Label
-                        Text="{Binding ErrorMessage}"
-                        TextColor="#f87171"
-                        FontSize="13"
-                        HorizontalTextAlignment="Center"
-                        Margin="0,6,0,0"
-                        LineBreakMode="WordWrap" />
 
                 </VerticalStackLayout>
+            </Border>
+
+            <!-- Bottom Copyright -->
+            <Label Text="&#169; 2026 TASKFLOW KURUMSAL &#199;&#214;Z&#220;MLER"
+                   FontSize="11"
+                   TextColor="#94A3B8"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,24,0,0"
+                   CharacterSpacing="2" />
 
         </VerticalStackLayout>
     </ScrollView>

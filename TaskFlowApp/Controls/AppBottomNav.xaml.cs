@@ -40,8 +40,8 @@ public partial class AppBottomNav : ContentView
     private static void SetItemState(Border border, BoxView dot, string? activeItem, string itemKey)
     {
         var isActive = string.Equals(activeItem, itemKey, StringComparison.OrdinalIgnoreCase);
-        border.BackgroundColor = Color.FromArgb(isActive ? "#1A3A5C" : "#162838");
-        border.Stroke = new SolidColorBrush(Color.FromArgb(isActive ? "#4B82B5" : "#24384B"));
+        border.BackgroundColor = Color.FromArgb(isActive ? "#EEF2FF" : "#F8F7FF");
+        border.Stroke = new SolidColorBrush(Color.FromArgb(isActive ? "#C7D2FE" : "#00000000"));
         dot.IsVisible = isActive;
     }
 }

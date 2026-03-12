@@ -1,236 +1,181 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
              xmlns:controls="clr-namespace:TaskFlowApp.Controls"
              x:Class="TaskFlowApp.Pages.DashBoardPage"
-             BackgroundColor="#0D1B2A"
+             BackgroundColor="#EEF2FF"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+        <!-- Header -->
         <Grid Grid.Row="0"
-              Padding="20,16,20,10"
+              Padding="20,12,20,12"
               ColumnDefinitions="Auto,*,Auto"
-              BackgroundColor="#0D1B2A">
+              BackgroundColor="#FFFFFF">
             <Image Grid.Column="0"
-                   Source="https://www.logoai.com/uploads/icon/2021/08/06/732ca933-7df8-43e8-b085-69466243c919.png"
+                   Source="taskflow_logo.png"
                    WidthRequest="32"
                    HeightRequest="32"
                    Aspect="AspectFit"
                    VerticalOptions="Center" />
 
-            <Grid Grid.Column="2"
-                  WidthRequest="44"
-                  HeightRequest="44"
-                  HorizontalOptions="End"
-                  VerticalOptions="Center">
-                <Ellipse WidthRequest="44"
-                         HeightRequest="44"
-                         Stroke="#3A5068"
-                         StrokeThickness="1.5"
-                         Fill="#1A3A5C"
-                         HorizontalOptions="Center"
-                         VerticalOptions="Center" />
-
-                <Grid WidthRequest="44"
-                      HeightRequest="44"
-                      HorizontalOptions="Center"
-                      VerticalOptions="Center">
-                    <Ellipse WidthRequest="16"
-                             HeightRequest="16"
-                             Fill="#5B8DB8"
-                             HorizontalOptions="Center"
-                             VerticalOptions="Start"
-                             Margin="0,10,0,0" />
-                    <Ellipse WidthRequest="28"
-                             HeightRequest="20"
-                             Fill="#5B8DB8"
-                             HorizontalOptions="Center"
-                             VerticalOptions="End"
-                             Margin="0,0,0,2" />
-                </Grid>
-
-                <Ellipse WidthRequest="12"
-                         HeightRequest="12"
-                         Fill="#4CAF50"
-                         Stroke="#0D1B2A"
-                         StrokeThickness="2"
-                         HorizontalOptions="End"
-                         VerticalOptions="End"
-                         Margin="0,0,1,1" />
-            </Grid>
+            <!-- Avatar: initials circle -->
+            <Border Grid.Column="2"
+                    BackgroundColor="#4F46E5"
+                    Stroke="Transparent"
+                    WidthRequest="32"
+                    HeightRequest="32"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+                <Label Text="{Binding CurrentUserInitials}"
+                       TextColor="White"
+                       FontSize="13"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center" />
+            </Border>
         </Grid>
 
-        <BoxView Grid.Row="1"
-                 Color="#1E2E3E"
-                 HeightRequest="1"
-                 HorizontalOptions="Fill" />
-
-        <ScrollView Grid.Row="2">
+        <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="20,14,20,20" Spacing="16">
                 <Label
                     Text="{Binding ErrorMessage}"
-                    TextColor="#f87171"
+                    TextColor="#A4262C"
                     FontSize="12" />
 
-                <Label Text="Ki&#351;isel &#304;statistikler"
-                       TextColor="White"
-                       FontSize="16"
-                       FontAttributes="Bold"
-                       Margin="2,0,0,0" />
+                <!-- Section Header: Kisisel Istatistikler -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Ki&#351;isel &#304;statistikler" TextColor="#1E1B4B" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
 
                 <Grid ColumnDefinitions="*,*"
-                      RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                      RowDefinitions="Auto,Auto,Auto,Auto"
                       ColumnSpacing="10"
                       RowSpacing="10">
-                    <Border Grid.Row="0"
-                            Grid.Column="0"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Atanan Bireysel G&#246;rev" TextColor="#B8C6D6" FontSize="12" />
-                            <Label Text="{Binding IndividualTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+
+                    <!-- Stat Card: Atanan Bireysel Gorev -->
+                    <Border Grid.Row="0" Grid.Column="0" BackgroundColor="#FFFFFF" Stroke="#E0E7FF" StrokeShape="RoundRectangle 12" Padding="0">
+                        <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
+                        <VerticalStackLayout Spacing="0">
+                            <BoxView Color="#4F46E5" HeightRequest="3" HorizontalOptions="Fill" CornerRadius="4,4,0,0" />
+                            <VerticalStackLayout Padding="14" Spacing="4">
+                                <Label Text="Atanan Bireysel G&#246;rev" TextColor="#64748B" FontSize="12" />
+                                <Label Text="{Binding IndividualTaskCount}" TextColor="#1E1B4B" FontSize="24" FontAttributes="Bold" />
+                            </VerticalStackLayout>
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border Grid.Row="0"
-                            Grid.Column="1"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Atanan Grup G&#246;revi" TextColor="#B8C6D6" FontSize="12" />
-                            <Label Text="{Binding GroupTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                    <!-- Stat Card: Atanan Grup Gorevi -->
+                    <Border Grid.Row="0" Grid.Column="1" BackgroundColor="#FFFFFF" Stroke="#E0E7FF" StrokeShape="RoundRectangle 12" Padding="0">
+                        <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
+                        <VerticalStackLayout Spacing="0">
+                            <BoxView Color="#4F46E5" HeightRequest="3" HorizontalOptions="Fill" CornerRadius="4,4,0,0" />
+                            <VerticalStackLayout Padding="14" Spacing="4">
+                                <Label Text="Atanan Grup G&#246;revi" TextColor="#64748B" FontSize="12" />
+                                <Label Text="{Binding GroupTaskCount}" TextColor="#1E1B4B" FontSize="24" FontAttributes="Bold" />
+                            </VerticalStackLayout>
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border Grid.Row="1"
-                            Grid.Column="0"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Toplam Tamamlanan G&#246;rev" TextColor="#B8C6D6" FontSize="12" />
-                            <Label Text="{Binding TotalCompleted}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                    <!-- Stat Card: Tamamlanan Bireysel Gorev -->
+                    <Border Grid.Row="1" Grid.Column="0" BackgroundColor="#FFFFFF" Stroke="#E0E7FF" StrokeShape="RoundRectangle 12" Padding="0">
+                        <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
+                        <VerticalStackLayout Spacing="0">
+                            <BoxView Color="#107C10" HeightRequest="3" HorizontalOptions="Fill" CornerRadius="4,4,0,0" />
+                            <VerticalStackLayout Padding="14" Spacing="4">
+                                <Label Text="Tamamlanan Bireysel G&#246;rev" TextColor="#64748B" FontSize="12" />
+                                <Label Text="{Binding CompletedIndividualTaskCount}" TextColor="#1E1B4B" FontSize="24" FontAttributes="Bold" />
+                            </VerticalStackLayout>
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border Grid.Row="1"
-                            Grid.Column="1"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Toplam Geciken G&#246;rev" TextColor="#B8C6D6" FontSize="12" />
-                            <Label Text="{Binding OverdueTasks}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                    <!-- Stat Card: Tamamlanan Grup Gorevi -->
+                    <Border Grid.Row="1" Grid.Column="1" BackgroundColor="#FFFFFF" Stroke="#E0E7FF" StrokeShape="RoundRectangle 12" Padding="0">
+                        <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
+                        <VerticalStackLayout Spacing="0">
+                            <BoxView Color="#107C10" HeightRequest="3" HorizontalOptions="Fill" CornerRadius="4,4,0,0" />
+                            <VerticalStackLayout Padding="14" Spacing="4">
+                                <Label Text="Tamamlanan Grup G&#246;revi" TextColor="#64748B" FontSize="12" />
+                                <Label Text="{Binding CompletedGroupTaskCount}" TextColor="#1E1B4B" FontSize="24" FontAttributes="Bold" />
+                            </VerticalStackLayout>
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border Grid.Row="2"
-                            Grid.Column="0"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Tamamlanan Bireysel G&#246;rev" TextColor="#B8C6D6" FontSize="12" />
-                            <Label Text="{Binding CompletedIndividualTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                    <!-- Stat Card: Geciken Bireysel Gorev -->
+                    <Border Grid.Row="2" Grid.Column="0" BackgroundColor="#FFFFFF" Stroke="#E0E7FF" StrokeShape="RoundRectangle 12" Padding="0">
+                        <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
+                        <VerticalStackLayout Spacing="0">
+                            <BoxView Color="#A4262C" HeightRequest="3" HorizontalOptions="Fill" CornerRadius="4,4,0,0" />
+                            <VerticalStackLayout Padding="14" Spacing="4">
+                                <Label Text="Geciken Bireysel G&#246;rev" TextColor="#64748B" FontSize="12" />
+                                <Label Text="{Binding OverdueIndividualTaskCount}" TextColor="#1E1B4B" FontSize="24" FontAttributes="Bold" />
+                            </VerticalStackLayout>
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border Grid.Row="2"
-                            Grid.Column="1"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Tamamlanan Grup G&#246;revi" TextColor="#B8C6D6" FontSize="12" />
-                            <Label Text="{Binding CompletedGroupTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                    <!-- Stat Card: Geciken Grup Gorevi -->
+                    <Border Grid.Row="2" Grid.Column="1" BackgroundColor="#FFFFFF" Stroke="#E0E7FF" StrokeShape="RoundRectangle 12" Padding="0">
+                        <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
+                        <VerticalStackLayout Spacing="0">
+                            <BoxView Color="#A4262C" HeightRequest="3" HorizontalOptions="Fill" CornerRadius="4,4,0,0" />
+                            <VerticalStackLayout Padding="14" Spacing="4">
+                                <Label Text="Geciken Grup G&#246;revi" TextColor="#64748B" FontSize="12" />
+                                <Label Text="{Binding OverdueGroupTaskCount}" TextColor="#1E1B4B" FontSize="24" FontAttributes="Bold" />
+                            </VerticalStackLayout>
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border Grid.Row="3"
-                            Grid.Column="0"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Geciken Bireysel G&#246;rev" TextColor="#B8C6D6" FontSize="12" />
-                            <Label Text="{Binding OverdueIndividualTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
-                        </VerticalStackLayout>
-                    </Border>
-
-                    <Border Grid.Row="3"
-                            Grid.Column="1"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Geciken Grup G&#246;revi" TextColor="#B8C6D6" FontSize="12" />
-                            <Label Text="{Binding OverdueGroupTaskCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
-                        </VerticalStackLayout>
-                    </Border>
-
-                    <Border Grid.Row="4"
-                            Grid.Column="0"
-                            Grid.ColumnSpan="2"
-                            BackgroundColor="#0F2338"
-                            Stroke="#2E4A67"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Okunmam&#305;&#351; Mesaj" TextColor="#B8C6D6" FontSize="12" />
-                            <Label Text="{Binding UnreadMessageCount}" TextColor="White" FontSize="24" FontAttributes="Bold" />
+                    <!-- Stat Card: Okunmamis Mesaj (full width) -->
+                    <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="#FFFFFF" Stroke="#E0E7FF" StrokeShape="RoundRectangle 12" Padding="0">
+                        <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
+                        <VerticalStackLayout Spacing="0">
+                            <BoxView Color="#FFB900" HeightRequest="3" HorizontalOptions="Fill" CornerRadius="4,4,0,0" />
+                            <VerticalStackLayout Padding="14" Spacing="4">
+                                <Label Text="Okunmam&#305;&#351; Mesaj" TextColor="#64748B" FontSize="12" />
+                                <Label Text="{Binding UnreadMessageCount}" TextColor="#1E1B4B" FontSize="24" FontAttributes="Bold" />
+                            </VerticalStackLayout>
                         </VerticalStackLayout>
                     </Border>
                 </Grid>
 
-                <Grid ColumnDefinitions="*,Auto"
-                      ColumnSpacing="12"
-                      Margin="2,6,0,0">
-                    <Label Grid.Column="0"
+                <!-- Section Header: Grubun Son Aktiviteleri -->
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="0,6,0,0">
+                    <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
                            Text="Grubun Son Aktiviteleri"
-                           TextColor="White"
-                           FontSize="16"
+                           TextColor="#1E1B4B"
+                           FontSize="18"
                            FontAttributes="Bold"
                            VerticalOptions="Center" />
-                    <Button Grid.Column="1"
+                    <Button Grid.Column="2"
                             Text="T&#252;m&#252;n&#252; G&#246;r"
                             Command="{Binding OpenGroupDetailsCommand}"
                             IsEnabled="{Binding CanOpenGroupDetails}"
-                            BackgroundColor="#1A3A5C"
-                            TextColor="White"
-                            CornerRadius="8"
+                            BackgroundColor="#E0E7FF"
+                            TextColor="#4F46E5"
+                            CornerRadius="4"
                             HeightRequest="28"
                             Padding="12,4"
                             FontSize="12" />
                 </Grid>
-                <Border BackgroundColor="#0F2338"
-                        Stroke="#2E4A67"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 14"
+
+                <!-- Activities Card -->
+                <Border BackgroundColor="#FFFFFF"
+                        Stroke="#E0E7FF"
+                        StrokeShape="RoundRectangle 12"
                         Padding="14">
+                    <Border.Shadow>
+                        <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
+                    </Border.Shadow>
                     <VerticalStackLayout Spacing="10">
 
                         <Label Text="{Binding GroupActivityEmptyMessage}"
-                               TextColor="#B8C6D6"
+                               TextColor="#64748B"
                                FontSize="13"
                                IsVisible="{Binding HasNoGroupRecentActivities}" />
 
@@ -239,78 +184,74 @@
                                              Spacing="8">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate>
-                                    <Border BackgroundColor="#0F2338"
-                                            Stroke="#2E4A67"
-                                            StrokeThickness="1"
-                                            StrokeShape="RoundRectangle 10"
-                                            Padding="10,8">
-                                        <Grid RowDefinitions="Auto,Auto"
-                                              ColumnDefinitions="*,Auto"
-                                              ColumnSpacing="8"
-                                              RowSpacing="2">
-                                            <Label Grid.Row="0"
-                                                   Grid.Column="0"
-                                                   Text="{Binding ActorName}"
-                                                   TextColor="White"
-                                                   FontSize="13"
-                                                   FontAttributes="Bold" />
-                                            <Label Grid.Row="0"
-                                                   Grid.Column="1"
-                                                   Text="{Binding OccurredAtText}"
-                                                   TextColor="#8FA6BE"
-                                                   FontSize="11" />
-                                            <Label Grid.Row="1"
-                                                   Grid.Column="0"
-                                                   Grid.ColumnSpan="2"
-                                                   Text="{Binding ActionText}"
-                                                   TextColor="#D4E2F0"
+                                    <!-- Timeline-style activity item -->
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Padding="4,4">
+                                        <!-- Blue dot -->
+                                        <Ellipse Grid.Column="0"
+                                                 WidthRequest="6"
+                                                 HeightRequest="6"
+                                                 Fill="#4F46E5"
+                                                 VerticalOptions="Start"
+                                                 Margin="0,6,0,0" />
+                                        <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                <Label Grid.Column="0"
+                                                       Text="{Binding ActorName}"
+                                                       TextColor="#1E1B4B"
+                                                       FontSize="13"
+                                                       FontAttributes="Bold" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding OccurredAtText}"
+                                                       TextColor="#94A3B8"
+                                                       FontSize="11" />
+                                            </Grid>
+                                            <Label Text="{Binding ActionText}"
+                                                   TextColor="#64748B"
                                                    FontSize="12"
                                                    MaxLines="2"
                                                    LineBreakMode="TailTruncation" />
-                                        </Grid>
-                                    </Border>
+                                        </VerticalStackLayout>
+                                    </Grid>
                                 </DataTemplate>
                             </BindableLayout.ItemTemplate>
                         </VerticalStackLayout>
                     </VerticalStackLayout>
                 </Border>
 
-                <Label Text="G&#252;n&#252;n &#214;zeti"
-                       TextColor="White"
-                       FontSize="16"
-                       FontAttributes="Bold"
-                       Margin="2,6,0,0" />
+                <!-- Section Header: Gunun Ozeti -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" Margin="0,6,0,0">
+                    <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="G&#252;n&#252;n &#214;zeti" TextColor="#1E1B4B" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
 
-                <Border BackgroundColor="#0F2338"
-                        Stroke="#34506C"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 14"
+                <Border BackgroundColor="#FFFFFF"
+                        Stroke="#E0E7FF"
+                        StrokeShape="RoundRectangle 12"
                         Padding="14">
+                    <Border.Shadow>
+                        <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
+                    </Border.Shadow>
                     <Label Text="{Binding DailySummaryText}"
-                           TextColor="#D4E2F0"
+                           TextColor="#64748B"
                            FontSize="12"
                            LineBreakMode="WordWrap" />
                 </Border>
             </VerticalStackLayout>
         </ScrollView>
 
-        <BoxView Grid.Row="3"
-                 Color="#1E2E3E"
-                 HeightRequest="1"
-                 HorizontalOptions="Fill" />
-
-        <FlexLayout Grid.Row="4" IsVisible="False"
+        <!-- Hidden old FlexLayout nav -->
+        <FlexLayout Grid.Row="2" IsVisible="False"
                     Direction="Row"
                     JustifyContent="SpaceAround"
                     AlignItems="Center"
                     HorizontalOptions="Fill"
-                    BackgroundColor="#0F1E2D"
+                    BackgroundColor="#FFFFFF"
                     Padding="18,10,18,24">
             <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnHomeTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -324,7 +265,7 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
                 </Border>
-                <BoxView Color="#2196F3"
+                <BoxView Color="#4F46E5"
                          WidthRequest="4"
                          HeightRequest="3"
                          CornerRadius="1.5"
@@ -337,7 +278,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnReportsTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -357,7 +298,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTasksTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -379,7 +320,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnLeaderTasksTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -398,7 +339,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnMessagesTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -418,7 +359,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnNotificationsTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -438,7 +379,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnLogoutTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -454,16 +395,11 @@
                 </Border>
             </VerticalStackLayout>
         </FlexLayout>
-    
-        <controls:AppBottomNav Grid.Row="4"
+
+        <controls:AppBottomNav Grid.Row="3"
                                ActiveItem="Home" />
 
-        <controls:ProfileDrawer Grid.RowSpan="5"
+        <controls:ProfileDrawer Grid.RowSpan="4"
                                 ActiveItem=""
                                 IsOpen="{Binding IsProfileMenuOpen}" /></Grid>
 </ContentPage>
-
-
-
-
-

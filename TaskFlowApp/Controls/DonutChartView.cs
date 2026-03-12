@@ -6,6 +6,7 @@ namespace TaskFlowApp.Controls;
 public sealed class DonutChartView : GraphicsView, IDrawable
 {
     private const double SegmentVisibilityEpsilon = 0.0001d;
+    private const float GapDegrees = 3f;
 
     public static readonly BindableProperty FirstValueProperty =
         BindableProperty.Create(
@@ -44,7 +45,7 @@ public sealed class DonutChartView : GraphicsView, IDrawable
             nameof(BackgroundRingColor),
             typeof(Color),
             typeof(DonutChartView),
-            Color.FromArgb("#2B3A4E"),
+            Color.FromArgb("#E0E7FF"),
             propertyChanged: OnChartPropertyChanged);
 
     public double FirstValue
@@ -101,7 +102,7 @@ public sealed class DonutChartView : GraphicsView, IDrawable
 
         var centerX = dirtyRect.Center.X;
         var centerY = dirtyRect.Center.Y;
-        var strokeSize = MathF.Max(10f, chartSize * 0.2f);
+        var strokeSize = MathF.Max(14f, chartSize * 0.22f);
         var drawableDiameter = chartSize - strokeSize;
         if (drawableDiameter <= 0f)
         {
@@ -113,8 +114,10 @@ public sealed class DonutChartView : GraphicsView, IDrawable
         var y = centerY - radius;
 
         canvas.Antialias = true;
-        canvas.StrokeLineCap = LineCap.Butt;
+        canvas.StrokeLineCap = LineCap.Round;
         canvas.StrokeSize = strokeSize;
+
+        // Background ring
         canvas.StrokeColor = BackgroundRingColor;
         canvas.DrawCircle(centerX, centerY, radius);
 
@@ -142,8 +145,10 @@ public sealed class DonutChartView : GraphicsView, IDrawable
         var firstSweep = (float)(360d * (first / total));
         var secondSweep = 360f - firstSweep;
 
-        DrawSegment(canvas, x, y, drawableDiameter, startAngle, firstSweep, FirstSegmentColor);
-        DrawSegment(canvas, x, y, drawableDiameter, startAngle + firstSweep, secondSweep, SecondSegmentColor);
+        // Draw segments with gap between them for cleaner look
+        var halfGap = GapDegrees / 2f;
+        DrawSegment(canvas, x, y, drawableDiameter, startAngle + halfGap, firstSweep - GapDegrees, FirstSegmentColor);
+        DrawSegment(canvas, x, y, drawableDiameter, startAngle + firstSweep + halfGap, secondSweep - GapDegrees, SecondSegmentColor);
     }
 
     private static void DrawFullRing(ICanvas canvas, float centerX, float centerY, float radius, Color color)

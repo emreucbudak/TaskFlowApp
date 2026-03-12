@@ -1,85 +1,36 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
              xmlns:controls="clr-namespace:TaskFlowApp.Controls"
              x:Class="TaskFlowApp.Pages.NotificationsPage"
-             BackgroundColor="#0D1B2A"
+             BackgroundColor="#EEF2FF"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
 
-        <Grid Grid.Row="0"
-              Padding="20,16,20,10"
-              ColumnDefinitions="Auto,*,Auto"
-              BackgroundColor="#0D1B2A">
-
-            <Image Grid.Column="0"
-                   Source="https://www.logoai.com/uploads/icon/2021/08/06/732ca933-7df8-43e8-b085-69466243c919.png"
-                   WidthRequest="32"
-                   HeightRequest="32"
-                   Aspect="AspectFit"
-                   VerticalOptions="Center" />
-
-            <Grid Grid.Column="2"
-                  WidthRequest="44"
-                  HeightRequest="44"
-                  HorizontalOptions="End"
-                  VerticalOptions="Center">
-                <Ellipse WidthRequest="44"
-                         HeightRequest="44"
-                         Stroke="#3A5068"
-                         StrokeThickness="1.5"
-                         Fill="#1A3A5C"
-                         HorizontalOptions="Center"
-                         VerticalOptions="Center" />
-
-                <Grid WidthRequest="44"
-                      HeightRequest="44"
-                      HorizontalOptions="Center"
-                      VerticalOptions="Center">
-                    <Ellipse WidthRequest="16"
-                             HeightRequest="16"
-                             Fill="#5B8DB8"
-                             HorizontalOptions="Center"
-                             VerticalOptions="Start"
-                             Margin="0,10,0,0" />
-                    <Ellipse WidthRequest="28"
-                             HeightRequest="20"
-                             Fill="#5B8DB8"
-                             HorizontalOptions="Center"
-                             VerticalOptions="End"
-                             Margin="0,0,0,2" />
-                </Grid>
-
-                <Ellipse WidthRequest="12"
-                         HeightRequest="12"
-                         Fill="#4CAF50"
-                         Stroke="#0D1B2A"
-                         StrokeThickness="2"
-                         HorizontalOptions="End"
-                         VerticalOptions="End"
-                         Margin="0,0,1,1" />
-            </Grid>
+        <!-- HEADER BAR -->
+        <Grid Grid.Row="0" Padding="20,12,20,12" ColumnDefinitions="Auto,*,Auto" BackgroundColor="#FFFFFF">
+            <Image Grid.Column="0" Source="taskflow_logo.png" WidthRequest="32" HeightRequest="32" Aspect="AspectFit" VerticalOptions="Center" />
+            <Border Grid.Column="2" BackgroundColor="#4F46E5" Stroke="Transparent" WidthRequest="32" HeightRequest="32" HorizontalOptions="End" VerticalOptions="Center">
+                <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                <Label Text="{Binding CurrentUserInitials}" TextColor="White" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+            </Border>
         </Grid>
 
-        <BoxView Grid.Row="1"
-                 Color="#1E2E3E"
-                 HeightRequest="1"
-                 HorizontalOptions="Fill" />
-
-        <Grid Grid.Row="2"
-              Padding="20,14,20,20"
+        <!-- Content -->
+        <Grid Grid.Row="1"
+              Padding="20,16,20,20"
               RowDefinitions="Auto,Auto,*,Auto"
               RowSpacing="10">
             <ActivityIndicator Grid.Row="0"
                                IsRunning="{Binding IsBusy}"
                                IsVisible="{Binding IsBusy}"
-                               Color="#2196F3" />
+                               Color="#4F46E5" />
 
             <Label Grid.Row="1"
                    Text="{Binding ErrorMessage}"
-                   TextColor="#f87171"
+                   TextColor="#A4262C"
                    FontSize="12" />
 
             <CollectionView Grid.Row="2"
@@ -95,62 +46,71 @@
                     <VerticalStackLayout Padding="0,30,0,0">
                         <Label Text="Bildirim bulunmuyor."
                                HorizontalOptions="Center"
-                               TextColor="#B8C6D6"
+                               TextColor="#94A3B8"
                                FontSize="13" />
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Border BackgroundColor="#0F2338"
-                                Stroke="#2E4A67"
-                                StrokeThickness="1"
-                                StrokeShape="RoundRectangle 14"
-                                Padding="14">
+                        <Border BackgroundColor="#FFFFFF" Stroke="#E0E7FF" StrokeShape="RoundRectangle 12" Padding="0">
+                            <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
                             <Border.Triggers>
                                 <DataTrigger TargetType="Border"
                                              Binding="{Binding IsRead}"
                                              Value="False">
-                                    <Setter Property="BackgroundColor" Value="#14314D" />
-                                    <Setter Property="Stroke" Value="#4E77A0" />
+                                    <Setter Property="BackgroundColor" Value="#EBF3FC" />
                                 </DataTrigger>
                             </Border.Triggers>
 
-                            <VerticalStackLayout Spacing="6">
-                                <Label Text="{Binding Title}"
-                                       TextColor="#B8C6D6"
-                                       FontSize="14"
-                                       LineBreakMode="TailTruncation"
-                                       MaxLines="1">
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label"
+                            <Grid ColumnDefinitions="4,*">
+                                <!-- Blue left accent for unread -->
+                                <BoxView Grid.Column="0" Color="Transparent" CornerRadius="4,0,0,4">
+                                    <BoxView.Triggers>
+                                        <DataTrigger TargetType="BoxView"
                                                      Binding="{Binding IsRead}"
                                                      Value="False">
-                                            <Setter Property="TextColor" Value="White" />
-                                            <Setter Property="FontAttributes" Value="Bold" />
+                                            <Setter Property="Color" Value="#4F46E5" />
                                         </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
+                                    </BoxView.Triggers>
+                                </BoxView>
 
-                                <Label Text="{Binding Description}"
-                                       TextColor="#8DA5BD"
-                                       FontSize="12"
-                                       LineBreakMode="WordWrap"
-                                       MaxLines="2">
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label"
-                                                     Binding="{Binding IsRead}"
-                                                     Value="False">
-                                            <Setter Property="TextColor" Value="#DCEAF8" />
-                                            <Setter Property="FontAttributes" Value="Bold" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
+                                <VerticalStackLayout Grid.Column="1" Padding="14" Spacing="6">
+                                    <Label Text="{Binding Title}"
+                                           TextColor="#64748B"
+                                           FontSize="14"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label"
+                                                         Binding="{Binding IsRead}"
+                                                         Value="False">
+                                                <Setter Property="TextColor" Value="#1E1B4B" />
+                                                <Setter Property="FontAttributes" Value="Bold" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
 
-                                <Label Text="{Binding SendTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
-                                       TextColor="#7D96AD"
-                                       FontSize="11" />
-                            </VerticalStackLayout>
+                                    <Label Text="{Binding Description}"
+                                           TextColor="#64748B"
+                                           FontSize="12"
+                                           LineBreakMode="WordWrap"
+                                           MaxLines="2">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label"
+                                                         Binding="{Binding IsRead}"
+                                                         Value="False">
+                                                <Setter Property="TextColor" Value="#1E1B4B" />
+                                                <Setter Property="FontAttributes" Value="Bold" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+
+                                    <Label Text="{Binding SendTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
+                                           TextColor="#94A3B8"
+                                           FontSize="11" />
+                                </VerticalStackLayout>
+                            </Grid>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
@@ -160,24 +120,23 @@
                                Margin="0,4,0,0"
                                IsRunning="{Binding IsLoadingMore}"
                                IsVisible="{Binding IsLoadingMore}"
-                               Color="#2196F3" />
+                               Color="#4F46E5" />
         </Grid>
 
-        <BoxView Grid.Row="3" Color="#1E2E3E" HeightRequest="1" HorizontalOptions="Fill" />
-
-        <FlexLayout Grid.Row="4" IsVisible="False"
+        <!-- Hidden FlexLayout Nav -->
+        <FlexLayout Grid.Row="2" IsVisible="False"
                     Direction="Row"
                     JustifyContent="SpaceAround"
                     AlignItems="Center"
                     HorizontalOptions="Fill"
-                    BackgroundColor="#0F1E2D"
+                    BackgroundColor="#FFFFFF"
                     Padding="18,10,18,24">
 
             <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="2">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnHomeTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -197,7 +156,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnReportsTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -217,7 +176,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTasksTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -237,7 +196,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnLeaderTasksTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -256,7 +215,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnMessagesTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -276,7 +235,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnNotificationsTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -290,7 +249,7 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
                 </Border>
-                <BoxView Color="#2196F3"
+                <BoxView Color="#4F46E5"
                          WidthRequest="4"
                          HeightRequest="3"
                          CornerRadius="1.5"
@@ -301,7 +260,7 @@
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnLogoutTapped" />
                 </VerticalStackLayout.GestureRecognizers>
-                <Border BackgroundColor="#1E2E3E"
+                <Border BackgroundColor="#EEF2FF"
                         StrokeShape="RoundRectangle 8"
                         Stroke="Transparent"
                         WidthRequest="42"
@@ -317,17 +276,12 @@
                 </Border>
             </VerticalStackLayout>
         </FlexLayout>
-    
-        <controls:AppBottomNav Grid.Row="4"
+
+        <controls:AppBottomNav Grid.Row="3"
                                ActiveItem="Notifications" />
 
-        <controls:ProfileDrawer Grid.RowSpan="5"
+        <controls:ProfileDrawer Grid.RowSpan="4"
                                 ActiveItem=""
-                                IsOpen="{Binding IsProfileMenuOpen}" /></Grid>
+                                IsOpen="{Binding IsProfileMenuOpen}" />
+    </Grid>
 </ContentPage>
-
-
-
-
-
-

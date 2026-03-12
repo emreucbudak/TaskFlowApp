@@ -11,6 +11,11 @@ public partial class ProfilePage : ContentPage
     {
         InitializeComponent();
         Shell.SetPresentationMode(this, PresentationMode.NotAnimated);
+        Shell.SetBackButtonBehavior(this, new BackButtonBehavior
+        {
+            IsVisible = false,
+            IsEnabled = false
+        });
         BindingContext = ServiceLocator.GetRequiredService<ProfilePageViewModel>();
     }
 

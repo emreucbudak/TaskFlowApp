@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure;
 using TaskFlowApp.Infrastructure.Api;
@@ -15,6 +15,7 @@ public abstract partial class PageViewModelBase(
     IRealtimeConnectionManager realtimeConnectionManager) : ObservableObject
 {
     private bool canAccessReportsPage;
+    private string currentLeaderDepartmentName = string.Empty;
 
     protected IUserSession UserSession { get; } = userSession;
     protected INavigationService NavigationService { get; } = navigationService;
@@ -33,7 +34,9 @@ public abstract partial class PageViewModelBase(
             OnPropertyChanged(nameof(ShowReportsNavigation));
             OnPropertyChanged(nameof(ShowLeaderManagementNavigation));
             OnPropertyChanged(nameof(AccountRoleLabel));
+            OnPropertyChanged(nameof(CurrentUserRoleText));
             OnPropertyChanged(nameof(CurrentUserSupportText));
+            OnPropertyChanged(nameof(HasCurrentUserSupportText));
         }
     }
 
@@ -47,18 +50,22 @@ public abstract partial class PageViewModelBase(
         ? "Planını ve abonelik detaylarını yönet."
         : "Bildirim akışını tek ekranda takip et.";
     public string AccountRoleLabel => IsCompanyUser
-        ? "Şirket Hesabı"
+        ? "Şirket yönetim hesabı"
         : CanAccessReportsPage
-            ? "Departman Lideri"
-            : "Çalışan Hesabı";
+            ? string.IsNullOrWhiteSpace(currentLeaderDepartmentName)
+                ? "Departman lideri"
+                : $"{currentLeaderDepartmentName} Departmanı Lideri"
+            : "Çalışan hesabı";
     public string CurrentUserDisplayName => !string.IsNullOrWhiteSpace(UserSession.DisplayName)
         ? UserSession.DisplayName!.Trim()
         : IsCompanyUser
             ? "Şirket Yöneticisi"
             : "TaskFlow Kullanıcısı";
+    public string CurrentUserRoleText => AccountRoleLabel;
     public string CurrentUserSupportText => !string.IsNullOrWhiteSpace(UserSession.Email)
         ? UserSession.Email!.Trim()
-        : AccountRoleLabel;
+        : string.Empty;
+    public bool HasCurrentUserSupportText => !string.IsNullOrWhiteSpace(CurrentUserSupportText);
     public string CurrentUserInitials => BuildInitials(CurrentUserDisplayName);
 
     [ObservableProperty]
@@ -92,6 +99,7 @@ public abstract partial class PageViewModelBase(
     {
         if (!IsWorkerUser)
         {
+            SetCurrentLeaderDepartmentName(string.Empty);
             CanAccessReportsPage = false;
             return WorkerReportAccessState.None;
         }
@@ -100,11 +108,13 @@ public abstract partial class PageViewModelBase(
         {
             var resolver = ServiceLocator.GetRequiredService<IWorkerReportAccessResolver>();
             var state = await resolver.GetStateAsync(cancellationToken);
+            SetCurrentLeaderDepartmentName(state.DepartmentName);
             CanAccessReportsPage = state.CanAccessReportsPage;
             return state;
         }
         catch
         {
+            SetCurrentLeaderDepartmentName(string.Empty);
             CanAccessReportsPage = false;
             return WorkerReportAccessState.None;
         }
@@ -220,9 +230,24 @@ public abstract partial class PageViewModelBase(
     {
         CloseProfileMenu();
         await RealtimeConnectionManager.DisconnectAllAsync();
+        SetCurrentLeaderDepartmentName(string.Empty);
         UserSession.Clear();
         CanAccessReportsPage = false;
         await NavigationService.GoToRootAsync("MainPage");
+    }
+
+
+    private void SetCurrentLeaderDepartmentName(string? departmentName)
+    {
+        var normalizedDepartmentName = departmentName?.Trim() ?? string.Empty;
+        if (string.Equals(currentLeaderDepartmentName, normalizedDepartmentName, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        currentLeaderDepartmentName = normalizedDepartmentName;
+        OnPropertyChanged(nameof(AccountRoleLabel));
+        OnPropertyChanged(nameof(CurrentUserRoleText));
     }
 
     protected static string BuildInitials(string value)

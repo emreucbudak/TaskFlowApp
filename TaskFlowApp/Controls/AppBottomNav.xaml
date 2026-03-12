@@ -1,205 +1,212 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
              x:Class="TaskFlowApp.Controls.AppBottomNav"
              x:Name="Root">
-    <Grid ColumnDefinitions="*,*,*,*"
-          BackgroundColor="#0F1E2D"
-          Padding="16,8,16,22">
-        <VerticalStackLayout Grid.Column="0"
-                             HorizontalOptions="Center"
-                             Spacing="4">
-            <VerticalStackLayout.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding NavigateHomeCommand}" />
-            </VerticalStackLayout.GestureRecognizers>
-            <Border x:Name="HomeBorder"
-                    BackgroundColor="#162838"
-                    Stroke="#24384B"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 10"
-                    WidthRequest="42"
-                    HeightRequest="32"
-                    HorizontalOptions="Center">
-                <Image Source="{mi:MaterialOutlined Icon=Home}"
-                       WidthRequest="18"
-                       HeightRequest="18"
-                       Aspect="AspectFit"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center" />
-            </Border>
-            <BoxView x:Name="HomeDot"
-                     Color="#2196F3"
-                     WidthRequest="4"
-                     HeightRequest="3"
-                     CornerRadius="1.5"
-                     HorizontalOptions="Center"
-                     IsVisible="False" />
-        </VerticalStackLayout>
+    <Border BackgroundColor="#FFFFFF"
+            Stroke="#E0E7FF"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 0">
+        <Border.Shadow>
+            <Shadow Brush="#204F46E5" Offset="0,-2" Radius="8" />
+        </Border.Shadow>
+        <Grid ColumnDefinitions="*,*,*,*"
+              Padding="16,8,16,22">
+            <VerticalStackLayout Grid.Column="0"
+                                 HorizontalOptions="Center"
+                                 Spacing="4">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateHomeCommand}" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border x:Name="HomeBorder"
+                        BackgroundColor="Transparent"
+                        Stroke="Transparent"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 8"
+                        WidthRequest="42"
+                        HeightRequest="32"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=Home, IconColor=#94A3B8}"
+                           WidthRequest="20"
+                           HeightRequest="20"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+                <BoxView x:Name="HomeDot"
+                         Color="#4F46E5"
+                         WidthRequest="16"
+                         HeightRequest="3"
+                         CornerRadius="1.5"
+                         HorizontalOptions="Center"
+                         IsVisible="False" />
+            </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Column="1"
-                             HorizontalOptions="Center"
-                             Spacing="4"
-                             IsVisible="{Binding IsWorkerUser}">
-            <VerticalStackLayout.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding NavigateNotificationsCommand}" />
-            </VerticalStackLayout.GestureRecognizers>
-            <Border x:Name="NotificationWorkerBorder"
-                    BackgroundColor="#162838"
-                    Stroke="#24384B"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 10"
-                    WidthRequest="42"
-                    HeightRequest="32"
-                    HorizontalOptions="Center">
-                <Image Source="{mi:MaterialOutlined Icon=NotificationsNone}"
-                       WidthRequest="18"
-                       HeightRequest="18"
-                       Aspect="AspectFit"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center" />
-            </Border>
-            <BoxView x:Name="NotificationWorkerDot"
-                     Color="#2196F3"
-                     WidthRequest="4"
-                     HeightRequest="3"
-                     CornerRadius="1.5"
-                     HorizontalOptions="Center"
-                     IsVisible="False" />
-        </VerticalStackLayout>
+            <VerticalStackLayout Grid.Column="1"
+                                 HorizontalOptions="Center"
+                                 Spacing="4"
+                                 IsVisible="{Binding IsWorkerUser}">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateNotificationsCommand}" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border x:Name="NotificationWorkerBorder"
+                        BackgroundColor="Transparent"
+                        Stroke="Transparent"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 8"
+                        WidthRequest="42"
+                        HeightRequest="32"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=NotificationsNone, IconColor=#94A3B8}"
+                           WidthRequest="20"
+                           HeightRequest="20"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+                <BoxView x:Name="NotificationWorkerDot"
+                         Color="#4F46E5"
+                         WidthRequest="16"
+                         HeightRequest="3"
+                         CornerRadius="1.5"
+                         HorizontalOptions="Center"
+                         IsVisible="False" />
+            </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Column="1"
-                             HorizontalOptions="Center"
-                             Spacing="4"
-                             IsVisible="{Binding IsCompanyUser}">
-            <VerticalStackLayout.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding NavigateNotificationsCommand}" />
-            </VerticalStackLayout.GestureRecognizers>
-            <Border x:Name="NotificationCompanyBorder"
-                    BackgroundColor="#162838"
-                    Stroke="#24384B"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 10"
-                    WidthRequest="42"
-                    HeightRequest="32"
-                    HorizontalOptions="Center">
-                <Image Source="{mi:MaterialOutlined Icon=Subscriptions}"
-                       WidthRequest="18"
-                       HeightRequest="18"
-                       Aspect="AspectFit"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center" />
-            </Border>
-            <BoxView x:Name="NotificationCompanyDot"
-                     Color="#2196F3"
-                     WidthRequest="4"
-                     HeightRequest="3"
-                     CornerRadius="1.5"
-                     HorizontalOptions="Center"
-                     IsVisible="False" />
-        </VerticalStackLayout>
+            <VerticalStackLayout Grid.Column="1"
+                                 HorizontalOptions="Center"
+                                 Spacing="4"
+                                 IsVisible="{Binding IsCompanyUser}">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateNotificationsCommand}" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border x:Name="NotificationCompanyBorder"
+                        BackgroundColor="Transparent"
+                        Stroke="Transparent"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 8"
+                        WidthRequest="42"
+                        HeightRequest="32"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=Subscriptions, IconColor=#94A3B8}"
+                           WidthRequest="20"
+                           HeightRequest="20"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+                <BoxView x:Name="NotificationCompanyDot"
+                         Color="#4F46E5"
+                         WidthRequest="16"
+                         HeightRequest="3"
+                         CornerRadius="1.5"
+                         HorizontalOptions="Center"
+                         IsVisible="False" />
+            </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Column="2"
-                             HorizontalOptions="Center"
-                             Spacing="4"
-                             IsVisible="{Binding IsWorkerUser}">
-            <VerticalStackLayout.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding NavigateMessagesCommand}" />
-            </VerticalStackLayout.GestureRecognizers>
-            <Border x:Name="SecondaryWorkerBorder"
-                    BackgroundColor="#162838"
-                    Stroke="#24384B"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 10"
-                    WidthRequest="42"
-                    HeightRequest="32"
-                    HorizontalOptions="Center">
-                <Image Source="{mi:MaterialOutlined Icon=ChatBubbleOutline}"
-                       WidthRequest="18"
-                       HeightRequest="18"
-                       Aspect="AspectFit"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center" />
-            </Border>
-            <BoxView x:Name="SecondaryWorkerDot"
-                     Color="#2196F3"
-                     WidthRequest="4"
-                     HeightRequest="3"
-                     CornerRadius="1.5"
-                     HorizontalOptions="Center"
-                     IsVisible="False" />
-        </VerticalStackLayout>
+            <VerticalStackLayout Grid.Column="2"
+                                 HorizontalOptions="Center"
+                                 Spacing="4"
+                                 IsVisible="{Binding IsWorkerUser}">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateMessagesCommand}" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border x:Name="SecondaryWorkerBorder"
+                        BackgroundColor="Transparent"
+                        Stroke="Transparent"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 8"
+                        WidthRequest="42"
+                        HeightRequest="32"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=ChatBubbleOutline, IconColor=#94A3B8}"
+                           WidthRequest="20"
+                           HeightRequest="20"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+                <BoxView x:Name="SecondaryWorkerDot"
+                         Color="#4F46E5"
+                         WidthRequest="16"
+                         HeightRequest="3"
+                         CornerRadius="1.5"
+                         HorizontalOptions="Center"
+                         IsVisible="False" />
+            </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Column="2"
-                             HorizontalOptions="Center"
-                             Spacing="4"
-                             IsVisible="{Binding IsCompanyUser}">
-            <VerticalStackLayout.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding NavigateMessagesCommand}" />
-            </VerticalStackLayout.GestureRecognizers>
-            <Border x:Name="SecondaryCompanyBorder"
-                    BackgroundColor="#162838"
-                    Stroke="#24384B"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 10"
-                    WidthRequest="42"
-                    HeightRequest="32"
-                    HorizontalOptions="Center">
-                <Image Source="{mi:MaterialOutlined Icon=ManageAccounts}"
-                       WidthRequest="18"
-                       HeightRequest="18"
-                       Aspect="AspectFit"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center" />
-            </Border>
-            <BoxView x:Name="SecondaryCompanyDot"
-                     Color="#2196F3"
-                     WidthRequest="4"
-                     HeightRequest="3"
-                     CornerRadius="1.5"
-                     HorizontalOptions="Center"
-                     IsVisible="False" />
-        </VerticalStackLayout>
+            <VerticalStackLayout Grid.Column="2"
+                                 HorizontalOptions="Center"
+                                 Spacing="4"
+                                 IsVisible="{Binding IsCompanyUser}">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateMessagesCommand}" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border x:Name="SecondaryCompanyBorder"
+                        BackgroundColor="Transparent"
+                        Stroke="Transparent"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 8"
+                        WidthRequest="42"
+                        HeightRequest="32"
+                        HorizontalOptions="Center">
+                    <Image Source="{mi:MaterialOutlined Icon=ManageAccounts, IconColor=#94A3B8}"
+                           WidthRequest="20"
+                           HeightRequest="20"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+                <BoxView x:Name="SecondaryCompanyDot"
+                         Color="#4F46E5"
+                         WidthRequest="16"
+                         HeightRequest="3"
+                         CornerRadius="1.5"
+                         HorizontalOptions="Center"
+                         IsVisible="False" />
+            </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Column="3"
-                             HorizontalOptions="Center"
-                             Spacing="4">
-            <VerticalStackLayout.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding ToggleProfileMenuCommand}" />
-            </VerticalStackLayout.GestureRecognizers>
-            <Border x:Name="ProfileBorder"
-                    BackgroundColor="#162838"
-                    Stroke="#24384B"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 10"
-                    WidthRequest="42"
-                    HeightRequest="32"
-                    HorizontalOptions="Center">
-                <Grid WidthRequest="18"
-                      HeightRequest="18"
-                      HorizontalOptions="Center"
-                      VerticalOptions="Center">
-                    <Ellipse WidthRequest="7"
-                             HeightRequest="7"
-                             Fill="#dbeafe"
-                             HorizontalOptions="Center"
-                             VerticalOptions="Start"
-                             Margin="0,1,0,0" />
-                    <Ellipse WidthRequest="13"
-                             HeightRequest="9"
-                             Fill="#dbeafe"
-                             HorizontalOptions="Center"
-                             VerticalOptions="End"
-                             Margin="0,0,0,1" />
-                </Grid>
-            </Border>
-            <BoxView x:Name="ProfileDot"
-                     Color="#2196F3"
-                     WidthRequest="4"
-                     HeightRequest="3"
-                     CornerRadius="1.5"
-                     HorizontalOptions="Center"
-                     IsVisible="False" />
-        </VerticalStackLayout>
-    </Grid>
+            <VerticalStackLayout Grid.Column="3"
+                                 HorizontalOptions="Center"
+                                 Spacing="4">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleProfileMenuCommand}" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Border x:Name="ProfileBorder"
+                        BackgroundColor="Transparent"
+                        Stroke="Transparent"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 8"
+                        WidthRequest="42"
+                        HeightRequest="32"
+                        HorizontalOptions="Center">
+                    <Grid WidthRequest="20"
+                          HeightRequest="20"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center">
+                        <Ellipse WidthRequest="8"
+                                 HeightRequest="8"
+                                 Fill="#94A3B8"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Start"
+                                 Margin="0,1,0,0" />
+                        <Ellipse WidthRequest="14"
+                                 HeightRequest="10"
+                                 Fill="#94A3B8"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="End"
+                                 Margin="0,0,0,1" />
+                    </Grid>
+                </Border>
+                <BoxView x:Name="ProfileDot"
+                         Color="#4F46E5"
+                         WidthRequest="16"
+                         HeightRequest="3"
+                         CornerRadius="1.5"
+                         HorizontalOptions="Center"
+                         IsVisible="False" />
+            </VerticalStackLayout>
+        </Grid>
+    </Border>
 </ContentView>
