@@ -11,9 +11,9 @@
 
         <!-- HEADER BAR -->
         <Grid Grid.Row="0" Padding="20,12,20,12" ColumnDefinitions="Auto,*,Auto" BackgroundColor="#FFFFFF">
-            <Label Grid.Column="0" Text="TaskFlow" FontSize="20" FontAttributes="Bold" TextColor="#1E1B4B" VerticalOptions="Center" />
-            <Border Grid.Column="2" BackgroundColor="#4F46E5" Stroke="Transparent" WidthRequest="36" HeightRequest="36" HorizontalOptions="End" VerticalOptions="Center">
-                <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+            <Image Grid.Column="0" Source="taskflow_logo.png" WidthRequest="32" HeightRequest="32" Aspect="AspectFit" VerticalOptions="Center" />
+            <Border Grid.Column="2" BackgroundColor="#4F46E5" Stroke="Transparent" WidthRequest="32" HeightRequest="32" HorizontalOptions="End" VerticalOptions="Center">
+                <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
                 <Label Text="{Binding CurrentUserInitials}" TextColor="White" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
             </Border>
         </Grid>
@@ -89,7 +89,7 @@
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <Button Grid.Column="0"
                         Text=""
-                        ImageSource="{mi:MaterialOutlined Icon=ArrowBack}"
+                        ImageSource="{mi:MaterialOutlined Icon=ArrowBack, IconColor=#FFFFFF}"
                         Command="{Binding PreviousPageCommand}"
                         IsEnabled="{Binding CanGoPrevious}"
                         BackgroundColor="#4F46E5"
@@ -106,7 +106,7 @@
                        FontSize="13" />
                 <Button Grid.Column="2"
                         Text=""
-                        ImageSource="{mi:MaterialOutlined Icon=ArrowForward}"
+                        ImageSource="{mi:MaterialOutlined Icon=ArrowForward, IconColor=#FFFFFF}"
                         Command="{Binding NextPageCommand}"
                         IsEnabled="{Binding CanGoNext}"
                         BackgroundColor="#4F46E5"

@@ -101,15 +101,7 @@ public partial class TasksPageViewModel(
     [RelayCommand]
     private Task ShowAllIndividualTasksAsync()
     {
-        if (!CanShowAllIndividualTasks)
-        {
-            return Task.CompletedTask;
-        }
-
-        isShowingAllIndividualTasks = true;
-        CanShowAllIndividualTasks = false;
-        RefreshVisibleTaskCollections();
-        return Task.CompletedTask;
+        return NavigationService.GoToRootAsync("AllIndividualTasksPage");
     }
 
     [RelayCommand]

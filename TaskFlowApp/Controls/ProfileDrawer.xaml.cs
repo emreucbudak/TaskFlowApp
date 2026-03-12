@@ -89,7 +89,7 @@ public partial class ProfileDrawer : ContentView
     private static void SetMenuState(Border border, string? activeItem, string itemKey)
     {
         var isActive = string.Equals(activeItem, itemKey, StringComparison.OrdinalIgnoreCase);
-        border.BackgroundColor = Color.FromArgb(isActive ? "#EEF2FF" : "#F8F7FF");
-        border.Stroke = new SolidColorBrush(Color.FromArgb(isActive ? "#C7D2FE" : "#00000000"));
+        border.BackgroundColor = Color.FromArgb("#F8F7FF");
+        border.Stroke = new SolidColorBrush(Color.FromArgb("#00000000"));
     }
 }

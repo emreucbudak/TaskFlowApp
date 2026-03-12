@@ -33,6 +33,7 @@ public abstract partial class PageViewModelBase(
 
             OnPropertyChanged(nameof(ShowReportsNavigation));
             OnPropertyChanged(nameof(ShowLeaderManagementNavigation));
+            OnPropertyChanged(nameof(ShowTasksNavigation));
             OnPropertyChanged(nameof(AccountRoleLabel));
             OnPropertyChanged(nameof(CurrentUserRoleText));
             OnPropertyChanged(nameof(CurrentUserSupportText));
@@ -44,6 +45,7 @@ public abstract partial class PageViewModelBase(
     public bool IsWorkerUser => string.Equals(UserSession.Role, "worker", StringComparison.OrdinalIgnoreCase);
     public bool ShowReportsNavigation => IsCompanyUser || CanAccessReportsPage;
     public bool ShowLeaderManagementNavigation => IsWorkerUser && CanAccessReportsPage;
+    public bool ShowTasksNavigation => !ShowLeaderManagementNavigation;
     public bool ShowGroupNavigation => IsWorkerUser;
     public string NotificationsMenuTitle => IsCompanyUser ? "Abonelikler" : "Bildirimler";
     public string NotificationsMenuDescription => IsCompanyUser

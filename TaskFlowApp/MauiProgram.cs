@@ -28,6 +28,27 @@ public static class MauiProgram
                 fonts.AddFont("Poppins-Regular.ttf", "PoppinsRegular");
                 fonts.AddFont("Poppins-SemiBold.ttf", "PoppinsSemiBold");
                 fonts.AddFont("Poppins-Bold.ttf", "PoppinsBold");
+            })
+            .ConfigureMauiHandlers(handlers =>
+            {
+#if ANDROID
+                handlers.AddHandler<Entry, Microsoft.Maui.Handlers.EntryHandler>();
+                Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoBorder", (handler, view) =>
+                {
+                    handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+                    handler.PlatformView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+                });
+#elif WINDOWS
+                handlers.AddHandler<Entry, Microsoft.Maui.Handlers.EntryHandler>();
+                Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoBorder", (handler, view) =>
+                {
+                    handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+                    handler.PlatformView.Style = null;
+                    var res = handler.PlatformView.Resources;
+                    res["TextControlBorderThemeThicknessFocused"] = new Microsoft.UI.Xaml.Thickness(0);
+                    handler.PlatformView.Resources = res;
+                });
+#endif
             });
 
         builder.Services.AddSingleton<IUserSession, UserSession>();
@@ -72,6 +93,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CompanySubscriptionsPageViewModel>();
         builder.Services.AddTransient<ReportsPageViewModel>();
         builder.Services.AddTransient<TasksPageViewModel>();
+        builder.Services.AddTransient<AllIndividualTasksPageViewModel>();
         builder.Services.AddTransient<LeaderIndividualTaskPageViewModel>();
         builder.Services.AddTransient<MessagesPageViewModel>();
         builder.Services.AddTransient<NotificationsPageViewModel>();
@@ -87,6 +109,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CompanySubscriptionsPage>();
         builder.Services.AddTransient<ReportsPage>();
         builder.Services.AddTransient<TasksPage>();
+        builder.Services.AddTransient<AllIndividualTasksPage>();
         builder.Services.AddTransient<LeaderIndividualTaskPage>();
         builder.Services.AddTransient<MessagesPage>();
         builder.Services.AddTransient<NotificationsPage>();

@@ -114,10 +114,10 @@ public sealed class DonutChartView : GraphicsView, IDrawable
         var y = centerY - radius;
 
         canvas.Antialias = true;
-        canvas.StrokeLineCap = LineCap.Round;
         canvas.StrokeSize = strokeSize;
 
         // Background ring
+        canvas.StrokeLineCap = LineCap.Round;
         canvas.StrokeColor = BackgroundRingColor;
         canvas.DrawCircle(centerX, centerY, radius);
 
@@ -145,19 +145,27 @@ public sealed class DonutChartView : GraphicsView, IDrawable
         var firstSweep = (float)(360d * (first / total));
         var secondSweep = 360f - firstSweep;
 
-        // Draw segments with gap between them for cleaner look
         var halfGap = GapDegrees / 2f;
-        DrawSegment(canvas, x, y, drawableDiameter, startAngle + halfGap, firstSweep - GapDegrees, FirstSegmentColor);
-        DrawSegment(canvas, x, y, drawableDiameter, startAngle + firstSweep + halfGap, secondSweep - GapDegrees, SecondSegmentColor);
+
+        var seg1Start = startAngle + halfGap;
+        var seg1Sweep = firstSweep - GapDegrees;
+        var seg2Start = startAngle + firstSweep + halfGap;
+        var seg2Sweep = secondSweep - GapDegrees;
+
+        // Draw arcs with Butt caps - flat ends, no overlap
+        canvas.StrokeLineCap = LineCap.Butt;
+        DrawArcSegment(canvas, x, y, drawableDiameter, seg1Start, seg1Sweep, FirstSegmentColor);
+        DrawArcSegment(canvas, x, y, drawableDiameter, seg2Start, seg2Sweep, SecondSegmentColor);
     }
 
     private static void DrawFullRing(ICanvas canvas, float centerX, float centerY, float radius, Color color)
     {
+        canvas.StrokeLineCap = LineCap.Round;
         canvas.StrokeColor = color;
         canvas.DrawCircle(centerX, centerY, radius);
     }
 
-    private static void DrawSegment(
+    private static void DrawArcSegment(
         ICanvas canvas,
         float x,
         float y,
@@ -182,6 +190,7 @@ public sealed class DonutChartView : GraphicsView, IDrawable
             true,
             false);
     }
+
 
     private static void OnChartPropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {

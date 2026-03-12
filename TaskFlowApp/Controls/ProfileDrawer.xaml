@@ -80,15 +80,15 @@
                     </Border>
 
                     <!-- Navigation Items -->
-                    <ScrollView Grid.Row="1">
-                        <VerticalStackLayout Spacing="4">
+                    <ScrollView Grid.Row="1" VerticalOptions="Center">
+                        <VerticalStackLayout Spacing="20">
 
                             <!-- Profile -->
                             <Border x:Name="ProfileMenuCard"
                                     BackgroundColor="#F8F7FF"
                                     Stroke="Transparent"
                                     StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 4"
+                                    StrokeShape="RoundRectangle 12"
                                     Padding="14,12">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding NavigateProfileCommand}" />
@@ -118,7 +118,7 @@
                                     BackgroundColor="#F8F7FF"
                                     Stroke="Transparent"
                                     StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 4"
+                                    StrokeShape="RoundRectangle 12"
                                     Padding="14,12">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding NavigateGroupDetailsCommand}" />
@@ -148,7 +148,7 @@
                                     BackgroundColor="#F8F7FF"
                                     Stroke="Transparent"
                                     StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 4"
+                                    StrokeShape="RoundRectangle 12"
                                     Padding="14,12">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding NavigateReportsCommand}" />
@@ -174,10 +174,11 @@
 
                             <!-- Tasks -->
                             <Border x:Name="TasksMenuCard"
+                                    IsVisible="{Binding ShowTasksNavigation}"
                                     BackgroundColor="#F8F7FF"
                                     Stroke="Transparent"
                                     StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 4"
+                                    StrokeShape="RoundRectangle 12"
                                     Padding="14,12">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding NavigateTasksCommand}" />
@@ -207,7 +208,7 @@
                                     BackgroundColor="#F8F7FF"
                                     Stroke="Transparent"
                                     StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 4"
+                                    StrokeShape="RoundRectangle 12"
                                     Padding="14,12">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding NavigateLeaderTasksCommand}" />

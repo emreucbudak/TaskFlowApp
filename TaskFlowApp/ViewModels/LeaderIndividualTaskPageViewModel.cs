@@ -28,6 +28,8 @@ public partial class LeaderIndividualTaskPageViewModel(
     public ObservableCollection<TaskPriorityOption> PriorityOptions { get; } = [];
     public ObservableCollection<GroupDepartmentOption> ManagedDepartments { get; } = [];
     public ObservableCollection<SelectableGroupUserOption> GroupEligibleUsers { get; } = [];
+    public ObservableCollection<SelectableGroupUserOption> SelectedGroupMembers { get; } = [];
+    public ObservableCollection<SelectableGroupUserOption> AvailableGroupUserOptions { get; } = [];
     public ObservableCollection<ManageableGroupOption> AvailableGroups { get; } = [];
 
     [ObservableProperty]
@@ -82,10 +84,30 @@ public partial class LeaderIndividualTaskPageViewModel(
     private string groupNameInput = string.Empty;
 
     [ObservableProperty]
+    private SelectableGroupUserOption? selectedGroupUserToAdd;
+
+    [ObservableProperty]
     private bool isCreatingGroup;
 
     [ObservableProperty]
     private string groupCreationStatus = string.Empty;
+
+    [ObservableProperty]
+    private bool isGroupTaskEnabled;
+
+    [ObservableProperty]
+    private string groupTaskTitle = string.Empty;
+
+    [ObservableProperty]
+    private string groupTaskDescription = string.Empty;
+
+    [ObservableProperty]
+    private DateTime groupTaskDeadlineDate = DateTime.Today.AddDays(1);
+
+    [ObservableProperty]
+    private TaskPriorityOption? selectedGroupTaskPriority;
+
+    public ObservableCollection<GroupMemberSubTaskOption> GroupMemberSubTasks { get; } = [];
 
     [ObservableProperty]
     private string groupDeleteHelperText = string.Empty;
@@ -111,6 +133,7 @@ public partial class LeaderIndividualTaskPageViewModel(
     public bool ShowGroupDepartmentPicker => !IsCompanyUser && ManagedDepartments.Count > 0;
     public bool HasSelectedGroupToDelete => SelectedGroupToDelete is not null;
     public bool CanUseDeleteGroupForm => CanDeleteGroups && HasSelectedGroupToDelete && !IsDeletingGroup;
+    public string GroupCreateButtonText => IsGroupTaskEnabled ? "Grup ve Gorev Olustur" : "Grup Olustur";
 
     partial void OnHasManagementAccessChanged(bool value)
     {
@@ -128,6 +151,19 @@ public partial class LeaderIndividualTaskPageViewModel(
     {
         RefreshGroupDeleteHelperText();
         OnPropertyChanged(nameof(CanUseDeleteGroupForm));
+    }
+
+    partial void OnIsGroupTaskEnabledChanged(bool value)
+    {
+        OnPropertyChanged(nameof(GroupCreateButtonText));
+        if (value)
+        {
+            RefreshGroupMemberSubTasks();
+            if (SelectedGroupTaskPriority is null)
+            {
+                SelectedGroupTaskPriority = PriorityOptions.FirstOrDefault(item => item.Id == 3) ?? PriorityOptions.FirstOrDefault();
+            }
+        }
     }
 
     partial void OnSelectedManagedDepartmentChanged(GroupDepartmentOption? value)
@@ -347,6 +383,57 @@ public partial class LeaderIndividualTaskPageViewModel(
     }
 
     [RelayCommand]
+    private void AddGroupMember()
+    {
+        if (SelectedGroupUserToAdd is null)
+        {
+            return;
+        }
+
+        var user = SelectedGroupUserToAdd;
+        user.IsSelected = true;
+        SelectedGroupMembers.Add(user);
+        AvailableGroupUserOptions.Remove(user);
+        SelectedGroupUserToAdd = null;
+
+        if (IsGroupTaskEnabled)
+        {
+            RefreshGroupMemberSubTasks();
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveGroupMember(SelectableGroupUserOption? user)
+    {
+        if (user is null)
+        {
+            return;
+        }
+
+        user.IsSelected = false;
+        SelectedGroupMembers.Remove(user);
+
+        var insertIndex = 0;
+        foreach (var existing in AvailableGroupUserOptions)
+        {
+            if (string.Compare(existing.Name, user.Name, StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                insertIndex++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        AvailableGroupUserOptions.Insert(insertIndex, user);
+
+        if (IsGroupTaskEnabled)
+        {
+            RefreshGroupMemberSubTasks();
+        }
+    }
+
+    [RelayCommand]
     private async Task CreateGroupAsync()
     {
         if (IsCreatingGroup || !CanCreateGroups)
@@ -379,8 +466,7 @@ public partial class LeaderIndividualTaskPageViewModel(
             return;
         }
 
-        var selectedUserIds = GroupEligibleUsers
-            .Where(item => item.IsSelected)
+        var selectedUserIds = SelectedGroupMembers
             .Select(item => item.UserId)
             .Where(userId => userId != Guid.Empty)
             .Distinct()
@@ -411,8 +497,81 @@ public partial class LeaderIndividualTaskPageViewModel(
                 item.IsSelected = false;
             }
 
+            SelectedGroupMembers.Clear();
+            AvailableGroupUserOptions.Clear();
+            foreach (var item in GroupEligibleUsers.OrderBy(u => u.Name, StringComparer.OrdinalIgnoreCase))
+            {
+                AvailableGroupUserOptions.Add(item);
+            }
+            SelectedGroupUserToAdd = null;
+
             GroupNameInput = string.Empty;
             await ReloadGroupsAsync(companyId);
+
+            if (IsGroupTaskEnabled)
+            {
+                try
+                {
+                    var trimmedGroupTaskTitle = GroupTaskTitle.Trim();
+                    if (trimmedGroupTaskTitle.Length < 3 || trimmedGroupTaskTitle.Length > 120)
+                    {
+                        GroupCreationStatus = "Grup olusturuldu ancak grup gorevi olusturulamadi: Gorev basligi 3 ile 120 karakter arasinda olmalidir.";
+                        ResetGroupTaskFields();
+                        return;
+                    }
+
+                    var trimmedGroupTaskDescription = GroupTaskDescription.Trim();
+                    if (trimmedGroupTaskDescription.Length < 5 || trimmedGroupTaskDescription.Length > 1000)
+                    {
+                        GroupCreationStatus = "Grup olusturuldu ancak grup gorevi olusturulamadi: Gorev aciklamasi 5 ile 1000 karakter arasinda olmalidir.";
+                        ResetGroupTaskFields();
+                        return;
+                    }
+
+                    var groupTaskDeadline = DateOnly.FromDateTime(GroupTaskDeadlineDate.Date);
+                    if (groupTaskDeadline < DateOnly.FromDateTime(DateTime.Today))
+                    {
+                        GroupCreationStatus = "Grup olusturuldu ancak grup gorevi olusturulamadi: Teslim tarihi bugunden once olamaz.";
+                        ResetGroupTaskFields();
+                        return;
+                    }
+
+                    if (SelectedGroupTaskPriority is null)
+                    {
+                        GroupCreationStatus = "Grup olusturuldu ancak grup gorevi olusturulamadi: Gorev onceligi secilmelidir.";
+                        ResetGroupTaskFields();
+                        return;
+                    }
+
+                    var subTaskAssignments = GroupMemberSubTasks
+                        .Select(item => new
+                        {
+                            AssignedUserId = item.UserId,
+                            TaskTitle = string.IsNullOrWhiteSpace(item.SubTaskTitle) ? $"{trimmedGroupTaskTitle} - {item.MemberName}" : item.SubTaskTitle.Trim(),
+                            Description = string.IsNullOrWhiteSpace(item.SubTaskDescription) ? trimmedGroupTaskDescription : item.SubTaskDescription.Trim()
+                        })
+                        .ToList();
+
+                    await projectManagementApiClient.CreateGroupTaskWithSubTasksCommandRequestAsync(new
+                    {
+                        TaskName = trimmedGroupTaskTitle,
+                        Description = trimmedGroupTaskDescription,
+                        DeadlineTime = GroupTaskDeadlineDate,
+                        TaskPriorityCategoryId = SelectedGroupTaskPriority.Id,
+                        SubTaskAssignments = subTaskAssignments
+                    });
+
+                    ResetGroupTaskFields();
+                    GroupCreationStatus = $"Grup ve grup gorevi basariyla olusturuldu.";
+                    StatusText = $"{trimmedGroupName} grubu ve gorevi olusturuldu. Uye sayisi: {selectedUserIds.Count}";
+                }
+                catch (Exception)
+                {
+                    GroupCreationStatus = "Grup olusturuldu ancak grup gorevi olusturulamadi. Lutfen tekrar deneyin.";
+                }
+
+                return;
+            }
 
             GroupCreationStatus = "Grup basariyla olusturuldu.";
             StatusText = $"{trimmedGroupName} grubu olusturuldu. Secilen uye sayisi: {selectedUserIds.Count}";
@@ -453,7 +612,7 @@ public partial class LeaderIndividualTaskPageViewModel(
 
         if (!CanDeleteGroups)
         {
-            ErrorMessage = "Grup silme sadece sirket hesabi ile kullanilabilir.";
+            ErrorMessage = "Grup silme yetkiniz bulunmuyor.";
             return;
         }
 
@@ -590,7 +749,7 @@ public partial class LeaderIndividualTaskPageViewModel(
 
         HasManagementAccess = true;
         CanCreateGroups = true;
-        CanDeleteGroups = false;
+        CanDeleteGroups = true;
         CurrentDepartmentName = BuildManagedDepartmentSummary();
         AccessMessage = string.Empty;
     }
@@ -636,12 +795,13 @@ public partial class LeaderIndividualTaskPageViewModel(
 
     private void RefreshGroupEligibleUsers()
     {
-        var selectedUserIds = GroupEligibleUsers
-            .Where(item => item.IsSelected)
+        var selectedUserIds = SelectedGroupMembers
             .Select(item => item.UserId)
             .ToHashSet();
 
         GroupEligibleUsers.Clear();
+        AvailableGroupUserOptions.Clear();
+        SelectedGroupMembers.Clear();
 
         if (!CanCreateGroups)
         {
@@ -669,13 +829,24 @@ public partial class LeaderIndividualTaskPageViewModel(
                 .DistinctBy(user => user.Id)
                 .OrderBy(user => ResolveDisplayName(user), StringComparer.OrdinalIgnoreCase))
             {
-                GroupEligibleUsers.Add(new SelectableGroupUserOption
+                var option = new SelectableGroupUserOption
                 {
                     UserId = user.Id,
                     Name = ResolveDisplayName(user),
                     DepartmentName = departmentName,
                     IsSelected = selectedUserIds.Contains(user.Id)
-                });
+                };
+
+                GroupEligibleUsers.Add(option);
+
+                if (option.IsSelected)
+                {
+                    SelectedGroupMembers.Add(option);
+                }
+                else
+                {
+                    AvailableGroupUserOptions.Add(option);
+                }
             }
 
             return;
@@ -685,12 +856,45 @@ public partial class LeaderIndividualTaskPageViewModel(
             .DistinctBy(user => user.Id)
             .OrderBy(user => ResolveDisplayName(user), StringComparer.OrdinalIgnoreCase))
         {
-            GroupEligibleUsers.Add(new SelectableGroupUserOption
+            var option = new SelectableGroupUserOption
             {
                 UserId = user.Id,
                 Name = ResolveDisplayName(user),
                 DepartmentName = ResolveDepartmentSummary(user, []),
                 IsSelected = selectedUserIds.Contains(user.Id)
+            };
+
+            GroupEligibleUsers.Add(option);
+
+            if (option.IsSelected)
+            {
+                SelectedGroupMembers.Add(option);
+            }
+            else
+            {
+                AvailableGroupUserOptions.Add(option);
+            }
+        }
+    }
+
+    private void RefreshGroupMemberSubTasks()
+    {
+        GroupMemberSubTasks.Clear();
+
+        var selectedUsers = SelectedGroupMembers.ToList();
+
+        foreach (var user in selectedUsers)
+        {
+            var autoTitle = string.IsNullOrWhiteSpace(GroupTaskTitle)
+                ? user.Name
+                : $"{GroupTaskTitle.Trim()} - {user.Name}";
+
+            GroupMemberSubTasks.Add(new GroupMemberSubTaskOption
+            {
+                UserId = user.UserId,
+                MemberName = user.Name,
+                SubTaskTitle = autoTitle,
+                SubTaskDescription = string.Empty
             });
         }
     }
@@ -797,6 +1001,16 @@ public partial class LeaderIndividualTaskPageViewModel(
             : "Silmek istediginiz grubu secin.";
     }
 
+    private void ResetGroupTaskFields()
+    {
+        IsGroupTaskEnabled = false;
+        GroupTaskTitle = string.Empty;
+        GroupTaskDescription = string.Empty;
+        GroupTaskDeadlineDate = DateTime.Today.AddDays(1);
+        SelectedGroupTaskPriority = null;
+        GroupMemberSubTasks.Clear();
+    }
+
     private void ApplyAccessDeniedState()
     {
         HasManagementAccess = false;
@@ -805,6 +1019,8 @@ public partial class LeaderIndividualTaskPageViewModel(
         CanDeleteGroups = false;
         EligibleUsers.Clear();
         GroupEligibleUsers.Clear();
+        AvailableGroupUserOptions.Clear();
+        SelectedGroupMembers.Clear();
         AvailableGroups.Clear();
         ManagedDepartments.Clear();
         SelectedAssignedUser = null;
@@ -950,4 +1166,14 @@ public sealed record ManageableGroupOption
     public string MembersSummary { get; init; } = string.Empty;
 }
 
+public partial class GroupMemberSubTaskOption : ObservableObject
+{
+    public Guid UserId { get; init; }
+    public string MemberName { get; init; } = string.Empty;
 
+    [ObservableProperty]
+    private string subTaskTitle = string.Empty;
+
+    [ObservableProperty]
+    private string subTaskDescription = string.Empty;
+}

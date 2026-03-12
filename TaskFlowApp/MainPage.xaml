@@ -32,31 +32,13 @@
                                          Padding="32,28,32,20">
 
                         <!-- Logo Icon -->
-                        <Border BackgroundColor="#4F46E5"
-                                Stroke="Transparent"
-                                StrokeThickness="0"
-                                StrokeShape="RoundRectangle 14"
-                                WidthRequest="64"
-                                HeightRequest="64"
-                                HorizontalOptions="Center"
-                                Margin="0,0,0,16">
-                            <Border.Shadow>
-                                <Shadow Brush="#404F46E5" Offset="0,6" Radius="16" />
-                            </Border.Shadow>
-                            <Image Source="{mi:MaterialOutlined Icon=AccountTree}"
-                                   WidthRequest="34"
-                                   HeightRequest="34"
-                                   Aspect="AspectFit"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center" />
-                        </Border>
+                        <Image Source="taskflow_logo.png"
+                               WidthRequest="64"
+                               HeightRequest="64"
+                               Aspect="AspectFit"
+                               HorizontalOptions="Center"
+                               Margin="0,0,0,16" />
 
-                        <!-- Brand Name -->
-                        <Label Text="TaskFlow"
-                               FontSize="26"
-                               FontAttributes="Bold"
-                               TextColor="#1E1B4B"
-                               HorizontalTextAlignment="Center" />
 
                     </VerticalStackLayout>
 

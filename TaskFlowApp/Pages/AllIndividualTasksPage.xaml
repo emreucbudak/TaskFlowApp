@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:controls="clr-namespace:TaskFlowApp.Controls"
+             x:Class="TaskFlowApp.Pages.AllIndividualTasksPage"
+             BackgroundColor="#EEF2FF"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+
+        <!-- Blue Header Bar -->
+        <Grid Grid.Row="0"
+              Padding="16,12,16,12"
+              ColumnDefinitions="Auto,*,Auto"
+              BackgroundColor="#4F46E5">
+            <Border Grid.Column="0"
+                    BackgroundColor="Transparent"
+                    Stroke="Transparent"
+                    StrokeShape="RoundRectangle 8"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    Padding="0"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoBackCommand}" />
+                </Border.GestureRecognizers>
+                <Image Source="{mi:MaterialOutlined Icon=ArrowBack}"
+                       WidthRequest="20"
+                       HeightRequest="20"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Border>
+
+            <Label Grid.Column="1"
+                   Text="T&#252;m Bireysel G&#246;revler"
+                   TextColor="White"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+
+            <Border Grid.Column="2"
+                    BackgroundColor="White"
+                    Stroke="Transparent"
+                    WidthRequest="36"
+                    HeightRequest="36"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+                <Label Text="{Binding CurrentUserInitials}"
+                       TextColor="#4F46E5"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center" />
+            </Border>
+        </Grid>
+
+        <!-- Content -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20,16,20,20" Spacing="18">
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="#4F46E5" />
+
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="#A4262C"
+                       FontSize="12" />
+
+                <CollectionView ItemsSource="{Binding AllTasks}"
+                                SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.EmptyView>
+                        <Label Text="Bireysel g&#246;rev bulunamad&#305;."
+                               FontSize="12"
+                               TextColor="#94A3B8"
+                               HorizontalTextAlignment="Center"
+                               Margin="0,8,0,0" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="#FFFFFF" Stroke="#E0E7FF" StrokeShape="RoundRectangle 12" Padding="0">
+                                <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
+                                <Grid ColumnDefinitions="4,*">
+                                    <BoxView Grid.Column="0" Color="#4F46E5" CornerRadius="4,0,0,4" />
+                                    <VerticalStackLayout Grid.Column="1" Padding="12" Spacing="8">
+                                        <Label Text="{Binding TaskName}"
+                                               TextColor="#1E1B4B"
+                                               FontSize="15"
+                                               FontAttributes="Bold" />
+                                        <Label Text="{Binding Description}"
+                                               TextColor="#64748B"
+                                               FontSize="12"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="2" />
+
+                                        <FlexLayout Wrap="Wrap"
+                                                    Direction="Row"
+                                                    AlignItems="Center"
+                                                    JustifyContent="Start">
+                                            <!-- Deadline pill -->
+                                            <Border BackgroundColor="#EEF2FF"
+                                                    Stroke="Transparent"
+                                                    StrokeShape="RoundRectangle 12"
+                                                    Padding="8,4"
+                                                    Margin="0,0,6,6">
+                                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4">
+                                                    <Image Grid.Column="0"
+                                                           Source="{mi:MaterialOutlined Icon=AccessTime}"
+                                                           WidthRequest="12"
+                                                           HeightRequest="12"
+                                                           Aspect="AspectFit"
+                                                           VerticalOptions="Center" />
+                                                    <Label Grid.Column="1"
+                                                           Text="{Binding DeadlineTime, StringFormat='Teslim: {0:dd.MM.yyyy}'}"
+                                                           TextColor="#4F46E5"
+                                                           FontSize="11" />
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Status pill -->
+                                            <Border BackgroundColor="#DFF6DD"
+                                                    Stroke="Transparent"
+                                                    StrokeShape="RoundRectangle 12"
+                                                    Padding="8,4"
+                                                    Margin="0,0,6,6">
+                                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4">
+                                                    <Image Grid.Column="0"
+                                                           Source="{mi:MaterialOutlined Icon=Info}"
+                                                           WidthRequest="12"
+                                                           HeightRequest="12"
+                                                           Aspect="AspectFit"
+                                                           VerticalOptions="Center" />
+                                                    <Label Grid.Column="1"
+                                                           Text="{Binding StatusName, StringFormat='Durum: {0}'}"
+                                                           TextColor="#107C10"
+                                                           FontSize="11" />
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Category pill -->
+                                            <Border BackgroundColor="#F0F0FF"
+                                                    Stroke="Transparent"
+                                                    StrokeShape="RoundRectangle 12"
+                                                    Padding="8,4"
+                                                    Margin="0,0,6,6">
+                                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4">
+                                                    <Image Grid.Column="0"
+                                                           Source="{mi:MaterialOutlined Icon=Category}"
+                                                           WidthRequest="12"
+                                                           HeightRequest="12"
+                                                           Aspect="AspectFit"
+                                                           VerticalOptions="Center" />
+                                                    <Label Grid.Column="1"
+                                                           Text="{Binding CategoryName, StringFormat='Kategori: {0}'}"
+                                                           TextColor="#5B5FC7"
+                                                           FontSize="11" />
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Priority pill -->
+                                            <Border BackgroundColor="#FDE7E9"
+                                                    Stroke="Transparent"
+                                                    StrokeShape="RoundRectangle 12"
+                                                    Padding="8,4"
+                                                    Margin="0,0,6,6">
+                                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4">
+                                                    <Image Grid.Column="0"
+                                                           Source="{mi:MaterialOutlined Icon=Flag}"
+                                                           WidthRequest="12"
+                                                           HeightRequest="12"
+                                                           Aspect="AspectFit"
+                                                           VerticalOptions="Center" />
+                                                    <Label Grid.Column="1"
+                                                           Text="{Binding TaskPriorityName, StringFormat='&#214;ncelik: {0}'}"
+                                                           TextColor="#A4262C"
+                                                           FontSize="11" />
+                                                </Grid>
+                                            </Border>
+                                        </FlexLayout>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:AppBottomNav Grid.Row="3"
+                               ActiveItem="" />
+
+        <controls:ProfileDrawer Grid.RowSpan="4"
+                                ActiveItem="Tasks"
+                                IsOpen="{Binding IsProfileMenuOpen}" />
+    </Grid>
+</ContentPage>
