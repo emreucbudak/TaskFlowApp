@@ -55,34 +55,6 @@
                 <VerticalStackLayout Spacing="16"
                                      IsVisible="{Binding HasManagementAccess}">
 
-                    <!-- Page Title -->
-                    <Label Text="Görev ve Grup Yönetimi"
-                           TextColor="#1E1B4B"
-                           FontSize="22"
-                           FontAttributes="Bold" />
-                    <Label Text="{Binding StatusText}"
-                           TextColor="#64748B"
-                           FontSize="12"
-                           LineBreakMode="WordWrap"
-                           Margin="0,-12,0,0" />
-
-                    <!-- Yetki Alani Info Panel -->
-                    <Border BackgroundColor="#EEF2FF"
-                            Stroke="Transparent"
-                            StrokeShape="RoundRectangle 4"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Yetki Alanı"
-                                   TextColor="#94A3B8"
-                                   FontSize="11" />
-                            <Label Text="{Binding CurrentDepartmentName}"
-                                   TextColor="#1E1B4B"
-                                   FontSize="14"
-                                   FontAttributes="Bold"
-                                   LineBreakMode="WordWrap" />
-                        </VerticalStackLayout>
-                    </Border>
-
                     <!-- Task Creation Card -->
                     <Border BackgroundColor="#FFFFFF"
                             Stroke="Transparent"
@@ -105,7 +77,7 @@
                                     Stroke="#C7D2FE"
                                     StrokeThickness="1"
                                     StrokeShape="RoundRectangle 4"
-                                    Padding="10,4">
+                                    Padding="6,0">
                                 <Picker ItemsSource="{Binding EligibleUsers}"
                                         SelectedItem="{Binding SelectedAssignedUser}"
                                         ItemDisplayBinding="{Binding Name}"
@@ -120,7 +92,7 @@
                                     Stroke="#C7D2FE"
                                     StrokeThickness="1"
                                     StrokeShape="RoundRectangle 4"
-                                    Padding="10,4">
+                                    Padding="6,0">
                                 <Picker ItemsSource="{Binding PriorityOptions}"
                                         SelectedItem="{Binding SelectedPriority}"
                                         ItemDisplayBinding="{Binding DisplayName}"
@@ -177,24 +149,12 @@
                                 </VerticalStackLayout>
                             </Border>
 
-                            <Grid ColumnDefinitions="*,Auto"
-                                  ColumnSpacing="12">
-                                <Button Grid.Column="0"
-                                        Text="Görev Oluştur"
-                                        Command="{Binding CreateTaskCommand}"
-                                        BackgroundColor="#4F46E5"
-                                        TextColor="White"
-                                        CornerRadius="4"
-                                        HeightRequest="46" />
-
-                                <ActivityIndicator Grid.Column="1"
-                                                   WidthRequest="24"
-                                                   HeightRequest="24"
-                                                   IsRunning="{Binding IsCreatingTask}"
-                                                   IsVisible="{Binding IsCreatingTask}"
-                                                   Color="#4F46E5"
-                                                   VerticalOptions="Center" />
-                            </Grid>
+                            <Button Text="Görev Oluştur"
+                                    Command="{Binding CreateTaskCommand}"
+                                    BackgroundColor="#4F46E5"
+                                    TextColor="White"
+                                    CornerRadius="4"
+                                    HeightRequest="46" />
 
                             <Label Text="{Binding CreateStatus}"
                                    TextColor="#107C10"
@@ -233,21 +193,15 @@
                                 </VerticalStackLayout>
                             </Grid>
 
-                            <Border BackgroundColor="#FFFFFF"
-                                    Stroke="#C7D2FE"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 4"
-                                    Padding="10,4"
-                                    IsVisible="{Binding ShowGroupDepartmentPicker}">
-                                <Picker ItemsSource="{Binding ManagedDepartments}"
-                                        SelectedItem="{Binding SelectedManagedDepartment}"
-                                        ItemDisplayBinding="{Binding DepartmentName}"
-                                        Title="Departman seç"
-                                        TitleColor="#94A3B8"
-                                        TextColor="#1E1B4B"
-                                        BackgroundColor="Transparent"
-                                        HandlerChanged="OnInputHandlerChanged" />
-                            </Border>
+                            <Picker ItemsSource="{Binding ManagedDepartments}"
+                                    SelectedItem="{Binding SelectedManagedDepartment}"
+                                    ItemDisplayBinding="{Binding DepartmentName}"
+                                    Title="Departman seç"
+                                    TitleColor="#94A3B8"
+                                    TextColor="#1E1B4B"
+                                    BackgroundColor="Transparent"
+                                    IsVisible="{Binding ShowGroupDepartmentPicker}"
+                                    HandlerChanged="OnInputHandlerChanged" />
 
                             <Border BackgroundColor="#FFFFFF"
                                     Stroke="#C7D2FE"
@@ -263,33 +217,57 @@
                                        HandlerChanged="OnInputHandlerChanged" />
                             </Border>
 
-                            <CollectionView ItemsSource="{Binding GroupEligibleUsers}"
-                                            SelectionMode="None"
-                                            HeightRequest="220">
+                            <!-- User Selection Dropdown -->
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Border Grid.Column="0"
+                                        BackgroundColor="#FFFFFF"
+                                        Stroke="#C7D2FE"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 4"
+                                        Padding="6,0">
+                                    <Picker ItemsSource="{Binding AvailableGroupUserOptions}"
+                                            SelectedItem="{Binding SelectedGroupUserToAdd}"
+                                            ItemDisplayBinding="{Binding Name}"
+                                            Title="Uye sec"
+                                            TitleColor="#94A3B8"
+                                            TextColor="#1E1B4B"
+                                            BackgroundColor="Transparent"
+                                            HandlerChanged="OnInputHandlerChanged" />
+                                </Border>
+                                <Button Grid.Column="1"
+                                        Text="Ekle"
+                                        Command="{Binding AddGroupMemberCommand}"
+                                        BackgroundColor="#4F46E5"
+                                        TextColor="White"
+                                        CornerRadius="4"
+                                        HeightRequest="40"
+                                        WidthRequest="70"
+                                        FontSize="13" />
+                            </Grid>
+
+                            <!-- Selected Members List -->
+                            <CollectionView ItemsSource="{Binding SelectedGroupMembers}"
+                                            SelectionMode="None">
                                 <CollectionView.ItemsLayout>
                                     <LinearItemsLayout Orientation="Vertical"
-                                                       ItemSpacing="8" />
+                                                       ItemSpacing="6" />
                                 </CollectionView.ItemsLayout>
                                 <CollectionView.EmptyView>
-                                    <Label Text="Secilebilecek kullanici bulunmuyor."
+                                    <Label Text="Henuz uye eklenmedi."
                                            FontSize="11"
                                            TextColor="#94A3B8"
                                            HorizontalTextAlignment="Center"
-                                           Margin="0,12,0,0" />
+                                           Margin="0,8,0,0" />
                                 </CollectionView.EmptyView>
                                 <CollectionView.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border BackgroundColor="#FFFFFF"
-                                                Stroke="Transparent"
+                                    <DataTemplate x:DataType="x:Object">
+                                        <Border BackgroundColor="#EEF2FF"
+                                                Stroke="#C7D2FE"
+                                                StrokeThickness="1"
                                                 StrokeShape="RoundRectangle 4"
-                                                Padding="10">
-                                            <Border.Shadow>
-                                                <Shadow Brush="#204F46E5" Offset="0,1" Radius="4" />
-                                            </Border.Shadow>
-                                            <Grid ColumnDefinitions="*,Auto"
-                                                  ColumnSpacing="10">
-                                                <VerticalStackLayout Grid.Column="0"
-                                                                     Spacing="2">
+                                                Padding="10,8">
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                <VerticalStackLayout Grid.Column="0" Spacing="1">
                                                     <Label Text="{Binding Name}"
                                                            TextColor="#1E1B4B"
                                                            FontSize="13"
@@ -300,35 +278,170 @@
                                                            FontSize="11"
                                                            LineBreakMode="TailTruncation" />
                                                 </VerticalStackLayout>
-
-                                                <CheckBox Grid.Column="1"
-                                                          IsChecked="{Binding IsSelected}"
-                                                          Color="#4F46E5"
-                                                          VerticalOptions="Center" />
+                                                <Button Grid.Column="1"
+                                                        Text="Kaldir"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveGroupMemberCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        BackgroundColor="#FEE2E2"
+                                                        TextColor="#A4262C"
+                                                        CornerRadius="4"
+                                                        HeightRequest="30"
+                                                        FontSize="11"
+                                                        Padding="8,0" />
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
 
-                            <Grid ColumnDefinitions="*,Auto"
-                                  ColumnSpacing="12">
-                                <Button Grid.Column="0"
-                                        Text="Grup Oluştur"
-                                        Command="{Binding CreateGroupCommand}"
-                                        BackgroundColor="#4F46E5"
-                                        TextColor="White"
-                                        CornerRadius="4"
-                                        HeightRequest="46" />
+                            <!-- Group Task Toggle -->
+                            <Border BackgroundColor="#EEF2FF"
+                                    Stroke="#C7D2FE"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 8"
+                                    Padding="14,10">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Grid.Column="0"
+                                           Text="Grup Gorevi Ekle"
+                                           TextColor="#1E1B4B"
+                                           FontSize="14"
+                                           FontAttributes="Bold"
+                                           VerticalTextAlignment="Center" />
+                                    <Switch Grid.Column="1"
+                                            IsToggled="{Binding IsGroupTaskEnabled}"
+                                            OnColor="#4F46E5"
+                                            ThumbColor="#FFFFFF" />
+                                </Grid>
+                            </Border>
 
-                                <ActivityIndicator Grid.Column="1"
-                                                   WidthRequest="24"
-                                                   HeightRequest="24"
-                                                   IsRunning="{Binding IsCreatingGroup}"
-                                                   IsVisible="{Binding IsCreatingGroup}"
-                                                   Color="#4F46E5"
-                                                   VerticalOptions="Center" />
-                            </Grid>
+                            <!-- Group Task Form -->
+                            <VerticalStackLayout Spacing="12"
+                                                 IsVisible="{Binding IsGroupTaskEnabled}">
+
+                                <Border BackgroundColor="#EEF2FF"
+                                        Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 4"
+                                        Padding="12">
+                                    <Label Text="Ana gorev bilgilerini doldurun. Her uye icin alt gorevler otomatik olusturulur."
+                                           TextColor="#64748B"
+                                           FontSize="11"
+                                           LineBreakMode="WordWrap" />
+                                </Border>
+
+                                <Picker ItemsSource="{Binding PriorityOptions}"
+                                        SelectedItem="{Binding SelectedGroupTaskPriority}"
+                                        ItemDisplayBinding="{Binding DisplayName}"
+                                        Title="Gorev onceligi sec"
+                                        TitleColor="#94A3B8"
+                                        TextColor="#1E1B4B"
+                                        BackgroundColor="Transparent"
+                                        HandlerChanged="OnInputHandlerChanged" />
+
+                                <Border BackgroundColor="#FFFFFF"
+                                        Stroke="#C7D2FE"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 4"
+                                        Padding="12,8">
+                                    <Entry Text="{Binding GroupTaskTitle}"
+                                           Placeholder="Grup gorev basligi"
+                                           PlaceholderColor="#94A3B8"
+                                           TextColor="#1E1B4B"
+                                           BackgroundColor="Transparent"
+                                           ClearButtonVisibility="WhileEditing"
+                                           HandlerChanged="OnInputHandlerChanged" />
+                                </Border>
+
+                                <Border BackgroundColor="#FFFFFF"
+                                        Stroke="#C7D2FE"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 4"
+                                        Padding="12">
+                                    <Editor Text="{Binding GroupTaskDescription}"
+                                            Placeholder="Grup gorev aciklamasi"
+                                            PlaceholderColor="#94A3B8"
+                                            TextColor="#1E1B4B"
+                                            BackgroundColor="Transparent"
+                                            AutoSize="TextChanges"
+                                            MinimumHeightRequest="80"
+                                            HandlerChanged="OnInputHandlerChanged" />
+                                </Border>
+
+                                <Border BackgroundColor="#FFFFFF"
+                                        Stroke="#C7D2FE"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 4"
+                                        Padding="12,8">
+                                    <VerticalStackLayout Spacing="6">
+                                        <Label Text="Gorev Teslim Tarihi"
+                                               TextColor="#94A3B8"
+                                               FontSize="11" />
+                                        <DatePicker Date="{Binding GroupTaskDeadlineDate}"
+                                                    MinimumDate="{Binding MinimumDeadlineDate}"
+                                                    TextColor="#1E1B4B"
+                                                    BackgroundColor="Transparent"
+                                                    HandlerChanged="OnInputHandlerChanged" />
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <!-- Sub Tasks per Member -->
+                                <Label Text="Uye Alt Gorevleri"
+                                       TextColor="#1E1B4B"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       Margin="0,6,0,0" />
+
+                                <CollectionView ItemsSource="{Binding GroupMemberSubTasks}"
+                                                SelectionMode="None">
+                                    <CollectionView.ItemsLayout>
+                                        <LinearItemsLayout Orientation="Vertical"
+                                                           ItemSpacing="10" />
+                                    </CollectionView.ItemsLayout>
+                                    <CollectionView.EmptyView>
+                                        <Label Text="Uye secildikten sonra alt gorevler burada gorunecektir."
+                                               FontSize="11"
+                                               TextColor="#94A3B8"
+                                               HorizontalTextAlignment="Center"
+                                               Margin="0,8,0,0" />
+                                    </CollectionView.EmptyView>
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BackgroundColor="#F8FAFC"
+                                                    Stroke="#E2E8F0"
+                                                    StrokeThickness="1"
+                                                    StrokeShape="RoundRectangle 4"
+                                                    Padding="12">
+                                                <VerticalStackLayout Spacing="8">
+                                                    <Label Text="{Binding MemberName}"
+                                                           TextColor="#4F46E5"
+                                                           FontSize="13"
+                                                           FontAttributes="Bold" />
+                                                    <Entry Text="{Binding SubTaskTitle}"
+                                                           Placeholder="Alt gorev basligi"
+                                                           PlaceholderColor="#94A3B8"
+                                                           TextColor="#1E1B4B"
+                                                           BackgroundColor="#FFFFFF"
+                                                           HandlerChanged="OnInputHandlerChanged" />
+                                                    <Editor Text="{Binding SubTaskDescription}"
+                                                            Placeholder="Alt gorev aciklamasi"
+                                                            PlaceholderColor="#94A3B8"
+                                                            TextColor="#1E1B4B"
+                                                            BackgroundColor="#FFFFFF"
+                                                            AutoSize="TextChanges"
+                                                            MinimumHeightRequest="60"
+                                                            HandlerChanged="OnInputHandlerChanged" />
+                                                </VerticalStackLayout>
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </VerticalStackLayout>
+
+                            <Button Text="{Binding GroupCreateButtonText}"
+                                    Command="{Binding CreateGroupCommand}"
+                                    BackgroundColor="#4F46E5"
+                                    TextColor="White"
+                                    CornerRadius="4"
+                                    HeightRequest="46" />
 
                             <Label Text="{Binding GroupCreationStatus}"
                                    TextColor="#107C10"
@@ -366,21 +479,15 @@
                                 </VerticalStackLayout>
                             </Grid>
 
-                            <Border BackgroundColor="#FFFFFF"
-                                    Stroke="#C7D2FE"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 4"
-                                    Padding="10,4">
-                                <Picker ItemsSource="{Binding AvailableGroups}"
-                                        SelectedItem="{Binding SelectedGroupToDelete}"
-                                        ItemDisplayBinding="{Binding DisplayName}"
-                                        Title="Grup seç"
-                                        TitleColor="#94A3B8"
-                                        TextColor="#1E1B4B"
-                                        BackgroundColor="Transparent"
-                                        IsEnabled="{Binding CanDeleteGroups}"
-                                        HandlerChanged="OnInputHandlerChanged" />
-                            </Border>
+                            <Picker ItemsSource="{Binding AvailableGroups}"
+                                    SelectedItem="{Binding SelectedGroupToDelete}"
+                                    ItemDisplayBinding="{Binding DisplayName}"
+                                    Title="Grup seç"
+                                    TitleColor="#94A3B8"
+                                    TextColor="#1E1B4B"
+                                    BackgroundColor="Transparent"
+                                    IsEnabled="{Binding CanDeleteGroups}"
+                                    HandlerChanged="OnInputHandlerChanged" />
 
                             <Border BackgroundColor="#EEF2FF"
                                     Stroke="Transparent"
@@ -405,25 +512,13 @@
                                 </VerticalStackLayout>
                             </Border>
 
-                            <Grid ColumnDefinitions="*,Auto"
-                                  ColumnSpacing="12">
-                                <Button Grid.Column="0"
-                                        Text="Grubu Sil"
-                                        Command="{Binding DeleteSelectedGroupCommand}"
-                                        IsEnabled="{Binding CanUseDeleteGroupForm}"
-                                        BackgroundColor="#A4262C"
-                                        TextColor="White"
-                                        CornerRadius="4"
-                                        HeightRequest="46" />
-
-                                <ActivityIndicator Grid.Column="1"
-                                                   WidthRequest="24"
-                                                   HeightRequest="24"
-                                                   IsRunning="{Binding IsDeletingGroup}"
-                                                   IsVisible="{Binding IsDeletingGroup}"
-                                                   Color="#A4262C"
-                                                   VerticalOptions="Center" />
-                            </Grid>
+                            <Button Text="Grubu Sil"
+                                    Command="{Binding DeleteSelectedGroupCommand}"
+                                    IsEnabled="{Binding CanUseDeleteGroupForm}"
+                                    BackgroundColor="#A4262C"
+                                    TextColor="White"
+                                    CornerRadius="4"
+                                    HeightRequest="46" />
 
                             <Label Text="{Binding GroupDeletionStatus}"
                                    TextColor="#A4262C"

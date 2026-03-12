@@ -41,7 +41,6 @@
                     <Button Grid.Column="2"
                             Text="T&#252;m&#252;n&#252; G&#246;r"
                             Command="{Binding ShowAllIndividualTasksCommand}"
-                            IsEnabled="{Binding CanShowAllIndividualTasks}"
                             BackgroundColor="#4F46E5"
                             TextColor="White"
                             CornerRadius="4"

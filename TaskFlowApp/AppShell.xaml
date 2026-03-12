@@ -56,6 +56,10 @@
         Route="MessagesPage" />
     <ShellContent
         Title=""
+        ContentTemplate="{DataTemplate pages:AllIndividualTasksPage}"
+        Route="AllIndividualTasksPage" />
+    <ShellContent
+        Title=""
         ContentTemplate="{DataTemplate pages:NotificationsPage}"
         Route="NotificationsPage" />
 

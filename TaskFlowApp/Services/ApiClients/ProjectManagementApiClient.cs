@@ -19,6 +19,9 @@ public sealed class ProjectManagementApiClient(IApiClient apiClient) : Controlle
     public Task CreateTasksCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("CreateTasksCommandRequest", request, cancellationToken: cancellationToken);
 
+    public Task CreateGroupTaskWithSubTasksCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
+        PostAsync("CreateGroupTaskWithSubTasksCommandRequest", request, cancellationToken: cancellationToken);
+
     public Task CompleteIndividualTaskCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("CompleteIndividualTaskCommandRequest", request, cancellationToken: cancellationToken);
 

@@ -170,7 +170,7 @@
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <Button Grid.Column="0"
                         Text=""
-                        ImageSource="{mi:MaterialOutlined Icon=ArrowBack}"
+                        ImageSource="{mi:MaterialOutlined Icon=ArrowBack, IconColor=#FFFFFF}"
                         Command="{Binding PreviousPageCommand}"
                         IsEnabled="{Binding CanGoPrevious}"
                         BackgroundColor="#4F46E5"
@@ -187,7 +187,7 @@
                        FontSize="13" />
                 <Button Grid.Column="2"
                         Text=""
-                        ImageSource="{mi:MaterialOutlined Icon=ArrowForward}"
+                        ImageSource="{mi:MaterialOutlined Icon=ArrowForward, IconColor=#FFFFFF}"
                         Command="{Binding NextPageCommand}"
                         IsEnabled="{Binding CanGoNext}"
                         BackgroundColor="#4F46E5"

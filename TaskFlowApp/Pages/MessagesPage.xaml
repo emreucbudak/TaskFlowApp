@@ -41,135 +41,10 @@
                     <Border.Shadow>
                         <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
                     </Border.Shadow>
-                    <Grid RowDefinitions="Auto,Auto,*"
+                    <Grid RowDefinitions="Auto,*"
                           RowSpacing="12">
-                        <!-- Department Group Creation -->
-                        <Border Grid.Row="0"
-                                BackgroundColor="#FFFFFF"
-                                Stroke="Transparent"
-                                StrokeShape="RoundRectangle 4"
-                                Padding="12"
-                                IsVisible="{Binding IsDepartmentLeader}">
-                            <Border.Shadow>
-                                <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
-                            </Border.Shadow>
-                            <VerticalStackLayout Spacing="10">
-                                <!-- Section Header with blue bar -->
-                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                                    <BoxView Grid.Column="0" Color="#4F46E5" WidthRequest="4" HeightRequest="20" VerticalOptions="Center" />
-                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                        <Label Text="Departman Grubu Oluştur"
-                                               TextColor="#1E1B4B"
-                                               FontSize="16"
-                                               FontAttributes="Bold" />
-                                        <Label Text="Sadece lideri olduğunuz departmandaki çalışanları seçerek grup oluşturabilirsiniz."
-                                               TextColor="#94A3B8"
-                                               FontSize="11" />
-                                    </VerticalStackLayout>
-                                </Grid>
-
-                                <Border BackgroundColor="#FFFFFF"
-                                        Stroke="#C7D2FE"
-                                        StrokeThickness="1"
-                                        StrokeShape="RoundRectangle 4"
-                                        Padding="12,8">
-                                    <Entry Text="{Binding GroupNameInput}"
-                                           Placeholder="Grup adı"
-                                           PlaceholderColor="#94A3B8"
-                                           TextColor="#1E1B4B"
-                                           BackgroundColor="Transparent"
-                                           ClearButtonVisibility="WhileEditing" />
-                                </Border>
-
-                                <Border BackgroundColor="#FFFFFF"
-                                        Stroke="#C7D2FE"
-                                        StrokeThickness="1"
-                                        StrokeShape="RoundRectangle 4"
-                                        Padding="10,4">
-                                    <Picker ItemsSource="{Binding ManagedDepartments}"
-                                            SelectedItem="{Binding SelectedManagedDepartment}"
-                                            ItemDisplayBinding="{Binding DepartmentName}"
-                                            Title="Departman seç"
-                                            TextColor="#1E1B4B"
-                                            TitleColor="#94A3B8"
-                                            BackgroundColor="Transparent" />
-                                </Border>
-
-                                <CollectionView ItemsSource="{Binding EligibleDepartmentUsers}"
-                                                SelectionMode="None"
-                                                HeightRequest="180">
-                                    <CollectionView.ItemsLayout>
-                                        <LinearItemsLayout Orientation="Vertical"
-                                                           ItemSpacing="8" />
-                                    </CollectionView.ItemsLayout>
-                                    <CollectionView.EmptyView>
-                                        <Label Text="Secilen departmanda gruba eklenebilecek calisan bulunmuyor."
-                                               FontSize="11"
-                                               TextColor="#94A3B8"
-                                               HorizontalTextAlignment="Center"
-                                               Margin="0,12,0,0" />
-                                    </CollectionView.EmptyView>
-                                    <CollectionView.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border BackgroundColor="#FFFFFF"
-                                                    Stroke="Transparent"
-                                                    StrokeShape="RoundRectangle 4"
-                                                    Padding="10">
-                                                <Border.Shadow>
-                                                    <Shadow Brush="#204F46E5" Offset="0,1" Radius="4" />
-                                                </Border.Shadow>
-                                                <Grid ColumnDefinitions="*,Auto"
-                                                      ColumnSpacing="10">
-                                                    <VerticalStackLayout Grid.Column="0"
-                                                                         Spacing="2">
-                                                        <Label Text="{Binding Name}"
-                                                               TextColor="#1E1B4B"
-                                                               FontSize="13"
-                                                               FontAttributes="Bold"
-                                                               LineBreakMode="TailTruncation" />
-                                                        <Label Text="{Binding DepartmentName}"
-                                                               TextColor="#64748B"
-                                                               FontSize="11"
-                                                               LineBreakMode="TailTruncation" />
-                                                    </VerticalStackLayout>
-
-                                                    <CheckBox Grid.Column="1"
-                                                              IsChecked="{Binding IsSelected}"
-                                                              Color="#4F46E5"
-                                                              VerticalOptions="Center" />
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-                                </CollectionView>
-
-                                <Grid ColumnDefinitions="*,Auto"
-                                      ColumnSpacing="12">
-                                    <Button Grid.Column="0"
-                                            Text="Grup Oluştur"
-                                            Command="{Binding CreateDepartmentGroupCommand}"
-                                            BackgroundColor="#4F46E5"
-                                            TextColor="White"
-                                            CornerRadius="4"
-                                            HeightRequest="44" />
-
-                                    <ActivityIndicator Grid.Column="1"
-                                                       WidthRequest="24"
-                                                       HeightRequest="24"
-                                                       IsRunning="{Binding IsCreatingDepartmentGroup}"
-                                                       IsVisible="{Binding IsCreatingDepartmentGroup}"
-                                                       Color="#4F46E5"
-                                                       VerticalOptions="Center" />
-                                </Grid>
-
-                                <Label Text="{Binding GroupCreationStatus}"
-                                       TextColor="#107C10"
-                                       FontSize="11" />
-                            </VerticalStackLayout>
-                        </Border>
-
                         <!-- Search Bar -->
-                        <Grid Grid.Row="1"
+                        <Grid Grid.Row="0"
                               ColumnDefinitions="*,Auto"
                               ColumnSpacing="8">
                             <Border Grid.Column="0"
@@ -208,7 +83,7 @@
                         </Grid>
 
                         <!-- User List -->
-                        <CollectionView Grid.Row="2"
+                        <CollectionView Grid.Row="1"
                                         ItemsSource="{Binding VisibleUsers}"
                                         SelectionMode="None">
                             <CollectionView.ItemsLayout>
@@ -358,7 +233,7 @@
 
                                         <!-- Own message (right) -->
                                         <Grid Grid.Column="1"
-                                              ColumnDefinitions="*,Auto"
+                                              ColumnDefinitions="Auto,*"
                                               ColumnSpacing="8"
                                               Margin="32,0,0,0"
                                               IsVisible="False">
@@ -376,29 +251,13 @@
                                             </Grid.GestureRecognizers>
 
                                             <Border Grid.Column="0"
-                                                    BackgroundColor="#4F46E5"
-                                                    Stroke="Transparent"
-                                                    StrokeShape="RoundRectangle 4"
-                                                    Padding="12">
-                                                <VerticalStackLayout Spacing="6">
-                                                    <Label Text="{Binding Content}"
-                                                           TextColor="White"
-                                                           FontSize="13"
-                                                           LineBreakMode="WordWrap" />
-                                                    <Label Text="{Binding SentAtText}"
-                                                           TextColor="#DCEEFB"
-                                                           FontSize="10" />
-                                                </VerticalStackLayout>
-                                            </Border>
-
-                                            <Border Grid.Column="1"
                                                     BackgroundColor="#FFFFFF"
                                                     Stroke="Transparent"
                                                     StrokeShape="RoundRectangle 4"
                                                     Padding="6"
                                                     WidthRequest="32"
                                                     HeightRequest="32"
-                                                    HorizontalOptions="End"
+                                                    HorizontalOptions="Start"
                                                     VerticalOptions="End"
                                                     Opacity="0"
                                                     InputTransparent="True">
@@ -416,12 +275,28 @@
                                                 <Border.GestureRecognizers>
                                                     <TapGestureRecognizer Tapped="OnDeleteMessageTapped" />
                                                 </Border.GestureRecognizers>
-                                                <Image Source="{mi:MaterialOutlined Icon=Delete}"
+                                                <Image Source="{mi:MaterialOutlined Icon=Delete, IconColor=#94A3B8}"
                                                        WidthRequest="16"
                                                        HeightRequest="16"
                                                        Aspect="AspectFit"
                                                        HorizontalOptions="Center"
                                                        VerticalOptions="Center" />
+                                            </Border>
+
+                                            <Border Grid.Column="1"
+                                                    BackgroundColor="#4F46E5"
+                                                    Stroke="Transparent"
+                                                    StrokeShape="RoundRectangle 4"
+                                                    Padding="12">
+                                                <VerticalStackLayout Spacing="6">
+                                                    <Label Text="{Binding Content}"
+                                                           TextColor="White"
+                                                           FontSize="13"
+                                                           LineBreakMode="WordWrap" />
+                                                    <Label Text="{Binding SentAtText}"
+                                                           TextColor="#DCEEFB"
+                                                           FontSize="10" />
+                                                </VerticalStackLayout>
                                             </Border>
                                         </Grid>
                                     </Grid>
