@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
+using TaskFlowApp.Models.Chat;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
@@ -14,12 +15,17 @@ public partial class GroupDetailsPageViewModel(
     INavigationService navigationService,
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
-    IdentityApiClient identityApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    IdentityApiClient identityApiClient,
+    ChatApiClient chatApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
+    private const int RecentActivityPreviewCount = 5;
+    private const int RecentActivityPageSize = 20;
     private const string NoGroupMessage = "Uyesi olunan grup bulunamadi.";
     private const string NoMembersMessage = "Bu grup icin uye bilgisi bulunamadi.";
+    private const string NoRecentActivityMessage = "Grupta henuz mesaj aktivitesi yok.";
 
     public ObservableCollection<GroupDetailMemberItem> GroupMembers { get; } = [];
+    public ObservableCollection<GroupRecentActivityItem> RecentGroupActivities { get; } = [];
     public ObservableCollection<GroupActivityDisplayItem> Activities { get; } = [];
 
     private Guid currentGroupId;
@@ -32,6 +38,9 @@ public partial class GroupDetailsPageViewModel(
 
     [ObservableProperty]
     private bool hasActivities;
+
+    [ObservableProperty]
+    private bool hasRecentGroupActivities;
 
     [ObservableProperty]
     private bool isGroupLeader;
@@ -51,7 +60,9 @@ public partial class GroupDetailsPageViewModel(
     [ObservableProperty]
     private string membersEmptyMessage = NoMembersMessage;
 
-    // Activity form fields
+    [ObservableProperty]
+    private string recentGroupActivityEmptyMessage = NoRecentActivityMessage;
+
     [ObservableProperty]
     private bool isActivityFormVisible;
 
@@ -67,6 +78,7 @@ public partial class GroupDetailsPageViewModel(
     public bool HasNoGroup => !HasGroup;
     public bool HasNoMembers => !HasMembers;
     public bool HasNoActivities => !HasActivities;
+    public bool HasNoRecentGroupActivities => !HasRecentGroupActivities;
 
     partial void OnHasGroupChanged(bool value)
     {
@@ -81,6 +93,11 @@ public partial class GroupDetailsPageViewModel(
     partial void OnHasActivitiesChanged(bool value)
     {
         OnPropertyChanged(nameof(HasNoActivities));
+    }
+
+    partial void OnHasRecentGroupActivitiesChanged(bool value)
+    {
+        OnPropertyChanged(nameof(HasNoRecentGroupActivities));
     }
 
     [RelayCommand]
@@ -125,12 +142,11 @@ public partial class GroupDetailsPageViewModel(
             }
 
             ApplyCurrentGroupState(currentGroup, userNameMap);
-
-            // Check if current user is group leader
             CheckGroupLeaderStatus(currentGroup, userId);
 
-            // Load activities for this group
-            await LoadActivitiesAsync();
+            var activitiesTask = LoadActivitiesAsync();
+            var recentActivitiesTask = LoadRecentGroupActivitiesAsync(userId, userNameMap);
+            await Task.WhenAll(activitiesTask, recentActivitiesTask);
 
             StatusText = $"{GroupName} detaylari yuklendi.";
         }
@@ -192,9 +208,9 @@ public partial class GroupDetailsPageViewModel(
                     StatusText = activity.StatusText,
                     StatusColor = activity.Status switch
                     {
-                        0 => "#F59E0B", // Pending - amber
-                        1 => "#10B981", // Approved - green
-                        2 => "#EF4444", // Rejected - red
+                        0 => "#F59E0B",
+                        1 => "#10B981",
+                        2 => "#EF4444",
                         _ => "#64748B"
                     },
                     ReviewedByUserName = activity.ReviewedByUserName,
@@ -208,8 +224,52 @@ public partial class GroupDetailsPageViewModel(
         }
         catch
         {
-            // Activities loading failure should not block the page
             HasActivities = false;
+        }
+    }
+
+    private async Task LoadRecentGroupActivitiesAsync(Guid userId, IReadOnlyDictionary<Guid, string> userNameMap)
+    {
+        ResetRecentGroupActivitiesState();
+
+        if (currentGroupId == Guid.Empty)
+        {
+            return;
+        }
+
+        try
+        {
+            var messages = await chatApiClient.GetMessagesByGroupIdQueryRequestAsync(new
+            {
+                CurrentUserId = userId,
+                GroupId = currentGroupId,
+                PageSize = RecentActivityPageSize,
+                Page = 1
+            }) ?? [];
+
+            var recentActivities = messages
+                .Where(message => !message.IsDeleted)
+                .OrderByDescending(message => message.SendTime)
+                .Take(RecentActivityPreviewCount)
+                .Select(message => new GroupRecentActivityItem
+                {
+                    ActorName = ResolveDisplayName(message.SenderId, userNameMap),
+                    ActionText = ResolveRecentActivityText(message.Content),
+                    OccurredAtText = FormatRelativeTime(message.SendTime)
+                })
+                .ToList();
+
+            foreach (var activity in recentActivities)
+            {
+                RecentGroupActivities.Add(activity);
+            }
+
+            HasRecentGroupActivities = RecentGroupActivities.Count > 0;
+            RecentGroupActivityEmptyMessage = HasRecentGroupActivities ? string.Empty : NoRecentActivityMessage;
+        }
+        catch
+        {
+            ResetRecentGroupActivitiesState();
         }
     }
 
@@ -334,11 +394,14 @@ public partial class GroupDetailsPageViewModel(
         GroupMembersSummaryText = string.Empty;
         GroupEmptyMessage = NoGroupMessage;
         MembersEmptyMessage = NoMembersMessage;
+        RecentGroupActivityEmptyMessage = NoRecentActivityMessage;
         GroupMembers.Clear();
+        RecentGroupActivities.Clear();
         Activities.Clear();
         HasGroup = false;
         HasMembers = false;
         HasActivities = false;
+        HasRecentGroupActivities = false;
         IsGroupLeader = false;
         IsActivityFormVisible = false;
         currentGroupId = Guid.Empty;
@@ -481,6 +544,63 @@ public partial class GroupDetailsPageViewModel(
         return "Bilinmeyen kullanici";
     }
 
+    private static string ResolveRecentActivityText(string? content)
+    {
+        var normalizedContent = content?.Trim();
+        return string.IsNullOrWhiteSpace(normalizedContent)
+            ? "gruba bir mesaj paylasti."
+            : $"mesaj paylasti: {normalizedContent}";
+    }
+
+    private void ResetRecentGroupActivitiesState()
+    {
+        RecentGroupActivities.Clear();
+        HasRecentGroupActivities = false;
+        RecentGroupActivityEmptyMessage = NoRecentActivityMessage;
+    }
+
+    private static DateTime ConvertToLocalTime(DateTime value)
+    {
+        return value.Kind switch
+        {
+            DateTimeKind.Utc => value.ToLocalTime(),
+            DateTimeKind.Local => value,
+            _ => DateTime.SpecifyKind(value, DateTimeKind.Utc).ToLocalTime()
+        };
+    }
+
+    private static string FormatRelativeTime(DateTime sendTime)
+    {
+        var localTime = ConvertToLocalTime(sendTime);
+        var elapsed = DateTime.Now - localTime;
+        if (elapsed < TimeSpan.Zero)
+        {
+            elapsed = TimeSpan.Zero;
+        }
+
+        if (elapsed < TimeSpan.FromMinutes(1))
+        {
+            return "Az once";
+        }
+
+        if (elapsed < TimeSpan.FromHours(1))
+        {
+            return $"{Math.Max(1, (int)elapsed.TotalMinutes)} dk once";
+        }
+
+        if (elapsed < TimeSpan.FromDays(1))
+        {
+            return $"{Math.Max(1, (int)elapsed.TotalHours)} sa once";
+        }
+
+        if (elapsed < TimeSpan.FromDays(7))
+        {
+            return $"{Math.Max(1, (int)elapsed.TotalDays)} gun once";
+        }
+
+        return localTime.ToString("dd.MM.yyyy HH:mm");
+    }
+
     private static string BuildInitials(string name)
     {
         var initials = string.Concat(name
@@ -490,7 +610,6 @@ public partial class GroupDetailsPageViewModel(
 
         return string.IsNullOrWhiteSpace(initials) ? "U" : initials;
     }
-
 }
 
 public sealed record GroupDetailMemberItem

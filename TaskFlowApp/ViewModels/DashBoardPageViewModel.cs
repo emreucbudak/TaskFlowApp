@@ -1,10 +1,8 @@
-﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
-using TaskFlowApp.Models.Chat;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Models.ProjectManagement;
 using TaskFlowApp.Services.ApiClients;
@@ -21,15 +19,8 @@ public partial class DashBoardPageViewModel(
     IdentityApiClient identityApiClient,
     AiApiClient aiApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
-    private const int GroupActivityPreviewCount = 5;
-    private const int GroupSummaryPageSize = 100;
     private const int TasksPageSize = 100;
-    private const string NoGroupMessage = "Uyesi olunan grup bulunamadi.";
-    private const string NoActivityMessage = "Grupta henuz aktivite yok.";
     private const string NoDailySummaryMessage = "Gunun ozeti bulunamadi.";
-    private readonly List<GroupRecentActivityItem> allGroupRecentActivities = [];
-    private bool isShowingAllGroupRecentActivities;
-    public ObservableCollection<GroupRecentActivityItem> GroupRecentActivities { get; } = [];
 
     [ObservableProperty]
     private int totalAssigned;
@@ -62,35 +53,7 @@ public partial class DashBoardPageViewModel(
     private int overdueGroupTaskCount;
 
     [ObservableProperty]
-    private string groupActivityEmptyMessage = NoGroupMessage;
-
-    [ObservableProperty]
-    private string currentGroupName = string.Empty;
-
-    [ObservableProperty]
     private string dailySummaryText = NoDailySummaryMessage;
-
-    [ObservableProperty]
-    private bool hasGroupRecentActivities;
-
-    [ObservableProperty]
-    private bool hasUserGroup;
-
-    [ObservableProperty]
-    private bool canShowAllGroupRecentActivities;
-
-    public bool HasNoGroupRecentActivities => !HasGroupRecentActivities;
-    public bool CanOpenGroupDetails => HasUserGroup;
-
-    partial void OnHasGroupRecentActivitiesChanged(bool value)
-    {
-        OnPropertyChanged(nameof(HasNoGroupRecentActivities));
-    }
-
-    partial void OnHasUserGroupChanged(bool value)
-    {
-        OnPropertyChanged(nameof(CanOpenGroupDetails));
-    }
 
     [RelayCommand]
     private async Task LoadAsync()
@@ -111,7 +74,6 @@ public partial class DashBoardPageViewModel(
             IsBusy = true;
             ErrorMessage = string.Empty;
             await LoadWorkerReportAccessStateAsync();
-            ResetGroupActivitiesState();
 
             var userId = UserSession.UserId.Value;
             var companyId = UserSession.CompanyId.Value;
@@ -132,13 +94,8 @@ public partial class DashBoardPageViewModel(
             var userNameMap = BuildUserNameMap(users);
             var userGroups = ResolveUserGroups(groups, userId, userNameMap);
             var groupMemberIds = ResolveGroupMemberIds(userGroups);
+            var groupTasks = await LoadAllGroupTasksAsync(companyId, groupMemberIds);
 
-            var groupTasksTask = LoadAllGroupTasksAsync(companyId, groupMemberIds);
-            var groupActivitiesTask = LoadGroupRecentActivitiesSafeAsync(userId, userGroups, userNameMap);
-
-            await Task.WhenAll(groupTasksTask, groupActivitiesTask);
-
-            var groupTasks = await groupTasksTask;
             var completedIndividualTasks = individualTasks.Count(task => IsCompletedStatus(task.StatusName));
             var completedGroupTasks = groupTasks.Count(task => IsCompletedStatus(task.StatusName));
             var overdueIndividualTasks = individualTasks.Count(task => task.Deadline < today && !IsCompletedStatus(task.StatusName));
@@ -179,143 +136,6 @@ public partial class DashBoardPageViewModel(
         {
             IsBusy = false;
         }
-    }
-
-    [RelayCommand]
-    private Task ShowAllGroupRecentActivitiesAsync()
-    {
-        if (!CanShowAllGroupRecentActivities)
-        {
-            return Task.CompletedTask;
-        }
-
-        isShowingAllGroupRecentActivities = true;
-        CanShowAllGroupRecentActivities = false;
-        RefreshVisibleGroupRecentActivities();
-        return Task.CompletedTask;
-    }
-
-    [RelayCommand]
-    private Task OpenGroupDetailsAsync()
-    {
-        if (!HasUserGroup)
-        {
-            return Task.CompletedTask;
-        }
-
-        return NavigationService.GoToAsync("GroupDetailsPage");
-    }
-
-    private async Task LoadGroupRecentActivitiesSafeAsync(
-        Guid userId,
-        IReadOnlyList<CompanyGroupDto> userGroups,
-        IReadOnlyDictionary<Guid, string> userNameMap)
-    {
-        try
-        {
-            await LoadGroupRecentActivitiesAsync(userId, userGroups, userNameMap);
-        }
-        catch (ApiException ex) when (ex.StatusCode == 404)
-        {
-            ApplyNoGroupState();
-        }
-        catch
-        {
-            if (!HasGroupRecentActivities)
-            {
-                GroupActivityEmptyMessage = NoActivityMessage;
-            }
-        }
-    }
-
-    private async Task LoadGroupRecentActivitiesAsync(
-        Guid userId,
-        IReadOnlyList<CompanyGroupDto> userGroups,
-        IReadOnlyDictionary<Guid, string> userNameMap)
-    {
-        var currentGroup = userGroups.FirstOrDefault();
-        if (currentGroup is null)
-        {
-            ApplyNoGroupState();
-            return;
-        }
-
-        HasUserGroup = true;
-        CurrentGroupName = currentGroup.GroupName;
-
-        if (currentGroup.GroupId == Guid.Empty)
-        {
-            GroupActivityEmptyMessage = NoActivityMessage;
-            DailySummaryText = NoDailySummaryMessage;
-            return;
-        }
-
-        var summaryMessages = await chatApiClient.GetMessagesByGroupIdQueryRequestAsync(new
-        {
-            CurrentUserId = userId,
-            GroupId = currentGroup.GroupId,
-            PageSize = GroupSummaryPageSize,
-            Page = 1
-        }) ?? [];
-
-        var recentActivities = summaryMessages
-            .Where(message => !message.IsDeleted)
-            .OrderByDescending(message => message.SendTime)
-            .Select(message => new GroupRecentActivityItem
-            {
-                ActorName = ResolveDisplayName(message.SenderId, userNameMap),
-                ActionText = ResolveActivityText(message.Content),
-                OccurredAtText = FormatRelativeTime(message.SendTime)
-            })
-            .ToList();
-
-        allGroupRecentActivities.Clear();
-        allGroupRecentActivities.AddRange(recentActivities);
-        isShowingAllGroupRecentActivities = false;
-        CanShowAllGroupRecentActivities = allGroupRecentActivities.Count > GroupActivityPreviewCount;
-        RefreshVisibleGroupRecentActivities();
-    }
-
-    private void ResetGroupActivitiesState()
-    {
-        allGroupRecentActivities.Clear();
-        GroupRecentActivities.Clear();
-        HasGroupRecentActivities = false;
-        HasUserGroup = false;
-        CanShowAllGroupRecentActivities = false;
-        isShowingAllGroupRecentActivities = false;
-        CurrentGroupName = string.Empty;
-        DailySummaryText = NoDailySummaryMessage;
-        GroupActivityEmptyMessage = NoGroupMessage;
-    }
-
-    private void ApplyNoGroupState()
-    {
-        allGroupRecentActivities.Clear();
-        GroupRecentActivities.Clear();
-        HasGroupRecentActivities = false;
-        HasUserGroup = false;
-        CanShowAllGroupRecentActivities = false;
-        isShowingAllGroupRecentActivities = false;
-        CurrentGroupName = string.Empty;
-        DailySummaryText = NoDailySummaryMessage;
-        GroupActivityEmptyMessage = NoGroupMessage;
-    }
-
-    private void RefreshVisibleGroupRecentActivities()
-    {
-        var visibleActivities = isShowingAllGroupRecentActivities
-            ? allGroupRecentActivities
-            : allGroupRecentActivities.Take(GroupActivityPreviewCount).ToList();
-
-        GroupRecentActivities.Clear();
-        foreach (var activity in visibleActivities)
-        {
-            GroupRecentActivities.Add(activity);
-        }
-
-        HasGroupRecentActivities = GroupRecentActivities.Count > 0;
-        GroupActivityEmptyMessage = HasGroupRecentActivities ? string.Empty : NoActivityMessage;
     }
 
     private async Task<List<IndividualTaskDto>> LoadAllIndividualTasksAsync(Guid userId)
@@ -461,24 +281,6 @@ public partial class DashBoardPageViewModel(
             .ToList();
     }
 
-    private static string ResolveDisplayName(Guid userId, IReadOnlyDictionary<Guid, string> userNameMap)
-    {
-        if (userNameMap.TryGetValue(userId, out var userName) && !string.IsNullOrWhiteSpace(userName))
-        {
-            return userName;
-        }
-
-        return "Bilinmeyen kullanici";
-    }
-
-    private static string ResolveActivityText(string? content)
-    {
-        var normalizedContent = content?.Trim();
-        return string.IsNullOrWhiteSpace(normalizedContent)
-            ? "gruba bir mesaj paylasti."
-            : $"mesaj paylasti: {normalizedContent}";
-    }
-
     private async Task LoadDailySummaryAsync(Guid userId, Guid companyId)
     {
         try
@@ -517,47 +319,4 @@ public partial class DashBoardPageViewModel(
             || normalizedStatus.Contains("done")
             || normalizedStatus.Contains("closed");
     }
-
-    private static DateTime ConvertToLocalTime(DateTime value)
-    {
-        return value.Kind switch
-        {
-            DateTimeKind.Utc => value.ToLocalTime(),
-            DateTimeKind.Local => value,
-            _ => DateTime.SpecifyKind(value, DateTimeKind.Utc).ToLocalTime()
-        };
-    }
-
-    private static string FormatRelativeTime(DateTime sendTime)
-    {
-        var localTime = ConvertToLocalTime(sendTime);
-        var elapsed = DateTime.Now - localTime;
-        if (elapsed < TimeSpan.Zero)
-        {
-            elapsed = TimeSpan.Zero;
-        }
-
-        if (elapsed < TimeSpan.FromMinutes(1))
-        {
-            return "Az once";
-        }
-
-        if (elapsed < TimeSpan.FromHours(1))
-        {
-            return $"{Math.Max(1, (int)elapsed.TotalMinutes)} dk once";
-        }
-
-        if (elapsed < TimeSpan.FromDays(1))
-        {
-            return $"{Math.Max(1, (int)elapsed.TotalHours)} sa once";
-        }
-
-        if (elapsed < TimeSpan.FromDays(7))
-        {
-            return $"{Math.Max(1, (int)elapsed.TotalDays)} gun once";
-        }
-
-        return localTime.ToString("dd.MM.yyyy HH:mm");
-    }
-
 }
