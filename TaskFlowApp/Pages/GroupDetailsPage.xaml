@@ -171,6 +171,72 @@
                         </HorizontalStackLayout>
                     </ScrollView>
 
+                    <!-- Section Header: Gruptan Son Aktiviteler -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
+                        <Label Grid.Column="1"
+                               Text="Gruptan Son Aktiviteler"
+                               TextColor="#1E1B4B"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center" />
+                    </Grid>
+
+                    <Border BackgroundColor="#FFFFFF"
+                            Stroke="#E0E7FF"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="14">
+                        <Border.Shadow>
+                            <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
+                        </Border.Shadow>
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="{Binding RecentGroupActivityEmptyMessage}"
+                                   TextColor="#64748B"
+                                   FontSize="13"
+                                   IsVisible="{Binding HasNoRecentGroupActivities}" />
+
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding RecentGroupActivities}"
+                                                 IsVisible="{Binding HasRecentGroupActivities}"
+                                                 Spacing="8">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BackgroundColor="#F5F3FF"
+                                                Stroke="#E0E7FF"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 10"
+                                                Padding="10,8">
+                                            <Grid RowDefinitions="Auto,Auto"
+                                                  ColumnDefinitions="*,Auto"
+                                                  ColumnSpacing="8"
+                                                  RowSpacing="2">
+                                                <Label Grid.Row="0"
+                                                       Grid.Column="0"
+                                                       Text="{Binding ActorName}"
+                                                       TextColor="#1E1B4B"
+                                                       FontSize="13"
+                                                       FontAttributes="Bold" />
+                                                <Label Grid.Row="0"
+                                                       Grid.Column="1"
+                                                       Text="{Binding OccurredAtText}"
+                                                       TextColor="#94A3B8"
+                                                       FontSize="11" />
+                                                <Label Grid.Row="1"
+                                                       Grid.Column="0"
+                                                       Grid.ColumnSpan="2"
+                                                       Text="{Binding ActionText}"
+                                                       TextColor="#475569"
+                                                       FontSize="12"
+                                                       MaxLines="2"
+                                                       LineBreakMode="TailTruncation" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+
                     <!-- Section Header: Aktiviteler -->
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                         <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
