@@ -7,6 +7,7 @@ using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Models.ProjectManagement;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -17,9 +18,10 @@ public partial class DashBoardPageViewModel(
     ProjectManagementApiClient projectManagementApiClient,
     ChatApiClient chatApiClient,
     IdentityApiClient identityApiClient,
-    AiApiClient aiApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    IWorkerDashboardStateService workerDashboardStateService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     private const int TasksPageSize = 100;
+    private const string LoadingDailySummaryMessage = "Gunun ozeti hazirlaniyor.";
     private const string NoDailySummaryMessage = "Gunun ozeti bulunamadi.";
 
     [ObservableProperty]
@@ -79,6 +81,22 @@ public partial class DashBoardPageViewModel(
             var companyId = UserSession.CompanyId.Value;
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
+            if (workerDashboardStateService.TryGetCachedDailySummary(out var cachedDailySummary))
+            {
+                DailySummaryText = cachedDailySummary;
+            }
+            else
+            {
+                DailySummaryText = LoadingDailySummaryMessage;
+            }
+
+            if (workerDashboardStateService.TryGetUnreadMessageCount(out var cachedUnreadMessageCount))
+            {
+                UnreadMessageCount = cachedUnreadMessageCount;
+            }
+
+            _ = LoadDailySummaryAsync();
+
             var usersTask = identityApiClient.GetAllCompanyUsersAsync(companyId);
             var groupsTask = identityApiClient.GetAllCompanyGroupsAsync(companyId);
             var individualTasksTask = LoadAllIndividualTasksAsync(userId);
@@ -111,8 +129,7 @@ public partial class DashBoardPageViewModel(
             TotalCompleted = CompletedIndividualTaskCount + CompletedGroupTaskCount;
             OverdueTasks = OverdueIndividualTaskCount + OverdueGroupTaskCount;
             UnreadMessageCount = unread;
-
-            await LoadDailySummaryAsync(userId, companyId);
+            workerDashboardStateService.SetUnreadMessageCount(unread);
 
             StatusText = string.Empty;
         }
@@ -281,23 +298,13 @@ public partial class DashBoardPageViewModel(
             .ToList();
     }
 
-    private async Task LoadDailySummaryAsync(Guid userId, Guid companyId)
+    private async Task LoadDailySummaryAsync()
     {
         try
         {
-            var isDepartmentLeader = CanAccessReportsPage;
-            Guid? departmentId = null;
-
-            if (isDepartmentLeader)
-            {
-                var resolver = Infrastructure.ServiceLocator.GetRequiredService<Infrastructure.Authorization.IWorkerReportAccessResolver>();
-                var state = await resolver.GetStateAsync();
-                departmentId = state.DepartmentId;
-            }
-
-            var result = await aiApiClient.GetDailySummaryAsync(userId, companyId, isDepartmentLeader, departmentId);
-            DailySummaryText = !string.IsNullOrWhiteSpace(result?.Summary)
-                ? result.Summary
+            var summary = await workerDashboardStateService.GetOrLoadDailySummaryAsync();
+            DailySummaryText = !string.IsNullOrWhiteSpace(summary)
+                ? summary
                 : NoDailySummaryMessage;
         }
         catch

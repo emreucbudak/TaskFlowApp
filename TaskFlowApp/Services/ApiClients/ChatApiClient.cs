@@ -38,6 +38,12 @@ public sealed class ChatApiClient(IApiClient apiClient) : ControllerApiClientBas
     public Task<int> GetUnreadMessageCountAsync(Guid userId, CancellationToken cancellationToken = default) =>
         PostForResultAsync<int>("GetUnreadMessageCountQueryRequest", new { UserId = userId }, cancellationToken: cancellationToken);
 
+    public Task<int> MarkConversationAsReadCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<int>("MarkConversationAsReadCommandRequest", request, cancellationToken: cancellationToken);
+
+    public Task<int> MarkConversationAsReadAsync(Guid otherUserId, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<int>("MarkConversationAsReadCommandRequest", new { OtherUserId = otherUserId }, cancellationToken: cancellationToken);
+
     public Task MarkAsDeliveredCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("MarkAsDeliveredCommandRequest", request, cancellationToken: cancellationToken);
 

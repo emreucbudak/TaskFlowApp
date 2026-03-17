@@ -6,6 +6,7 @@ using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -13,7 +14,8 @@ public partial class MainPageViewModel(
     IdentityApiClient identityApiClient,
     IUserSession userSession,
     INavigationService navigationService,
-    IRealtimeConnectionManager realtimeConnectionManager) : ObservableObject
+    IRealtimeConnectionManager realtimeConnectionManager,
+    IWorkerDashboardStateService workerDashboardStateService) : ObservableObject
 {
     [ObservableProperty]
     private string email = string.Empty;
@@ -100,6 +102,13 @@ public partial class MainPageViewModel(
                 currentUserContext.UserId,
                 currentUserContext.CompanyId,
                 currentUserContext.Role);
+            workerDashboardStateService.Clear();
+
+            if (string.Equals(userSession.Role, "worker", StringComparison.OrdinalIgnoreCase))
+            {
+                _ = workerDashboardStateService.WarmDailySummaryAsync();
+            }
+
             try
             {
                 await realtimeConnectionManager.ConnectAllAsync();

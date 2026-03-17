@@ -9,6 +9,7 @@ using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Pages;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Services.State;
 using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp;
@@ -94,6 +95,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<TenantApiClient>();
         builder.Services.AddSingleton<AiApiClient>();
         builder.Services.AddSingleton<IWorkerReportAccessResolver, WorkerReportAccessResolver>();
+        builder.Services.AddSingleton<IWorkerDashboardStateService, WorkerDashboardStateService>();
         builder.Services.AddSingleton<ISignalRChatService, SignalRChatService>();
         builder.Services.AddSingleton<ISignalRNotificationService, SignalRNotificationService>();
         builder.Services.AddSingleton<IRealtimeConnectionManager, RealtimeConnectionManager>();
