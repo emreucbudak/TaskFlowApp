@@ -38,9 +38,24 @@ public static class MauiProgram
                     handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
                     handler.PlatformView.SetBackgroundColor(Android.Graphics.Color.Transparent);
                 });
+                handlers.AddHandler<Editor, Microsoft.Maui.Handlers.EditorHandler>();
+                Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("NoBorder", (handler, view) =>
+                {
+                    handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+                    handler.PlatformView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+                });
 #elif WINDOWS
                 handlers.AddHandler<Entry, Microsoft.Maui.Handlers.EntryHandler>();
                 Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoBorder", (handler, view) =>
+                {
+                    handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+                    handler.PlatformView.Style = null;
+                    var res = handler.PlatformView.Resources;
+                    res["TextControlBorderThemeThicknessFocused"] = new Microsoft.UI.Xaml.Thickness(0);
+                    handler.PlatformView.Resources = res;
+                });
+                handlers.AddHandler<Editor, Microsoft.Maui.Handlers.EditorHandler>();
+                Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("NoBorder", (handler, view) =>
                 {
                     handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
                     handler.PlatformView.Style = null;
@@ -77,6 +92,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ReportApiClient>();
         builder.Services.AddSingleton<StatsApiClient>();
         builder.Services.AddSingleton<TenantApiClient>();
+        builder.Services.AddSingleton<AiApiClient>();
         builder.Services.AddSingleton<IWorkerReportAccessResolver, WorkerReportAccessResolver>();
         builder.Services.AddSingleton<ISignalRChatService, SignalRChatService>();
         builder.Services.AddSingleton<ISignalRNotificationService, SignalRNotificationService>();
@@ -97,6 +113,7 @@ public static class MauiProgram
         builder.Services.AddTransient<LeaderIndividualTaskPageViewModel>();
         builder.Services.AddTransient<MessagesPageViewModel>();
         builder.Services.AddTransient<NotificationsPageViewModel>();
+        builder.Services.AddTransient<CreateReportPageViewModel>();
 
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<DashBoardPage>();
@@ -113,6 +130,7 @@ public static class MauiProgram
         builder.Services.AddTransient<LeaderIndividualTaskPage>();
         builder.Services.AddTransient<MessagesPage>();
         builder.Services.AddTransient<NotificationsPage>();
+        builder.Services.AddTransient<CreateReportPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

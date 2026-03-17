@@ -18,7 +18,8 @@ public partial class DashBoardPageViewModel(
     IRealtimeConnectionManager realtimeConnectionManager,
     ProjectManagementApiClient projectManagementApiClient,
     ChatApiClient chatApiClient,
-    IdentityApiClient identityApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    IdentityApiClient identityApiClient,
+    AiApiClient aiApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     private const int GroupActivityPreviewCount = 5;
     private const int GroupSummaryPageSize = 100;
@@ -27,6 +28,7 @@ public partial class DashBoardPageViewModel(
     private const string NoActivityMessage = "Grupta henuz aktivite yok.";
     private const string NoDailySummaryMessage = "Gunun ozeti bulunamadi.";
     private readonly List<GroupRecentActivityItem> allGroupRecentActivities = [];
+    private bool isShowingAllGroupRecentActivities;
     public ObservableCollection<GroupRecentActivityItem> GroupRecentActivities { get; } = [];
 
     [ObservableProperty]
@@ -73,6 +75,9 @@ public partial class DashBoardPageViewModel(
 
     [ObservableProperty]
     private bool hasUserGroup;
+
+    [ObservableProperty]
+    private bool canShowAllGroupRecentActivities;
 
     public bool HasNoGroupRecentActivities => !HasGroupRecentActivities;
     public bool CanOpenGroupDetails => HasUserGroup;
@@ -149,6 +154,9 @@ public partial class DashBoardPageViewModel(
             TotalCompleted = CompletedIndividualTaskCount + CompletedGroupTaskCount;
             OverdueTasks = OverdueIndividualTaskCount + OverdueGroupTaskCount;
             UnreadMessageCount = unread;
+
+            await LoadDailySummaryAsync(userId, companyId);
+
             StatusText = string.Empty;
         }
         catch (ApiException ex)
@@ -171,6 +179,20 @@ public partial class DashBoardPageViewModel(
         {
             IsBusy = false;
         }
+    }
+
+    [RelayCommand]
+    private Task ShowAllGroupRecentActivitiesAsync()
+    {
+        if (!CanShowAllGroupRecentActivities)
+        {
+            return Task.CompletedTask;
+        }
+
+        isShowingAllGroupRecentActivities = true;
+        CanShowAllGroupRecentActivities = false;
+        RefreshVisibleGroupRecentActivities();
+        return Task.CompletedTask;
     }
 
     [RelayCommand]
@@ -228,17 +250,13 @@ public partial class DashBoardPageViewModel(
             return;
         }
 
-        var summaryMessagesTask = chatApiClient.GetMessagesByGroupIdQueryRequestAsync(new
+        var summaryMessages = await chatApiClient.GetMessagesByGroupIdQueryRequestAsync(new
         {
             CurrentUserId = userId,
             GroupId = currentGroup.GroupId,
             PageSize = GroupSummaryPageSize,
             Page = 1
-        });
-
-        var summaryMessages = await summaryMessagesTask ?? [];
-
-        DailySummaryText = ResolveDailySummaryText(summaryMessages);
+        }) ?? [];
 
         var recentActivities = summaryMessages
             .Where(message => !message.IsDeleted)
@@ -253,6 +271,8 @@ public partial class DashBoardPageViewModel(
 
         allGroupRecentActivities.Clear();
         allGroupRecentActivities.AddRange(recentActivities);
+        isShowingAllGroupRecentActivities = false;
+        CanShowAllGroupRecentActivities = allGroupRecentActivities.Count > GroupActivityPreviewCount;
         RefreshVisibleGroupRecentActivities();
     }
 
@@ -262,6 +282,8 @@ public partial class DashBoardPageViewModel(
         GroupRecentActivities.Clear();
         HasGroupRecentActivities = false;
         HasUserGroup = false;
+        CanShowAllGroupRecentActivities = false;
+        isShowingAllGroupRecentActivities = false;
         CurrentGroupName = string.Empty;
         DailySummaryText = NoDailySummaryMessage;
         GroupActivityEmptyMessage = NoGroupMessage;
@@ -273,6 +295,8 @@ public partial class DashBoardPageViewModel(
         GroupRecentActivities.Clear();
         HasGroupRecentActivities = false;
         HasUserGroup = false;
+        CanShowAllGroupRecentActivities = false;
+        isShowingAllGroupRecentActivities = false;
         CurrentGroupName = string.Empty;
         DailySummaryText = NoDailySummaryMessage;
         GroupActivityEmptyMessage = NoGroupMessage;
@@ -280,8 +304,12 @@ public partial class DashBoardPageViewModel(
 
     private void RefreshVisibleGroupRecentActivities()
     {
+        var visibleActivities = isShowingAllGroupRecentActivities
+            ? allGroupRecentActivities
+            : allGroupRecentActivities.Take(GroupActivityPreviewCount).ToList();
+
         GroupRecentActivities.Clear();
-        foreach (var activity in allGroupRecentActivities.Take(GroupActivityPreviewCount))
+        foreach (var activity in visibleActivities)
         {
             GroupRecentActivities.Add(activity);
         }
@@ -451,64 +479,29 @@ public partial class DashBoardPageViewModel(
             : $"mesaj paylasti: {normalizedContent}";
     }
 
-    private static string ResolveDailySummaryText(IEnumerable<MessageDto> messages)
+    private async Task LoadDailySummaryAsync(Guid userId, Guid companyId)
     {
-        foreach (var message in messages.Where(message => !message.IsDeleted).OrderByDescending(message => message.SendTime))
+        try
         {
-            var summaryText = TryExtractDailySummaryText(message);
-            if (!string.IsNullOrWhiteSpace(summaryText))
+            var isDepartmentLeader = CanAccessReportsPage;
+            Guid? departmentId = null;
+
+            if (isDepartmentLeader)
             {
-                return summaryText;
-            }
-        }
-
-        return NoDailySummaryMessage;
-    }
-
-    private static string? TryExtractDailySummaryText(MessageDto message)
-    {
-        var localTime = ConvertToLocalTime(message.SendTime);
-        if (localTime.Date != DateTime.Now.Date)
-        {
-            return null;
-        }
-
-        var content = message.Content?.Trim();
-        if (string.IsNullOrWhiteSpace(content) || !ContainsDailySummaryKeyword(content))
-        {
-            return null;
-        }
-
-        var prefixes = new[]
-        {
-            "Gunun ozeti:",
-            "Gunun ozeti",
-            "Gun ozeti:",
-            "Gun ozeti",
-            "Daily summary:",
-            "Daily summary"
-        };
-
-        foreach (var prefix in prefixes)
-        {
-            if (!content.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
+                var resolver = Infrastructure.ServiceLocator.GetRequiredService<Infrastructure.Authorization.IWorkerReportAccessResolver>();
+                var state = await resolver.GetStateAsync();
+                departmentId = state.DepartmentId;
             }
 
-            var trimmedSummary = content[prefix.Length..].TrimStart(' ', ':', '-');
-            return string.IsNullOrWhiteSpace(trimmedSummary) ? content : trimmedSummary;
+            var result = await aiApiClient.GetDailySummaryAsync(userId, companyId, isDepartmentLeader, departmentId);
+            DailySummaryText = !string.IsNullOrWhiteSpace(result?.Summary)
+                ? result.Summary
+                : NoDailySummaryMessage;
         }
-
-        return content;
-    }
-
-    private static bool ContainsDailySummaryKeyword(string content)
-    {
-        var normalized = content.Trim().ToLowerInvariant();
-        return normalized.Contains("gunun ozeti")
-            || normalized.Contains("gun ozeti")
-            || normalized.Contains("daily summary");
+        catch
+        {
+            DailySummaryText = NoDailySummaryMessage;
+        }
     }
 
     private static bool IsCompletedStatus(string? statusName)
@@ -566,4 +559,5 @@ public partial class DashBoardPageViewModel(
 
         return localTime.ToString("dd.MM.yyyy HH:mm");
     }
+
 }

@@ -618,10 +618,16 @@ public partial class CompanyDashboardPageViewModel(
             })
             .ToList();
 
-        _isInitializingMonthSelection = true;
-        MonthOptions = options;
-        SelectedMonthOption = options[0];
-        _isInitializingMonthSelection = false;
+        try
+        {
+            _isInitializingMonthSelection = true;
+            MonthOptions = options;
+            SelectedMonthOption = options[0];
+        }
+        finally
+        {
+            _isInitializingMonthSelection = false;
+        }
     }
 
     private sealed record RankedWorkerSummary(Guid UserId, int TotalPoints, int TotalTasksCompleted);

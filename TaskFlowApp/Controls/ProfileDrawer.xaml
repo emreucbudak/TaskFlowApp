@@ -20,9 +20,9 @@
                     BackgroundColor="#FFFFFF"
                     Stroke="#E0E7FF"
                     StrokeThickness="1"
-                    StrokeShape="RoundRectangle 12"
+                    StrokeShape="RoundRectangle 12,0,12,0"
                     Padding="20,24,20,20"
-                    Margin="0,8,8,8"
+                    Margin="0"
                     TranslationX="340">
                 <Border.Shadow>
                     <Shadow Brush="#404F46E5" Offset="-4,0" Radius="16" />
@@ -81,162 +81,138 @@
 
                     <!-- Navigation Items -->
                     <ScrollView Grid.Row="1" VerticalOptions="Center">
-                        <VerticalStackLayout Spacing="20">
+                        <VerticalStackLayout Spacing="4" VerticalOptions="Center">
 
                             <!-- Profile -->
-                            <Border x:Name="ProfileMenuCard"
-                                    BackgroundColor="#F8F7FF"
-                                    Stroke="Transparent"
-                                    StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 12"
-                                    Padding="14,12">
-                                <Border.GestureRecognizers>
+                            <Grid x:Name="ProfileMenuCard"
+                                  ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="10"
+                                  Padding="14,12">
+                                <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding NavigateProfileCommand}" />
-                                </Border.GestureRecognizers>
-                                <Grid ColumnDefinitions="*,Auto"
-                                      ColumnSpacing="10">
-                                    <VerticalStackLayout Spacing="2">
-                                        <Label Text="Profilim"
-                                               TextColor="#1E1B4B"
-                                               FontSize="14"
-                                               FontAttributes="Bold" />
-                                        <Label Text="Hesap, yetki ve &#246;zet bilgilerini g&#246;r."
-                                               TextColor="#64748B"
-                                               FontSize="12" />
-                                    </VerticalStackLayout>
-                                    <Label Grid.Column="1"
-                                           Text="&#x203A;"
-                                           TextColor="#94A3B8"
-                                           FontSize="28"
-                                           VerticalOptions="Center" />
-                                </Grid>
-                            </Border>
+                                </Grid.GestureRecognizers>
+                                <Label Text="Profilim"
+                                       TextColor="#1E1B4B"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center" />
+                                <Label Grid.Column="1"
+                                       Text="&#x203A;"
+                                       TextColor="#94A3B8"
+                                       FontSize="28"
+                                       VerticalOptions="Center" />
+                            </Grid>
 
                             <!-- Group -->
-                            <Border x:Name="GroupMenuCard"
-                                    IsVisible="{Binding ShowGroupNavigation}"
-                                    BackgroundColor="#F8F7FF"
-                                    Stroke="Transparent"
-                                    StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 12"
-                                    Padding="14,12">
-                                <Border.GestureRecognizers>
+                            <Grid x:Name="GroupMenuCard"
+                                  IsVisible="{Binding ShowGroupNavigation}"
+                                  ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="10"
+                                  Padding="14,12">
+                                <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding NavigateGroupDetailsCommand}" />
-                                </Border.GestureRecognizers>
-                                <Grid ColumnDefinitions="*,Auto"
-                                      ColumnSpacing="10">
-                                    <VerticalStackLayout Spacing="2">
-                                        <Label Text="Grubum"
-                                               TextColor="#1E1B4B"
-                                               FontSize="14"
-                                               FontAttributes="Bold" />
-                                        <Label Text="Grup detaylar&#305; ve son aktiviteleri a&#231;."
-                                               TextColor="#64748B"
-                                               FontSize="12" />
-                                    </VerticalStackLayout>
-                                    <Label Grid.Column="1"
-                                           Text="&#x203A;"
-                                           TextColor="#94A3B8"
-                                           FontSize="28"
-                                           VerticalOptions="Center" />
-                                </Grid>
-                            </Border>
+                                </Grid.GestureRecognizers>
+                                <Label Text="Grubum"
+                                       TextColor="#1E1B4B"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center" />
+                                <Label Grid.Column="1"
+                                       Text="&#x203A;"
+                                       TextColor="#94A3B8"
+                                       FontSize="28"
+                                       VerticalOptions="Center" />
+                            </Grid>
+
+                            <!-- Create Report (Worker only) -->
+                            <Grid x:Name="CreateReportMenuCard"
+                                  IsVisible="{Binding IsWorkerUser}"
+                                  ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="10"
+                                  Padding="14,12">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding NavigateCreateReportCommand}" />
+                                </Grid.GestureRecognizers>
+                                <Label Text="Rapor Olu&#351;tur"
+                                       TextColor="#1E1B4B"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center" />
+                                <Label Grid.Column="1"
+                                       Text="&#x203A;"
+                                       TextColor="#94A3B8"
+                                       FontSize="28"
+                                       VerticalOptions="Center" />
+                            </Grid>
 
                             <!-- Reports -->
-                            <Border x:Name="ReportsMenuCard"
-                                    IsVisible="{Binding ShowReportsNavigation}"
-                                    BackgroundColor="#F8F7FF"
-                                    Stroke="Transparent"
-                                    StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 12"
-                                    Padding="14,12">
-                                <Border.GestureRecognizers>
+                            <Grid x:Name="ReportsMenuCard"
+                                  IsVisible="{Binding ShowReportsNavigation}"
+                                  ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="10"
+                                  Padding="14,12">
+                                <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding NavigateReportsCommand}" />
-                                </Border.GestureRecognizers>
-                                <Grid ColumnDefinitions="*,Auto"
-                                      ColumnSpacing="10">
-                                    <VerticalStackLayout Spacing="2">
-                                        <Label Text="Raporlar"
-                                               TextColor="#1E1B4B"
-                                               FontSize="14"
-                                               FontAttributes="Bold" />
-                                        <Label Text="Rapor ekran&#305;na h&#305;zl&#305; ge&#231;i&#351; yap."
-                                               TextColor="#64748B"
-                                               FontSize="12" />
-                                    </VerticalStackLayout>
-                                    <Label Grid.Column="1"
-                                           Text="&#x203A;"
-                                           TextColor="#94A3B8"
-                                           FontSize="28"
-                                           VerticalOptions="Center" />
-                                </Grid>
-                            </Border>
+                                </Grid.GestureRecognizers>
+                                <Label Text="Raporlar"
+                                       TextColor="#1E1B4B"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center" />
+                                <Label Grid.Column="1"
+                                       Text="&#x203A;"
+                                       TextColor="#94A3B8"
+                                       FontSize="28"
+                                       VerticalOptions="Center" />
+                            </Grid>
 
                             <!-- Tasks -->
-                            <Border x:Name="TasksMenuCard"
-                                    IsVisible="{Binding ShowTasksNavigation}"
-                                    BackgroundColor="#F8F7FF"
-                                    Stroke="Transparent"
-                                    StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 12"
-                                    Padding="14,12">
-                                <Border.GestureRecognizers>
+                            <Grid x:Name="TasksMenuCard"
+                                  IsVisible="{Binding ShowTasksNavigation}"
+                                  ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="10"
+                                  Padding="14,12">
+                                <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding NavigateTasksCommand}" />
-                                </Border.GestureRecognizers>
-                                <Grid ColumnDefinitions="*,Auto"
-                                      ColumnSpacing="10">
-                                    <VerticalStackLayout Spacing="2">
-                                        <Label Text="G&#246;revler"
-                                               TextColor="#1E1B4B"
-                                               FontSize="14"
-                                               FontAttributes="Bold" />
-                                        <Label Text="G&#246;revler sayfas&#305;na h&#305;zl&#305; ge&#231;i&#351; yap."
-                                               TextColor="#64748B"
-                                               FontSize="12" />
-                                    </VerticalStackLayout>
-                                    <Label Grid.Column="1"
-                                           Text="&#x203A;"
-                                           TextColor="#94A3B8"
-                                           FontSize="28"
-                                           VerticalOptions="Center" />
-                                </Grid>
-                            </Border>
+                                </Grid.GestureRecognizers>
+                                <Label Text="G&#246;revler"
+                                       TextColor="#1E1B4B"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center" />
+                                <Label Grid.Column="1"
+                                       Text="&#x203A;"
+                                       TextColor="#94A3B8"
+                                       FontSize="28"
+                                       VerticalOptions="Center" />
+                            </Grid>
 
                             <!-- Leader Management -->
-                            <Border x:Name="LeaderMenuCard"
-                                    IsVisible="{Binding ShowLeaderManagementNavigation}"
-                                    BackgroundColor="#F8F7FF"
-                                    Stroke="Transparent"
-                                    StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 12"
-                                    Padding="14,12">
-                                <Border.GestureRecognizers>
+                            <Grid x:Name="LeaderMenuCard"
+                                  IsVisible="{Binding ShowLeaderManagementNavigation}"
+                                  ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="10"
+                                  Padding="14,12">
+                                <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding NavigateLeaderTasksCommand}" />
-                                </Border.GestureRecognizers>
-                                <Grid ColumnDefinitions="*,Auto"
-                                      ColumnSpacing="10">
-                                    <VerticalStackLayout Spacing="2">
-                                        <Label Text="Y&#246;netim"
-                                               TextColor="#1E1B4B"
-                                               FontSize="14"
-                                               FontAttributes="Bold" />
-                                        <Label Text="Lider g&#246;rev ve ekip y&#246;netimine git."
-                                               TextColor="#64748B"
-                                               FontSize="12" />
-                                    </VerticalStackLayout>
-                                    <Label Grid.Column="1"
-                                           Text="&#x203A;"
-                                           TextColor="#94A3B8"
-                                           FontSize="28"
-                                           VerticalOptions="Center" />
-                                </Grid>
-                            </Border>
+                                </Grid.GestureRecognizers>
+                                <Label Text="Y&#246;netim"
+                                       TextColor="#1E1B4B"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center" />
+                                <Label Grid.Column="1"
+                                       Text="&#x203A;"
+                                       TextColor="#94A3B8"
+                                       FontSize="28"
+                                       VerticalOptions="Center" />
+                            </Grid>
                         </VerticalStackLayout>
                     </ScrollView>
 
                     <!-- Logout -->
                     <Border Grid.Row="2"
-                            BackgroundColor="#FDE7E9"
+                            BackgroundColor="#DC2626"
                             Stroke="Transparent"
                             StrokeThickness="0"
                             StrokeShape="RoundRectangle 10"
@@ -246,18 +222,14 @@
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="*,Auto"
                               ColumnSpacing="10">
-                            <VerticalStackLayout Spacing="2">
-                                <Label Text="&#199;&#305;k&#305;&#351; Yap"
-                                       TextColor="#A4262C"
-                                       FontSize="14"
-                                       FontAttributes="Bold" />
-                                <Label Text="Aktif oturumu g&#252;venli &#351;ekilde kapat."
-                                       TextColor="#64748B"
-                                       FontSize="12" />
-                            </VerticalStackLayout>
+                            <Label Text="&#199;&#305;k&#305;&#351; Yap"
+                                   TextColor="White"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center" />
                             <Label Grid.Column="1"
                                    Text="&#x203A;"
-                                   TextColor="#A4262C"
+                                   TextColor="White"
                                    FontSize="28"
                                    VerticalOptions="Center" />
                         </Grid>

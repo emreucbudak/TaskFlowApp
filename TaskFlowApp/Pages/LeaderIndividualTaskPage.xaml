@@ -228,7 +228,7 @@
                                     <Picker ItemsSource="{Binding AvailableGroupUserOptions}"
                                             SelectedItem="{Binding SelectedGroupUserToAdd}"
                                             ItemDisplayBinding="{Binding Name}"
-                                            Title="Uye sec"
+                                            Title="&#220;ye se&#231;"
                                             TitleColor="#94A3B8"
                                             TextColor="#1E1B4B"
                                             BackgroundColor="Transparent"
@@ -253,7 +253,7 @@
                                                        ItemSpacing="6" />
                                 </CollectionView.ItemsLayout>
                                 <CollectionView.EmptyView>
-                                    <Label Text="Henuz uye eklenmedi."
+                                    <Label Text="Hen&#252;z &#252;ye eklenmedi."
                                            FontSize="11"
                                            TextColor="#94A3B8"
                                            HorizontalTextAlignment="Center"
@@ -322,7 +322,7 @@
                                         Stroke="Transparent"
                                         StrokeShape="RoundRectangle 4"
                                         Padding="12">
-                                    <Label Text="Ana gorev bilgilerini doldurun. Her uye icin alt gorevler otomatik olusturulur."
+                                    <Label Text="Ana g&#246;rev bilgilerini doldurun. Her &#252;ye i&#231;in alt g&#246;revler otomatik olu&#351;turulur."
                                            TextColor="#64748B"
                                            FontSize="11"
                                            LineBreakMode="WordWrap" />
@@ -343,7 +343,7 @@
                                         StrokeShape="RoundRectangle 4"
                                         Padding="12,8">
                                     <Entry Text="{Binding GroupTaskTitle}"
-                                           Placeholder="Grup gorev basligi"
+                                           Placeholder="Grup g&#246;rev ba&#351;l&#305;&#287;&#305;"
                                            PlaceholderColor="#94A3B8"
                                            TextColor="#1E1B4B"
                                            BackgroundColor="Transparent"
@@ -357,7 +357,7 @@
                                         StrokeShape="RoundRectangle 4"
                                         Padding="12">
                                     <Editor Text="{Binding GroupTaskDescription}"
-                                            Placeholder="Grup gorev aciklamasi"
+                                            Placeholder="Grup g&#246;rev a&#231;&#305;klamas&#305;"
                                             PlaceholderColor="#94A3B8"
                                             TextColor="#1E1B4B"
                                             BackgroundColor="Transparent"
@@ -384,7 +384,7 @@
                                 </Border>
 
                                 <!-- Sub Tasks per Member -->
-                                <Label Text="Uye Alt Gorevleri"
+                                <Label Text="&#220;ye Alt G&#246;revleri"
                                        TextColor="#1E1B4B"
                                        FontSize="14"
                                        FontAttributes="Bold"
@@ -397,7 +397,7 @@
                                                            ItemSpacing="10" />
                                     </CollectionView.ItemsLayout>
                                     <CollectionView.EmptyView>
-                                        <Label Text="Uye secildikten sonra alt gorevler burada gorunecektir."
+                                        <Label Text="&#220;ye se&#231;ildikten sonra alt g&#246;revler burada g&#246;r&#252;necektir."
                                                FontSize="11"
                                                TextColor="#94A3B8"
                                                HorizontalTextAlignment="Center"
@@ -416,13 +416,13 @@
                                                            FontSize="13"
                                                            FontAttributes="Bold" />
                                                     <Entry Text="{Binding SubTaskTitle}"
-                                                           Placeholder="Alt gorev basligi"
+                                                           Placeholder="Alt g&#246;rev ba&#351;l&#305;&#287;&#305;"
                                                            PlaceholderColor="#94A3B8"
                                                            TextColor="#1E1B4B"
                                                            BackgroundColor="#FFFFFF"
                                                            HandlerChanged="OnInputHandlerChanged" />
                                                     <Editor Text="{Binding SubTaskDescription}"
-                                                            Placeholder="Alt gorev aciklamasi"
+                                                            Placeholder="Alt g&#246;rev a&#231;&#305;klamas&#305;"
                                                             PlaceholderColor="#94A3B8"
                                                             TextColor="#1E1B4B"
                                                             BackgroundColor="#FFFFFF"
@@ -502,7 +502,7 @@
                                            TextColor="#1E1B4B"
                                            FontSize="13"
                                            LineBreakMode="WordWrap" />
-                                    <Label Text="Uyeler"
+                                    <Label Text="&#220;yeler"
                                            TextColor="#94A3B8"
                                            FontSize="11" />
                                     <Label Text="{Binding SelectedDeleteGroupMembersText}"

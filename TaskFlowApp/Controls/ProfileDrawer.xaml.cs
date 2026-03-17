@@ -78,18 +78,5 @@ public partial class ProfileDrawer : ContentView
 
     private void ApplyActiveState()
     {
-        var activeItem = ActiveItem?.Trim();
-        SetMenuState(ProfileMenuCard, activeItem, "Profile");
-        SetMenuState(GroupMenuCard, activeItem, "Group");
-        SetMenuState(ReportsMenuCard, activeItem, "Reports");
-        SetMenuState(TasksMenuCard, activeItem, "Tasks");
-        SetMenuState(LeaderMenuCard, activeItem, "Leader");
-    }
-
-    private static void SetMenuState(Border border, string? activeItem, string itemKey)
-    {
-        var isActive = string.Equals(activeItem, itemKey, StringComparison.OrdinalIgnoreCase);
-        border.BackgroundColor = Color.FromArgb("#F8F7FF");
-        border.Stroke = new SolidColorBrush(Color.FromArgb("#00000000"));
     }
 }

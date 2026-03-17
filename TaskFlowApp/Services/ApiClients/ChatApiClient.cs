@@ -20,9 +20,6 @@ public sealed class ChatApiClient(IApiClient apiClient) : ControllerApiClientBas
             new { CurrentUserId = currentUserId, UserId1 = firstUserId, UserId2 = secondUserId, Page = page, PageSize = pageSize },
             cancellationToken: cancellationToken);
 
-    public Task<List<MessageDto>> GetMessagesByGroupIdQueryRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostForResultAsync<List<MessageDto>>("GetMessagesByGroupIdQueryRequest", request, cancellationToken: cancellationToken);
-
     public Task<List<MessageDto>> GetMessagesByUserIdQueryRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostForResultAsync<List<MessageDto>>("GetMessagesByUserIdQueryRequest", request, cancellationToken: cancellationToken);
 
@@ -31,6 +28,9 @@ public sealed class ChatApiClient(IApiClient apiClient) : ControllerApiClientBas
             "GetMessagesByUserIdQueryRequest",
             new { UserId = userId, Page = page, PageSize = pageSize },
             cancellationToken: cancellationToken);
+
+    public Task<List<MessageDto>> GetMessagesByGroupIdQueryRequestAsync(object request, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<List<MessageDto>>("GetMessagesByGroupIdQueryRequest", request, cancellationToken: cancellationToken);
 
     public Task<int> GetUnreadMessageCountQueryRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostForResultAsync<int>("GetUnreadMessageCountQueryRequest", request, cancellationToken: cancellationToken);
