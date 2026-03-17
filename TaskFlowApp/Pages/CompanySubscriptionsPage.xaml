@@ -238,7 +238,7 @@
         </Grid>
 
         <controls:AppBottomNav Grid.Row="3"
-                               ActiveItem="Notifications" />
+                               ActiveItem="" />
 
         <controls:ProfileDrawer Grid.RowSpan="4"
                                 ActiveItem=""

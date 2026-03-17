@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:controls="clr-namespace:TaskFlowApp.Controls"
+             x:Class="TaskFlowApp.Pages.CreateReportPage"
+             BackgroundColor="#EEF2FF"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+
+        <!-- HEADER BAR -->
+        <Grid Grid.Row="0" Padding="20,12,20,12" ColumnDefinitions="Auto,*,Auto" BackgroundColor="#FFFFFF">
+            <Image Grid.Column="0" Source="taskflow_logo.png" WidthRequest="32" HeightRequest="32" Aspect="AspectFit" VerticalOptions="Center" />
+            <Border Grid.Column="2" BackgroundColor="#4F46E5" Stroke="Transparent" WidthRequest="32" HeightRequest="32" HorizontalOptions="End" VerticalOptions="Center">
+                <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                <Label Text="{Binding CurrentUserInitials}" TextColor="White" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+            </Border>
+        </Grid>
+
+        <!-- Section Header -->
+        <Grid Grid.Row="1" Padding="20,16,20,4" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+            <BoxView Grid.Column="0" Color="#4F46E5" WidthRequest="4" CornerRadius="2" VerticalOptions="Fill" />
+            <Label Grid.Column="1"
+                   Text="Rapor Oluştur"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="#1E1B4B"
+                   VerticalOptions="Center" />
+        </Grid>
+
+        <!-- Content -->
+        <Grid Grid.Row="2">
+            <ScrollView>
+                <VerticalStackLayout Padding="16,12,16,24" Spacing="12">
+
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="#A4262C"
+                           FontSize="12"
+                           HeightRequest="18"
+                           VerticalTextAlignment="Center"
+                           LineBreakMode="TailTruncation"
+                           MaxLines="1" />
+
+                    <!-- Create Report Form -->
+                    <Border BackgroundColor="#FFFFFF" Stroke="#E0E7FF" StrokeShape="RoundRectangle 12" Padding="16,20" VerticalOptions="Start">
+                        <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
+                        <VerticalStackLayout Spacing="16">
+
+                            <!-- Title -->
+                            <Border BackgroundColor="#FFFFFF" StrokeShape="RoundRectangle 4" Stroke="#C7D2FE" Padding="4,0">
+                                <Entry Placeholder="Başlık"
+                                       Text="{Binding TitleInput}"
+                                       TextColor="#1E1B4B"
+                                       PlaceholderColor="#94A3B8"
+                                       BackgroundColor="Transparent"
+                                       FontSize="13"
+                                       HeightRequest="44" />
+                            </Border>
+
+                            <!-- Description -->
+                            <Border BackgroundColor="#FFFFFF" StrokeShape="RoundRectangle 4" Stroke="#C7D2FE" Padding="4,4">
+                                <Editor Placeholder="Açıklama (en az 10 karakter)"
+                                        Text="{Binding DescriptionInput}"
+                                        TextColor="#1E1B4B"
+                                        PlaceholderColor="#94A3B8"
+                                        BackgroundColor="Transparent"
+                                        FontSize="13"
+                                        HeightRequest="120"
+                                        AutoSize="TextChanges" />
+                            </Border>
+
+                            <!-- Topic Select -->
+                            <Border BackgroundColor="#FFFFFF" StrokeShape="RoundRectangle 4" Stroke="#C7D2FE" Padding="8,0">
+                                <Grid HeightRequest="44" VerticalOptions="Center">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnTopicSelectTapped" />
+                                    </Grid.GestureRecognizers>
+                                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                                        <Label Grid.Column="0"
+                                               Text="{Binding SelectedTopicDisplayText}"
+                                               TextColor="#1E1B4B"
+                                               VerticalOptions="Center"
+                                               FontSize="13" />
+                                        <Path Grid.Column="1"
+                                              Data="M 2 4 L 7 9 L 12 4"
+                                              Stroke="#94A3B8"
+                                              StrokeThickness="2"
+                                              StrokeLineCap="Round"
+                                              StrokeLineJoin="Round"
+                                              WidthRequest="14"
+                                              HeightRequest="10"
+                                              HorizontalOptions="End"
+                                              VerticalOptions="Center"
+                                              Margin="8,0,0,0" />
+                                    </Grid>
+                                </Grid>
+                            </Border>
+
+                            <!-- Department Select -->
+                            <Border BackgroundColor="#FFFFFF" StrokeShape="RoundRectangle 4" Stroke="#C7D2FE" Padding="8,0">
+                                <Grid HeightRequest="44" VerticalOptions="Center">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnDepartmentSelectTapped" />
+                                    </Grid.GestureRecognizers>
+                                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                                        <Label Grid.Column="0"
+                                               Text="{Binding SelectedDepartmentDisplayText}"
+                                               TextColor="#1E1B4B"
+                                               VerticalOptions="Center"
+                                               FontSize="13" />
+                                        <Path Grid.Column="1"
+                                              Data="M 2 4 L 7 9 L 12 4"
+                                              Stroke="#94A3B8"
+                                              StrokeThickness="2"
+                                              StrokeLineCap="Round"
+                                              StrokeLineJoin="Round"
+                                              WidthRequest="14"
+                                              HeightRequest="10"
+                                              HorizontalOptions="End"
+                                              VerticalOptions="Center"
+                                              Margin="8,0,0,0" />
+                                    </Grid>
+                                </Grid>
+                            </Border>
+
+                            <!-- Submit Button -->
+                            <Button Text="Rapor Oluştur"
+                                    Command="{Binding CreateReportCommand}"
+                                    BackgroundColor="#4F46E5"
+                                    TextColor="White"
+                                    CornerRadius="4"
+                                    HeightRequest="44"
+                                    FontSize="13"
+                                    FontAttributes="Bold"
+                                    Margin="0,8,0,0" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <ActivityIndicator
+                Grid.ZIndex="1"
+                IsRunning="{Binding IsBusy}"
+                IsVisible="{Binding IsBusy}"
+                Color="#4F46E5"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </Grid>
+
+        <controls:AppBottomNav Grid.Row="3"
+                               ActiveItem="" />
+
+        <controls:ProfileDrawer Grid.RowSpan="5"
+                                ActiveItem=""
+                                IsOpen="{Binding IsProfileMenuOpen}" />
+    </Grid>
+</ContentPage>

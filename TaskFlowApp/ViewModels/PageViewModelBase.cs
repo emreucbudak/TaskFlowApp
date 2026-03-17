@@ -221,6 +221,19 @@ public abstract partial class PageViewModelBase(
     }
 
     [RelayCommand]
+    private Task NavigateCreateReportAsync()
+    {
+        CloseProfileMenu();
+
+        if (!IsWorkerUser)
+        {
+            return Task.CompletedTask;
+        }
+
+        return NavigationService.GoToRootAsync("CreateReportPage");
+    }
+
+    [RelayCommand]
     private Task NavigateProfileAsync()
     {
         CloseProfileMenu();

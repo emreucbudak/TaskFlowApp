@@ -144,34 +144,27 @@
                 </Grid>
 
                 <!-- Section Header: Grubun Son Aktiviteleri -->
-                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="0,6,0,0">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="0,8,0,0">
                     <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
-                    <Label Grid.Column="1"
-                           Text="Grubun Son Aktiviteleri"
-                           TextColor="#1E1B4B"
-                           FontSize="18"
-                           FontAttributes="Bold"
-                           VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Grubun Son Aktiviteleri" TextColor="#1E1B4B" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
                     <Button Grid.Column="2"
                             Text="T&#252;m&#252;n&#252; G&#246;r"
-                            Command="{Binding OpenGroupDetailsCommand}"
-                            IsEnabled="{Binding CanOpenGroupDetails}"
-                            BackgroundColor="#E0E7FF"
-                            TextColor="#4F46E5"
-                            CornerRadius="4"
+                            Command="{Binding ShowAllGroupRecentActivitiesCommand}"
+                            IsEnabled="{Binding CanShowAllGroupRecentActivities}"
+                            BackgroundColor="#4F46E5"
+                            TextColor="White"
+                            CornerRadius="8"
                             HeightRequest="28"
                             Padding="12,4"
                             FontSize="12" />
                 </Grid>
 
-                <!-- Activities Card -->
                 <Border BackgroundColor="#FFFFFF"
                         Stroke="#E0E7FF"
+                        StrokeThickness="1"
                         StrokeShape="RoundRectangle 12"
                         Padding="14">
-                    <Border.Shadow>
-                        <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
-                    </Border.Shadow>
+                    <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
                     <VerticalStackLayout Spacing="10">
 
                         <Label Text="{Binding GroupActivityEmptyMessage}"
@@ -184,34 +177,36 @@
                                              Spacing="8">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate>
-                                    <!-- Timeline-style activity item -->
-                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Padding="4,4">
-                                        <!-- Blue dot -->
-                                        <Ellipse Grid.Column="0"
-                                                 WidthRequest="6"
-                                                 HeightRequest="6"
-                                                 Fill="#4F46E5"
-                                                 VerticalOptions="Start"
-                                                 Margin="0,6,0,0" />
-                                        <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                                                <Label Grid.Column="0"
-                                                       Text="{Binding ActorName}"
-                                                       TextColor="#1E1B4B"
-                                                       FontSize="13"
-                                                       FontAttributes="Bold" />
-                                                <Label Grid.Column="1"
-                                                       Text="{Binding OccurredAtText}"
-                                                       TextColor="#94A3B8"
-                                                       FontSize="11" />
-                                            </Grid>
-                                            <Label Text="{Binding ActionText}"
-                                                   TextColor="#64748B"
+                                    <Border BackgroundColor="#F5F3FF"
+                                            Stroke="#E0E7FF"
+                                            StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 10"
+                                            Padding="10,8">
+                                        <Grid RowDefinitions="Auto,Auto"
+                                              ColumnDefinitions="*,Auto"
+                                              ColumnSpacing="8"
+                                              RowSpacing="2">
+                                            <Label Grid.Row="0"
+                                                   Grid.Column="0"
+                                                   Text="{Binding ActorName}"
+                                                   TextColor="#1E1B4B"
+                                                   FontSize="13"
+                                                   FontAttributes="Bold" />
+                                            <Label Grid.Row="0"
+                                                   Grid.Column="1"
+                                                   Text="{Binding OccurredAtText}"
+                                                   TextColor="#94A3B8"
+                                                   FontSize="11" />
+                                            <Label Grid.Row="1"
+                                                   Grid.Column="0"
+                                                   Grid.ColumnSpan="2"
+                                                   Text="{Binding ActionText}"
+                                                   TextColor="#475569"
                                                    FontSize="12"
                                                    MaxLines="2"
                                                    LineBreakMode="TailTruncation" />
-                                        </VerticalStackLayout>
-                                    </Grid>
+                                        </Grid>
+                                    </Border>
                                 </DataTemplate>
                             </BindableLayout.ItemTemplate>
                         </VerticalStackLayout>
@@ -219,23 +214,23 @@
                 </Border>
 
                 <!-- Section Header: Gunun Ozeti -->
-                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" Margin="0,6,0,0">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" Margin="0,8,0,0">
                     <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
                     <Label Grid.Column="1" Text="G&#252;n&#252;n &#214;zeti" TextColor="#1E1B4B" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
                 </Grid>
 
                 <Border BackgroundColor="#FFFFFF"
                         Stroke="#E0E7FF"
+                        StrokeThickness="1"
                         StrokeShape="RoundRectangle 12"
                         Padding="14">
-                    <Border.Shadow>
-                        <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
-                    </Border.Shadow>
+                    <Border.Shadow><Shadow Brush="#204F46E5" Offset="0,2" Radius="8" /></Border.Shadow>
                     <Label Text="{Binding DailySummaryText}"
-                           TextColor="#64748B"
+                           TextColor="#475569"
                            FontSize="12"
                            LineBreakMode="WordWrap" />
                 </Border>
+
             </VerticalStackLayout>
         </ScrollView>
 

@@ -205,8 +205,12 @@ public partial class CompanyEmployeesPageViewModel(
             });
 
             var companyId = UserSession.CompanyId.Value;
-            _ = await TryRefreshDepartmentsAsync(companyId);
-            _ = await TryRefreshUsersAsync(companyId);
+            var deptRefreshed = await TryRefreshDepartmentsAsync(companyId);
+            var usersRefreshed = await TryRefreshUsersAsync(companyId);
+            if (!deptRefreshed || !usersRefreshed)
+            {
+                ErrorMessage = "Çalışan eklendi ancak liste güncellenemedi. Sayfayı yenileyin.";
+            }
 
             WorkerNameInput = string.Empty;
             WorkerEmailInput = string.Empty;
@@ -217,6 +221,14 @@ public partial class CompanyEmployeesPageViewModel(
         catch (ApiException ex) when (ex.StatusCode == 409)
         {
             ErrorMessage = "Bu e-posta adresi zaten kullanılıyor.";
+        }
+        catch (ApiException ex) when (ex.StatusCode == 401)
+        {
+            ErrorMessage = ex.ResponseBody?.Contains("zaten", StringComparison.OrdinalIgnoreCase) == true
+                ? "Bu e-posta adresi zaten kullanılıyor."
+                : ex.ResponseBody?.Contains("başarısız", StringComparison.OrdinalIgnoreCase) == true
+                    ? "Kayıt işlemi başarısız oldu. Şifre kurallarını kontrol edin (en az 8 karakter, büyük harf, küçük harf, rakam)."
+                    : "Çalışan eklenemedi. Bilgileri kontrol edip tekrar deneyin.";
         }
         catch (ApiException ex) when (ex.StatusCode == 400)
         {
@@ -284,8 +296,14 @@ public partial class CompanyEmployeesPageViewModel(
             });
 
             var companyId = UserSession.CompanyId.Value;
-            _ = await TryRefreshUsersAsync(companyId);
+            var refreshed = await TryRefreshUsersAsync(companyId);
+            if (!refreshed)
+            {
+                ErrorMessage = "Transfer kaydedildi ancak liste güncellenemedi. Sayfayı yenileyin.";
+            }
 
+            SelectedUser = null;
+            SelectedTransferDepartment = null;
             FormMessage = "Çalışan başarıyla departmana transfer edildi.";
         }
         catch (ApiException ex) when (ex.StatusCode == 400)
@@ -419,7 +437,11 @@ public partial class CompanyEmployeesPageViewModel(
             });
 
             var companyId = UserSession.CompanyId.Value;
-            _ = await TryRefreshUsersAsync(companyId);
+            var refreshed = await TryRefreshUsersAsync(companyId);
+            if (!refreshed)
+            {
+                ErrorMessage = "Çalışan silindi ancak liste güncellenemedi. Sayfayı yenileyin.";
+            }
 
             SelectedDeleteUser = null;
             FormMessage = "Çalışan başarıyla silindi.";
@@ -499,6 +521,7 @@ public partial class CompanyEmployeesPageViewModel(
             });
 
             NewPasswordInput = string.Empty;
+            SelectedPasswordUser = null;
             FormMessage = "Çalışan şifresi başarıyla güncellendi.";
         }
         catch (ApiException ex) when (ex.StatusCode == 400)

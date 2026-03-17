@@ -1,4 +1,3 @@
-using System.Text.Json;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Models.Common;
 using TaskFlowApp.Models.Identity;
@@ -13,41 +12,17 @@ public sealed class IdentityApiClient(IApiClient apiClient) : ControllerApiClien
     public Task AddGroupsCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("AddGroupsCommandRequest", request, cancellationToken: cancellationToken);
 
-    public Task AddGroupsMemberCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostAsync("AddGroupsMemberCommandRequest", request, cancellationToken: cancellationToken);
-
     public Task AddUserToDepartmentCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("AddUserToDepartmentCommandRequest", request, cancellationToken: cancellationToken);
 
-    public Task CreateCompanyCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostAsync("CreateCompanyCommandRequest", request, includeAuth: false, cancellationToken: cancellationToken);
-
-    public Task DeleteCompanyCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostAsync("DeleteCompanyCommandRequest", request, cancellationToken: cancellationToken);
-
-    public Task DeleteDepartmentCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostAsync("DeleteDepartmentCommandRequest", request, cancellationToken: cancellationToken);
-
     public Task DeleteGroupsCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("DeleteGroupsCommandRequest", request, cancellationToken: cancellationToken);
-
-    public Task DeleteGroupsMemberCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostAsync("DeleteGroupsMemberCommandRequest", request, cancellationToken: cancellationToken);
-
-    public Task DeleteUserFromDepartmentCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostAsync("DeleteUserFromDepartmentCommandRequest", request, cancellationToken: cancellationToken);
 
     public Task DeleteWorkerCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("DeleteWorkerCommandRequest", request, cancellationToken: cancellationToken);
 
     public Task ChangeUserPasswordCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("ChangeUserPasswordCommandRequest", request, cancellationToken: cancellationToken);
-
-    public Task<PagedResultDto<JsonElement>> GetAllCompaniesQueriesRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostForResultAsync<PagedResultDto<JsonElement>>("GetAllCompaniesQueriesRequest", request, cancellationToken: cancellationToken);
-
-    public Task<List<JsonElement>> GetAllCompanyGroupsQueriesRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostForResultAsync<List<JsonElement>>("GetAllCompanyGroupsQueriesRequest", request, cancellationToken: cancellationToken);
 
     public Task<List<CompanyGroupDto>> GetAllCompanyGroupsAsync(Guid companyId, CancellationToken cancellationToken = default) =>
         PostForResultAsync<List<CompanyGroupDto>>(
@@ -73,21 +48,6 @@ public sealed class IdentityApiClient(IApiClient apiClient) : ControllerApiClien
             new { CompanyId = companyId, SearchText = searchText, Page = page, PageSize = pageSize },
             cancellationToken: cancellationToken);
 
-    public Task<DepartmentLeaderDto> GetDepartmentLeaderAsync(Guid departmentId, CancellationToken cancellationToken = default) =>
-        PostForResultAsync<DepartmentLeaderDto>(
-            "GetDepartmentLeaderQueryRequest",
-            new { DepartmentId = departmentId },
-            cancellationToken: cancellationToken);
-
-    public async Task<Guid?> GetDepartmentLeaderIdAsync(Guid departmentId, CancellationToken cancellationToken = default)
-    {
-        var response = await GetDepartmentLeaderAsync(departmentId, cancellationToken);
-        return response.LeaderId == Guid.Empty ? null : response.LeaderId;
-    }
-
-    public Task<JsonElement> GetDepartmentLeaderQueryRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostForJsonAsync("GetDepartmentLeaderQueryRequest", request, cancellationToken: cancellationToken);
-
     public Task<LoginCommandResponseDto> LoginCommandRequestAsync(LoginCommandRequestDto request, CancellationToken cancellationToken = default) =>
         PostForResultAsync<LoginCommandResponseDto>("LoginCommandRequest", request, includeAuth: false, cancellationToken: cancellationToken);
 
@@ -97,12 +57,27 @@ public sealed class IdentityApiClient(IApiClient apiClient) : ControllerApiClien
     public Task RegisterCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
         PostAsync("RegisterCommandRequest", request, includeAuth: false, cancellationToken: cancellationToken);
 
-    public Task UpdateCompanyCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostAsync("UpdateCompanyCommandRequest", request, cancellationToken: cancellationToken);
+    public async Task<Guid> GetDepartmentLeaderIdAsync(Guid departmentId, CancellationToken cancellationToken = default)
+    {
+        var result = await PostForResultAsync<DepartmentLeaderResponseDto>(
+            "GetDepartmentLeaderQueryRequest",
+            new { DepartmentId = departmentId },
+            cancellationToken: cancellationToken);
+        return result.LeaderId;
+    }
 
-    public Task UpdateDepartmentCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostAsync("UpdateDepartmentCommandRequest", request, cancellationToken: cancellationToken);
+    public Task SubmitGroupActivityAsync(Guid groupId, string title, string description, CancellationToken cancellationToken = default) =>
+        PostAsync("SubmitGroupActivityCommandRequest", new { GroupId = groupId, Title = title, Description = description }, cancellationToken: cancellationToken);
 
-    public Task UpdateGroupsCommandRequestAsync(object request, CancellationToken cancellationToken = default) =>
-        PostAsync("UpdateGroupsCommandRequest", request, cancellationToken: cancellationToken);
+    public Task ApproveGroupActivityAsync(Guid activityId, string? note = null, CancellationToken cancellationToken = default) =>
+        PostAsync("ApproveGroupActivityCommandRequest", new { ActivityId = activityId, Note = note }, cancellationToken: cancellationToken);
+
+    public Task RejectGroupActivityAsync(Guid activityId, string? note = null, CancellationToken cancellationToken = default) =>
+        PostAsync("RejectGroupActivityCommandRequest", new { ActivityId = activityId, Note = note }, cancellationToken: cancellationToken);
+
+    public Task<List<GroupActivityDto>> GetGroupActivitiesAsync(Guid groupId, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<List<GroupActivityDto>>(
+            "GetGroupActivitiesQueryRequest",
+            new { GroupId = groupId },
+            cancellationToken: cancellationToken);
 }

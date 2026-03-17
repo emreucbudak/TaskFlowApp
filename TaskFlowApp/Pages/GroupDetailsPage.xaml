@@ -52,7 +52,7 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="18" />
                 </Border.StrokeShape>
-                <Label Text="KA"
+                <Label Text="{Binding CurrentUserInitials}"
                        TextColor="#4F46E5"
                        FontAttributes="Bold"
                        HorizontalTextAlignment="Center"
@@ -117,25 +117,6 @@
                         </VerticalStackLayout>
                     </Border>
 
-                    <!-- Section Header: Gun Ozeti -->
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                        <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
-                        <Label Grid.Column="1" Text="Gün Özeti" TextColor="#1E1B4B" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
-                    </Grid>
-
-                    <Border BackgroundColor="#FFFFFF"
-                            Stroke="Transparent"
-                            StrokeShape="RoundRectangle 4"
-                            Padding="14">
-                        <Border.Shadow>
-                            <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
-                        </Border.Shadow>
-                        <Label Text="{Binding DailySummaryText}"
-                               TextColor="#64748B"
-                               FontSize="12"
-                               LineBreakMode="WordWrap" />
-                    </Border>
-
                     <!-- Section Header: Uyeler -->
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                         <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
@@ -190,73 +171,263 @@
                         </HorizontalStackLayout>
                     </ScrollView>
 
-                    <!-- Section Header: Tum Aktiviteler -->
+                    <!-- Section Header: Aktiviteler -->
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                         <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
-                        <Label Grid.Column="1"
-                               Text="Tüm Aktiviteler"
-                               TextColor="#1E1B4B"
-                               FontSize="18"
-                               FontAttributes="Bold"
-                               VerticalOptions="Center" />
-                        <Label Grid.Column="2"
-                               Text="{Binding GroupMembersSummaryText}"
-                               TextColor="#94A3B8"
-                               FontSize="11"
-                               VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="Aktiviteler" TextColor="#1E1B4B" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                        <!-- Add Activity Button -->
+                        <Border Grid.Column="2"
+                                BackgroundColor="#4F46E5"
+                                Stroke="Transparent"
+                                StrokeShape="RoundRectangle 8"
+                                Padding="10,6"
+                                HorizontalOptions="End"
+                                VerticalOptions="Center">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ShowActivityFormCommand}" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="4">
+                                <Image Source="{mi:MaterialOutlined Icon=Add}"
+                                       WidthRequest="16"
+                                       HeightRequest="16"
+                                       VerticalOptions="Center" />
+                                <Label Text="Ekle"
+                                       TextColor="White"
+                                       FontSize="12"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
                     </Grid>
 
-                    <!-- Activities Card -->
+                    <!-- Add Activity Form -->
                     <Border BackgroundColor="#FFFFFF"
-                            Stroke="Transparent"
-                            StrokeShape="RoundRectangle 4"
-                            Padding="14">
+                            Stroke="#4F46E5"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 8"
+                            Padding="16"
+                            IsVisible="{Binding IsActivityFormVisible}">
                         <Border.Shadow>
                             <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
                         </Border.Shadow>
-                        <VerticalStackLayout Spacing="10">
-                            <Label Text="{Binding ActivitiesEmptyMessage}"
-                                   TextColor="#64748B"
-                                   FontSize="13"
-                                   IsVisible="{Binding HasNoActivities}" />
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Yeni Aktivite"
+                                   TextColor="#1E1B4B"
+                                   FontSize="16"
+                                   FontAttributes="Bold" />
 
-                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding GroupActivities}"
-                                                 IsVisible="{Binding HasActivities}"
-                                                 Spacing="8">
-                                <BindableLayout.ItemTemplate>
-                                    <DataTemplate>
-                                        <!-- Timeline-style activity item -->
-                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Padding="4,4">
-                                            <!-- Blue dot -->
-                                            <Ellipse Grid.Column="0"
-                                                     WidthRequest="6"
-                                                     HeightRequest="6"
-                                                     Fill="#4F46E5"
-                                                     VerticalOptions="Start"
-                                                     Margin="0,6,0,0" />
-                                            <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" RowSpacing="4">
-                                                    <Label Grid.Column="0"
-                                                           Text="{Binding ActorName}"
-                                                           TextColor="#1E1B4B"
-                                                           FontSize="13"
-                                                           FontAttributes="Bold" />
-                                                    <Label Grid.Column="1"
-                                                           Text="{Binding OccurredAtText}"
-                                                           TextColor="#94A3B8"
-                                                           FontSize="11" />
-                                                </Grid>
-                                                <Label Text="{Binding ActionText}"
-                                                       TextColor="#64748B"
-                                                       FontSize="12"
-                                                       LineBreakMode="WordWrap" />
-                                            </VerticalStackLayout>
-                                        </Grid>
-                                    </DataTemplate>
-                                </BindableLayout.ItemTemplate>
-                            </VerticalStackLayout>
+                            <Border BackgroundColor="#F8FAFC"
+                                    Stroke="#CBD5E1"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 6"
+                                    Padding="8,4">
+                                <Entry Placeholder="Aktivite basligi"
+                                       Text="{Binding NewActivityTitle}"
+                                       TextColor="#1E1B4B"
+                                       PlaceholderColor="#94A3B8"
+                                       FontSize="14" />
+                            </Border>
+
+                            <Border BackgroundColor="#F8FAFC"
+                                    Stroke="#CBD5E1"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 6"
+                                    Padding="8,4">
+                                <Editor Placeholder="Aciklama (istege bagli)"
+                                        Text="{Binding NewActivityDescription}"
+                                        TextColor="#1E1B4B"
+                                        PlaceholderColor="#94A3B8"
+                                        FontSize="14"
+                                        HeightRequest="80"
+                                        AutoSize="TextChanges" />
+                            </Border>
+
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <!-- Cancel -->
+                                <Border Grid.Column="0"
+                                        BackgroundColor="#F1F5F9"
+                                        Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 8"
+                                        Padding="12,10"
+                                        HorizontalOptions="Fill">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HideActivityFormCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="Iptal"
+                                           TextColor="#64748B"
+                                           FontSize="14"
+                                           FontAttributes="Bold"
+                                           HorizontalTextAlignment="Center" />
+                                </Border>
+                                <!-- Submit -->
+                                <Border Grid.Column="1"
+                                        BackgroundColor="#4F46E5"
+                                        Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 8"
+                                        Padding="12,10"
+                                        HorizontalOptions="Fill">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SubmitActivityCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                                        <ActivityIndicator IsRunning="{Binding IsSubmittingActivity}"
+                                                           IsVisible="{Binding IsSubmittingActivity}"
+                                                           Color="White"
+                                                           WidthRequest="16"
+                                                           HeightRequest="16" />
+                                        <Label Text="Gonder"
+                                               TextColor="White"
+                                               FontSize="14"
+                                               FontAttributes="Bold"
+                                               HorizontalTextAlignment="Center" />
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </Grid>
                         </VerticalStackLayout>
                     </Border>
+
+                    <!-- No Activities Message -->
+                    <Label Text="Henuz aktivite bulunmuyor."
+                           TextColor="#94A3B8"
+                           FontSize="12"
+                           IsVisible="{Binding HasNoActivities}" />
+
+                    <!-- Activities List -->
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Activities}"
+                                         Spacing="10"
+                                         IsVisible="{Binding HasActivities}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border BackgroundColor="#FFFFFF"
+                                        Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 8"
+                                        Padding="14">
+                                    <Border.Shadow>
+                                        <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
+                                    </Border.Shadow>
+                                    <VerticalStackLayout Spacing="8">
+                                        <!-- Title + Status Row -->
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding Title}"
+                                                   TextColor="#1E1B4B"
+                                                   FontSize="15"
+                                                   FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation" />
+                                            <Border Grid.Column="1"
+                                                    BackgroundColor="{Binding StatusColor}"
+                                                    Stroke="Transparent"
+                                                    StrokeShape="RoundRectangle 10"
+                                                    Padding="8,3"
+                                                    VerticalOptions="Center">
+                                                <Label Text="{Binding StatusText}"
+                                                       TextColor="White"
+                                                       FontSize="10"
+                                                       FontAttributes="Bold" />
+                                            </Border>
+                                        </Grid>
+
+                                        <!-- Description -->
+                                        <Label Text="{Binding Description}"
+                                               TextColor="#64748B"
+                                               FontSize="12"
+                                               LineBreakMode="WordWrap"
+                                               MaxLines="3" />
+
+                                        <!-- Submitted by + date -->
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                            <Border Grid.Column="0"
+                                                    BackgroundColor="#EEF2FF"
+                                                    Stroke="Transparent"
+                                                    StrokeShape="RoundRectangle 12"
+                                                    WidthRequest="24"
+                                                    HeightRequest="24"
+                                                    VerticalOptions="Center">
+                                                <Label Text="{Binding Initials}"
+                                                       TextColor="#4F46E5"
+                                                       FontSize="9"
+                                                       FontAttributes="Bold"
+                                                       HorizontalTextAlignment="Center"
+                                                       VerticalTextAlignment="Center" />
+                                            </Border>
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding SubmittedByUserName}"
+                                                   TextColor="#64748B"
+                                                   FontSize="11"
+                                                   VerticalOptions="Center" />
+                                            <Label Grid.Column="2"
+                                                   Text="{Binding SubmittedAtText}"
+                                                   TextColor="#94A3B8"
+                                                   FontSize="10"
+                                                   VerticalOptions="Center" />
+                                        </Grid>
+
+                                        <!-- Review Note (if exists) -->
+                                        <Label Text="{Binding ReviewNoteDisplay}"
+                                               TextColor="#64748B"
+                                               FontSize="11"
+                                               FontAttributes="Italic"
+                                               IsVisible="{Binding HasReviewNote}" />
+
+                                        <!-- Approve/Reject Buttons (only for leader, only for pending) -->
+                                        <Grid ColumnDefinitions="*,*"
+                                              ColumnSpacing="8"
+                                              IsVisible="{Binding CanReview}">
+                                            <!-- Approve -->
+                                            <Border Grid.Column="0"
+                                                    BackgroundColor="#10B981"
+                                                    Stroke="Transparent"
+                                                    StrokeShape="RoundRectangle 8"
+                                                    Padding="10,8"
+                                                    HorizontalOptions="Fill">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveActivityCommand}"
+                                                        CommandParameter="{Binding ActivityId}" />
+                                                </Border.GestureRecognizers>
+                                                <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
+                                                    <Image Source="{mi:MaterialOutlined Icon=Check}"
+                                                           WidthRequest="14"
+                                                           HeightRequest="14"
+                                                           VerticalOptions="Center" />
+                                                    <Label Text="Onayla"
+                                                           TextColor="White"
+                                                           FontSize="12"
+                                                           FontAttributes="Bold"
+                                                           VerticalOptions="Center" />
+                                                </HorizontalStackLayout>
+                                            </Border>
+                                            <!-- Reject -->
+                                            <Border Grid.Column="1"
+                                                    BackgroundColor="#EF4444"
+                                                    Stroke="Transparent"
+                                                    StrokeShape="RoundRectangle 8"
+                                                    Padding="10,8"
+                                                    HorizontalOptions="Fill">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RejectActivityCommand}"
+                                                        CommandParameter="{Binding ActivityId}" />
+                                                </Border.GestureRecognizers>
+                                                <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
+                                                    <Image Source="{mi:MaterialOutlined Icon=Close}"
+                                                           WidthRequest="14"
+                                                           HeightRequest="14"
+                                                           VerticalOptions="Center" />
+                                                    <Label Text="Reddet"
+                                                           TextColor="White"
+                                                           FontSize="12"
+                                                           FontAttributes="Bold"
+                                                           VerticalOptions="Center" />
+                                                </HorizontalStackLayout>
+                                            </Border>
+                                        </Grid>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
                 </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>

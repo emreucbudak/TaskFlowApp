@@ -62,5 +62,9 @@
         Title=""
         ContentTemplate="{DataTemplate pages:NotificationsPage}"
         Route="NotificationsPage" />
+    <ShellContent
+        Title=""
+        ContentTemplate="{DataTemplate pages:CreateReportPage}"
+        Route="CreateReportPage" />
 
 </Shell>
