@@ -6,6 +6,7 @@ using TaskFlowApp.Infrastructure.Authorization;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -246,6 +247,14 @@ public abstract partial class PageViewModelBase(
         CloseProfileMenu();
         await RealtimeConnectionManager.DisconnectAllAsync();
         SetCurrentLeaderDepartmentName(string.Empty);
+        try
+        {
+            ServiceLocator.GetRequiredService<IWorkerDashboardStateService>().Clear();
+        }
+        catch
+        {
+        }
+
         UserSession.Clear();
         CanAccessReportsPage = false;
         await NavigationService.GoToRootAsync("MainPage");

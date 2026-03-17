@@ -9,6 +9,7 @@ using TaskFlowApp.Models.Chat;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -18,7 +19,8 @@ public partial class MessagesPageViewModel(
     IRealtimeConnectionManager realtimeConnectionManager,
     ChatApiClient chatApiClient,
     IdentityApiClient identityApiClient,
-    ISignalRChatService signalRChatService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    ISignalRChatService signalRChatService,
+    IWorkerDashboardStateService workerDashboardStateService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
 {
     private const int ConversationListPageSize = 100;
     private const int ConversationListMaxPages = 5;
@@ -142,6 +144,7 @@ public partial class MessagesPageViewModel(
             ReplacePriorConversationUsers(await usersTask);
             ConfigureDepartmentGroupState(currentUserId);
             UnreadCount = await unreadTask;
+            workerDashboardStateService.SetUnreadMessageCount(UnreadCount);
             StatusText = priorConversationUsers.Count > 0
                 ? $"Son yazisilan kisi sayisi: {priorConversationUsers.Count}"
                 : string.Empty;
@@ -197,6 +200,7 @@ public partial class MessagesPageViewModel(
             if (cachedMessages.Count > 0)
             {
                 SyncConversationMessages(cachedMessages, currentUserId);
+                await MarkConversationAsReadAsync(currentUserId, user.UserId, adjustUnreadCount: true, cancellationToken);
                 return;
             }
 
@@ -212,6 +216,7 @@ public partial class MessagesPageViewModel(
 
             ReplaceConversationCache(currentUserId, user.UserId, conversationMessages);
             ReplaceConversationMessages(conversationMessages, currentUserId);
+            await MarkConversationAsReadAsync(currentUserId, user.UserId, adjustUnreadCount: true, cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -870,6 +875,63 @@ public partial class MessagesPageViewModel(
         };
     }
 
+    private void MarkCachedConversationAsRead(Guid currentUserId, Guid otherUserId)
+    {
+        for (var index = 0; index < recentDirectMessages.Count; index++)
+        {
+            var message = recentDirectMessages[index];
+            if (message.IsDeleted ||
+                message.GroupId is not null ||
+                message.ReceiverId != currentUserId ||
+                message.SenderId != otherUserId ||
+                message.IsRead)
+            {
+                continue;
+            }
+
+            recentDirectMessages[index] = message with
+            {
+                IsRead = true
+            };
+        }
+    }
+
+    private async Task MarkConversationAsReadAsync(
+        Guid currentUserId,
+        Guid otherUserId,
+        bool adjustUnreadCount,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var markedCount = await chatApiClient.MarkConversationAsReadAsync(otherUserId, cancellationToken);
+            if (markedCount <= 0)
+            {
+                return;
+            }
+
+            MarkCachedConversationAsRead(currentUserId, otherUserId);
+
+            if (SelectedConversationUser?.UserId == otherUserId)
+            {
+                var cachedMessages = GetCachedConversationMessages(currentUserId, otherUserId);
+                SyncConversationMessages(cachedMessages, currentUserId);
+            }
+
+            if (adjustUnreadCount)
+            {
+                UnreadCount = Math.Max(0, UnreadCount - markedCount);
+                workerDashboardStateService.DecrementUnreadMessageCount(markedCount);
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private Task MarkConversationAsReadForActiveConversationAsync(Guid currentUserId, Guid otherUserId) =>
+        MarkConversationAsReadAsync(currentUserId, otherUserId, adjustUnreadCount: false);
+
     private void ReplaceConversationMessages(IEnumerable<MessageDto> messages, Guid currentUserId)
     {
         ConversationMessages.Clear();
@@ -1096,23 +1158,35 @@ public partial class MessagesPageViewModel(
                 return;
             }
 
-            UpsertDirectMessageCache(message);
-            UpsertPriorConversationUser(message, otherUserId.Value);
+            var isActiveConversation = SelectedConversationUser?.UserId == otherUserId.Value;
+            var normalizedMessage = isActiveConversation && message.ReceiverId == currentUserId
+                ? message with { IsRead = true }
+                : message;
 
-            if (SelectedConversationUser?.UserId == otherUserId.Value)
+            UpsertDirectMessageCache(normalizedMessage);
+            UpsertPriorConversationUser(normalizedMessage, otherUserId.Value);
+
+            if (isActiveConversation)
             {
-                if (ConversationMessages.All(item => item.MessageId != message.Id))
+                if (ConversationMessages.All(item => item.MessageId != normalizedMessage.Id))
                 {
-                    ConversationMessages.Add(MapConversationMessage(message, currentUserId));
+                    ConversationMessages.Add(MapConversationMessage(normalizedMessage, currentUserId));
                 }
 
                 ConversationEmptyMessage = string.Empty;
+
+                if (message.ReceiverId == currentUserId)
+                {
+                    _ = MarkConversationAsReadForActiveConversationAsync(currentUserId, otherUserId.Value);
+                }
+
                 return;
             }
 
             if (message.ReceiverId == currentUserId)
             {
                 UnreadCount += 1;
+                workerDashboardStateService.IncrementUnreadMessageCount();
             }
         });
     }
