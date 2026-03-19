@@ -6,8 +6,10 @@ using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Models.ProjectManagement;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Infrastructure.Helpers;
 using TaskFlowApp.Services.Realtime;
 using TaskFlowApp.Services.State;
+using TaskFlowApp.Infrastructure.Authorization;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -18,7 +20,8 @@ public partial class DashBoardPageViewModel(
     ProjectManagementApiClient projectManagementApiClient,
     ChatApiClient chatApiClient,
     IdentityApiClient identityApiClient,
-    IWorkerDashboardStateService workerDashboardStateService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
     private const int TasksPageSize = 100;
     private const string LoadingDailySummaryMessage = "Gunun ozeti hazirlaniyor.";
@@ -114,10 +117,10 @@ public partial class DashBoardPageViewModel(
             var groupMemberIds = ResolveGroupMemberIds(userGroups);
             var groupTasks = await LoadAllGroupTasksAsync(companyId, groupMemberIds);
 
-            var completedIndividualTasks = individualTasks.Count(task => IsCompletedStatus(task.StatusName));
-            var completedGroupTasks = groupTasks.Count(task => IsCompletedStatus(task.StatusName));
-            var overdueIndividualTasks = individualTasks.Count(task => task.Deadline < today && !IsCompletedStatus(task.StatusName));
-            var overdueGroupTasks = groupTasks.Count(task => task.DeadlineTime < today && !IsCompletedStatus(task.StatusName));
+            var completedIndividualTasks = individualTasks.Count(task => TaskStatusHelper.IsCompletedStatus(task.StatusName));
+            var completedGroupTasks = groupTasks.Count(task => TaskStatusHelper.IsCompletedStatus(task.StatusName));
+            var overdueIndividualTasks = individualTasks.Count(task => task.Deadline < today && !TaskStatusHelper.IsCompletedStatus(task.StatusName));
+            var overdueGroupTasks = groupTasks.Count(task => task.DeadlineTime < today && !TaskStatusHelper.IsCompletedStatus(task.StatusName));
 
             IndividualTaskCount = individualTasks.Count;
             GroupTaskCount = groupTasks.Count;
@@ -233,8 +236,8 @@ public partial class DashBoardPageViewModel(
     {
         userNameMap.TryGetValue(userId, out var currentUserName);
 
-        return NormalizeGroups(groups)
-            .Where(group => IsGroupMember(group, userId, currentUserName))
+        return GroupHelper.NormalizeGroups(groups)
+            .Where(group => GroupHelper.IsGroupMember(group, userId, currentUserName))
             .OrderBy(group => group.GroupName)
             .ToList();
     }
@@ -248,55 +251,6 @@ public partial class DashBoardPageViewModel(
             .ToList();
     }
 
-    private static bool IsGroupMember(CompanyGroupDto group, Guid userId, string? currentUserName)
-    {
-        if (group.WorkerUserIds.Contains(userId))
-        {
-            return true;
-        }
-
-        if (string.IsNullOrWhiteSpace(currentUserName))
-        {
-            return false;
-        }
-
-        return group.WorkerName.Any(name =>
-            string.Equals(name?.Trim(), currentUserName, StringComparison.OrdinalIgnoreCase));
-    }
-
-    private static List<CompanyGroupDto> NormalizeGroups(IEnumerable<CompanyGroupDto> groups)
-    {
-        return groups
-            .Where(group => !string.IsNullOrWhiteSpace(group.GroupName))
-            .GroupBy(group => group.GroupName.Trim(), StringComparer.OrdinalIgnoreCase)
-            .Select(grouped => new CompanyGroupDto
-            {
-                GroupId = grouped
-                    .Select(group => group.GroupId)
-                    .FirstOrDefault(groupId => groupId != Guid.Empty),
-                GroupName = grouped.First().GroupName,
-                WorkerUserIds = grouped
-                    .SelectMany(group => group.WorkerUserIds)
-                    .Where(workerId => workerId != Guid.Empty)
-                    .Distinct()
-                    .ToList(),
-                WorkerName = grouped
-                    .SelectMany(group => group.WorkerName)
-                    .Select(name => name?.Trim())
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Cast<string>()
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList(),
-                DepartmenName = grouped
-                    .SelectMany(group => group.DepartmenName)
-                    .Select(name => name?.Trim())
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Cast<string>()
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList()
-            })
-            .ToList();
-    }
 
     private async Task LoadDailySummaryAsync()
     {
@@ -307,23 +261,11 @@ public partial class DashBoardPageViewModel(
                 ? summary
                 : NoDailySummaryMessage;
         }
-        catch
+        catch (Exception ex)
         {
+            LogSilentFailure(ex);
             DailySummaryText = NoDailySummaryMessage;
         }
     }
 
-    private static bool IsCompletedStatus(string? statusName)
-    {
-        if (string.IsNullOrWhiteSpace(statusName))
-        {
-            return false;
-        }
-
-        var normalizedStatus = statusName.Trim().ToLowerInvariant();
-        return normalizedStatus.Contains("tamam")
-            || normalizedStatus.Contains("complete")
-            || normalizedStatus.Contains("done")
-            || normalizedStatus.Contains("closed");
-    }
 }

@@ -7,10 +7,10 @@ public partial class LeaderIndividualTaskPage : ContentPage
 {
     private LeaderIndividualTaskPageViewModel ViewModel => (LeaderIndividualTaskPageViewModel)BindingContext;
 
-    public LeaderIndividualTaskPage()
+    public LeaderIndividualTaskPage(LeaderIndividualTaskPageViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = ServiceLocator.GetRequiredService<LeaderIndividualTaskPageViewModel>();
+        BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()

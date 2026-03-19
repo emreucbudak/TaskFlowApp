@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using TaskFlowApp.Infrastructure;
+using TaskFlowApp.Infrastructure.Constants;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Chat;
 
@@ -33,7 +34,7 @@ public sealed class SignalRChatService(IUserSession userSession) : ISignalRChatS
             if (_hubConnection.State == HubConnectionState.Disconnected)
             {
                 await _hubConnection.StartAsync(cancellationToken);
-                ConnectionStateChanged?.Invoke("Connected");
+                ConnectionStateChanged?.Invoke(ConnectionStates.Connected);
             }
         }
         finally
@@ -59,7 +60,7 @@ public sealed class SignalRChatService(IUserSession userSession) : ISignalRChatS
 
             await _hubConnection.DisposeAsync();
             _hubConnection = null;
-            ConnectionStateChanged?.Invoke("Disconnected");
+            ConnectionStateChanged?.Invoke(ConnectionStates.Disconnected);
         }
         finally
         {
@@ -70,19 +71,19 @@ public sealed class SignalRChatService(IUserSession userSession) : ISignalRChatS
     public async Task SendPrivateMessageAsync(string targetUserId, string message, CancellationToken cancellationToken = default)
     {
         await EnsureConnectedAsync(cancellationToken);
-        await _hubConnection!.InvokeAsync("SendPrivateMessage", cancellationToken, targetUserId, message);
+        await _hubConnection!.InvokeAsync(HubMethods.SendPrivateMessage, cancellationToken, targetUserId, message);
     }
 
     public async Task JoinGroupAsync(string groupName, CancellationToken cancellationToken = default)
     {
         await EnsureConnectedAsync(cancellationToken);
-        await _hubConnection!.InvokeAsync("JoinGroup", cancellationToken, groupName);
+        await _hubConnection!.InvokeAsync(HubMethods.JoinGroup, cancellationToken, groupName);
     }
 
     public async Task LeaveGroupAsync(string groupName, CancellationToken cancellationToken = default)
     {
         await EnsureConnectedAsync(cancellationToken);
-        await _hubConnection!.InvokeAsync("LeaveGroup", cancellationToken, groupName);
+        await _hubConnection!.InvokeAsync(HubMethods.LeaveGroup, cancellationToken, groupName);
     }
 
     private HubConnection CreateConnection()
@@ -96,7 +97,7 @@ public sealed class SignalRChatService(IUserSession userSession) : ISignalRChatS
             .WithAutomaticReconnect()
             .Build();
 
-        connection.On<string, string, DateTime>("ReceivePrivateMessage", (senderId, message, sendTime) =>
+        connection.On<string, string, DateTime>(HubMethods.ReceivePrivateMessage, (senderId, message, sendTime) =>
         {
             var senderGuid = Guid.TryParse(senderId, out var parsedSenderId) ? parsedSenderId : Guid.Empty;
             PrivateMessageReceived?.Invoke(new MessageDto
@@ -110,7 +111,7 @@ public sealed class SignalRChatService(IUserSession userSession) : ISignalRChatS
             });
         });
 
-        connection.On<string, MessageDto>("ReceivePrivateMessage", (_, message) =>
+        connection.On<string, MessageDto>(HubMethods.ReceivePrivateMessage, (_, message) =>
         {
             if (message is null)
             {
@@ -127,23 +128,29 @@ public sealed class SignalRChatService(IUserSession userSession) : ISignalRChatS
 
         connection.Reconnecting += _ =>
         {
-            ConnectionStateChanged?.Invoke("Reconnecting");
+            ConnectionStateChanged?.Invoke(ConnectionStates.Reconnecting);
             return Task.CompletedTask;
         };
 
         connection.Reconnected += _ =>
         {
-            ConnectionStateChanged?.Invoke("Connected");
+            ConnectionStateChanged?.Invoke(ConnectionStates.Connected);
             return Task.CompletedTask;
         };
 
         connection.Closed += _ =>
         {
-            ConnectionStateChanged?.Invoke("Disconnected");
+            ConnectionStateChanged?.Invoke(ConnectionStates.Disconnected);
             return Task.CompletedTask;
         };
 
         return connection;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await DisconnectAsync();
+        _connectionLock.Dispose();
     }
 
     private static DateTime NormalizeSendTime(DateTime sendTime)

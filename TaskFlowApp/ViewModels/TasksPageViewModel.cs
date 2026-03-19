@@ -7,7 +7,11 @@ using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Models.ProjectManagement;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Infrastructure.Helpers;
+using TaskFlowApp.Infrastructure.Constants;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Authorization;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -16,7 +20,9 @@ public partial class TasksPageViewModel(
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
     ProjectManagementApiClient projectManagementApiClient,
-    IdentityApiClient identityApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    IdentityApiClient identityApiClient,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
     private const int TasksPageSize = 100;
     private const int PreviewTaskCount = 4;
@@ -101,7 +107,7 @@ public partial class TasksPageViewModel(
     [RelayCommand]
     private Task ShowAllIndividualTasksAsync()
     {
-        return NavigationService.GoToRootAsync("AllIndividualTasksPage");
+        return NavigationService.GoToRootAsync(AppRoutes.AllIndividualTasks);
     }
 
     [RelayCommand]
@@ -210,7 +216,7 @@ public partial class TasksPageViewModel(
 
     private static CompanyTaskDto MapIndividualTask(IndividualTaskDto task)
     {
-        var statusName = string.IsNullOrWhiteSpace(task.StatusName) ? "Acik" : task.StatusName;
+        var statusName = string.IsNullOrWhiteSpace(task.StatusName) ? TaskStatusHelper.DefaultOpenStatus : task.StatusName;
         var categoryName = string.IsNullOrWhiteSpace(task.CategoryName) ? "Bireysel" : task.CategoryName;
         var priorityName = string.IsNullOrWhiteSpace(task.TaskPriorityName) ? "Belirtilmedi" : task.TaskPriorityName;
 
@@ -270,7 +276,7 @@ public partial class TasksPageViewModel(
     private static List<CompanyTaskDto> OrderTasks(IEnumerable<CompanyTaskDto> tasks)
     {
         return tasks
-            .OrderBy(task => IsCompletedStatus(task.StatusName))
+            .OrderBy(task => TaskStatusHelper.IsCompletedStatus(task.StatusName))
             .ThenBy(task => task.DeadlineTime)
             .ThenBy(task => task.TaskName, StringComparer.OrdinalIgnoreCase)
             .ToList();
@@ -323,8 +329,8 @@ public partial class TasksPageViewModel(
     {
         userNameMap.TryGetValue(userId, out var currentUserName);
 
-        return NormalizeGroups(groups)
-            .Where(group => IsGroupMember(group, userId, currentUserName))
+        return GroupHelper.NormalizeGroups(groups)
+            .Where(group => GroupHelper.IsGroupMember(group, userId, currentUserName))
             .OrderBy(group => group.GroupName, StringComparer.OrdinalIgnoreCase)
             .ToList();
     }
@@ -355,67 +361,4 @@ public partial class TasksPageViewModel(
         return memberIds.ToList();
     }
 
-    private static bool IsGroupMember(CompanyGroupDto group, Guid userId, string? currentUserName)
-    {
-        if (group.WorkerUserIds.Contains(userId))
-        {
-            return true;
-        }
-
-        if (string.IsNullOrWhiteSpace(currentUserName))
-        {
-            return false;
-        }
-
-        return group.WorkerName.Any(name =>
-            string.Equals(name?.Trim(), currentUserName, StringComparison.OrdinalIgnoreCase));
-    }
-
-    private static List<CompanyGroupDto> NormalizeGroups(IEnumerable<CompanyGroupDto> groups)
-    {
-        return groups
-            .Where(group => !string.IsNullOrWhiteSpace(group.GroupName))
-            .GroupBy(group => group.GroupName.Trim(), StringComparer.OrdinalIgnoreCase)
-            .Select(grouped => new CompanyGroupDto
-            {
-                GroupId = grouped
-                    .Select(group => group.GroupId)
-                    .FirstOrDefault(groupId => groupId != Guid.Empty),
-                GroupName = grouped.First().GroupName,
-                WorkerUserIds = grouped
-                    .SelectMany(group => group.WorkerUserIds)
-                    .Where(workerId => workerId != Guid.Empty)
-                    .Distinct()
-                    .ToList(),
-                WorkerName = grouped
-                    .SelectMany(group => group.WorkerName)
-                    .Select(name => name?.Trim())
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Cast<string>()
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList(),
-                DepartmenName = grouped
-                    .SelectMany(group => group.DepartmenName)
-                    .Select(name => name?.Trim())
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Cast<string>()
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList()
-            })
-            .ToList();
-    }
-
-    private static bool IsCompletedStatus(string? statusName)
-    {
-        if (string.IsNullOrWhiteSpace(statusName))
-        {
-            return false;
-        }
-
-        var normalizedStatus = statusName.Trim().ToLowerInvariant();
-        return normalizedStatus.Contains("tamam")
-            || normalizedStatus.Contains("complete")
-            || normalizedStatus.Contains("done")
-            || normalizedStatus.Contains("closed");
-    }
 }

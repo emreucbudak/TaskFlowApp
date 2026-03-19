@@ -1,5 +1,4 @@
-﻿using TaskFlowApp.Infrastructure;
-using TaskFlowApp.ViewModels;
+﻿using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp.Pages;
 
@@ -7,10 +6,10 @@ public partial class DashBoardPage : ContentPage
 {
     private DashBoardPageViewModel ViewModel => (DashBoardPageViewModel)BindingContext;
 
-    public DashBoardPage()
+    public DashBoardPage(DashBoardPageViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = ServiceLocator.GetRequiredService<DashBoardPageViewModel>();
+        BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()

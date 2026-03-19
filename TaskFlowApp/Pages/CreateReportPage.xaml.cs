@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using TaskFlowApp.Infrastructure;
+using TaskFlowApp.Infrastructure.Constants;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.ViewModels;
 
@@ -11,10 +11,10 @@ public partial class CreateReportPage : ContentPage
     private bool isShowingFormMessage;
     private bool isViewModelSubscribed;
 
-    public CreateReportPage()
+    public CreateReportPage(CreateReportPageViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = ServiceLocator.GetRequiredService<CreateReportPageViewModel>();
+        BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()
@@ -32,7 +32,7 @@ public partial class CreateReportPage : ContentPage
 
     private async void OnTopicSelectTapped(object? sender, TappedEventArgs e)
     {
-        var topics = new[] { "Hata Bildirimi", "Geri Bildirim", "Diğer" };
+        var topics = ReportTopics.All.ToArray();
         var cancelText = "İptal";
 
         var selectedName = await DisplayActionSheet(
@@ -46,13 +46,7 @@ public partial class CreateReportPage : ContentPage
             return;
         }
 
-        var topicId = selectedName switch
-        {
-            "Hata Bildirimi" => 1,
-            "Geri Bildirim" => 2,
-            "Diğer" => 3,
-            _ => 0
-        };
+        var topicId = ReportTopics.GetId(selectedName);
 
         if (topicId > 0)
         {

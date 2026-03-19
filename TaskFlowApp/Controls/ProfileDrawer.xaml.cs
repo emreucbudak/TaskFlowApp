@@ -78,5 +78,6 @@ public partial class ProfileDrawer : ContentView
 
     private void ApplyActiveState()
     {
+        // TODO: Implement visual state for active navigation item
     }
 }

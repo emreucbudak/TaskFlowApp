@@ -1,3 +1,4 @@
+using TaskFlowApp.Infrastructure.Constants;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Services.ApiClients;
 
@@ -14,7 +15,7 @@ public sealed class WorkerReportAccessResolver(
 
     public async Task<WorkerReportAccessState> GetStateAsync(CancellationToken cancellationToken = default)
     {
-        if (!string.Equals(userSession.Role, "worker", StringComparison.OrdinalIgnoreCase) ||
+        if (!string.Equals(userSession.Role, AppRoles.Worker, StringComparison.OrdinalIgnoreCase) ||
             userSession.UserId is null ||
             userSession.CompanyId is null)
         {

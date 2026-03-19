@@ -7,10 +7,10 @@ public partial class MessagesPage : ContentPage
 {
     private MessagesPageViewModel ViewModel => (MessagesPageViewModel)BindingContext;
 
-    public MessagesPage()
+    public MessagesPage(MessagesPageViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = ServiceLocator.GetRequiredService<MessagesPageViewModel>();
+        BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()

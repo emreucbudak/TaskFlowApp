@@ -7,6 +7,8 @@ using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Authorization;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -15,8 +17,10 @@ public sealed partial class CreateReportPageViewModel(
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
     ReportApiClient reportApiClient,
-    IdentityApiClient identityApiClient)
-    : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    IdentityApiClient identityApiClient,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService)
+    : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
     [ObservableProperty]
     private string titleInput = string.Empty;

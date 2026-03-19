@@ -1,4 +1,3 @@
-using TaskFlowApp.Infrastructure;
 using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp.Pages;
@@ -7,7 +6,7 @@ public partial class ProfilePage : ContentPage
 {
     private ProfilePageViewModel ViewModel => (ProfilePageViewModel)BindingContext;
 
-    public ProfilePage()
+    public ProfilePage(ProfilePageViewModel viewModel)
     {
         InitializeComponent();
         Shell.SetPresentationMode(this, PresentationMode.NotAnimated);
@@ -16,7 +15,7 @@ public partial class ProfilePage : ContentPage
             IsVisible = false,
             IsEnabled = false
         });
-        BindingContext = ServiceLocator.GetRequiredService<ProfilePageViewModel>();
+        BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()

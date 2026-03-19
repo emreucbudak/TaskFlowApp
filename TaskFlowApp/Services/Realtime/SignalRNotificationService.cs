@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using TaskFlowApp.Infrastructure;
+using TaskFlowApp.Infrastructure.Constants;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Notification;
 
@@ -33,7 +34,7 @@ public sealed class SignalRNotificationService(IUserSession userSession) : ISign
             if (_hubConnection.State == HubConnectionState.Disconnected)
             {
                 await _hubConnection.StartAsync(cancellationToken);
-                ConnectionStateChanged?.Invoke("Connected");
+                ConnectionStateChanged?.Invoke(ConnectionStates.Connected);
             }
         }
         finally
@@ -59,7 +60,7 @@ public sealed class SignalRNotificationService(IUserSession userSession) : ISign
 
             await _hubConnection.DisposeAsync();
             _hubConnection = null;
-            ConnectionStateChanged?.Invoke("Disconnected");
+            ConnectionStateChanged?.Invoke(ConnectionStates.Disconnected);
         }
         finally
         {
@@ -78,7 +79,7 @@ public sealed class SignalRNotificationService(IUserSession userSession) : ISign
             .WithAutomaticReconnect()
             .Build();
 
-        connection.On<string, string>("NewMessage", (title, message) =>
+        connection.On<string, string>(HubMethods.NewMessage, (title, message) =>
         {
             var dto = new NotificationDto
             {
@@ -93,22 +94,28 @@ public sealed class SignalRNotificationService(IUserSession userSession) : ISign
 
         connection.Reconnecting += _ =>
         {
-            ConnectionStateChanged?.Invoke("Reconnecting");
+            ConnectionStateChanged?.Invoke(ConnectionStates.Reconnecting);
             return Task.CompletedTask;
         };
 
         connection.Reconnected += _ =>
         {
-            ConnectionStateChanged?.Invoke("Connected");
+            ConnectionStateChanged?.Invoke(ConnectionStates.Connected);
             return Task.CompletedTask;
         };
 
         connection.Closed += _ =>
         {
-            ConnectionStateChanged?.Invoke("Disconnected");
+            ConnectionStateChanged?.Invoke(ConnectionStates.Disconnected);
             return Task.CompletedTask;
         };
 
         return connection;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await DisconnectAsync();
+        _connectionLock.Dispose();
     }
 }

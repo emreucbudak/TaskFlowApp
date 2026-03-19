@@ -7,7 +7,10 @@ using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Infrastructure.Helpers;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Constants;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -16,7 +19,9 @@ public partial class LeaderIndividualTaskPageViewModel(
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
     IdentityApiClient identityApiClient,
-    ProjectManagementApiClient projectManagementApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    ProjectManagementApiClient projectManagementApiClient,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
     private const string AccessDeniedMessageText = "Bu sayfa sadece sirket hesabi veya departman liderleri icindir.";
     private const int DepartmentLeaderRoleId = 1;
@@ -219,7 +224,7 @@ public partial class LeaderIndividualTaskPageViewModel(
                 DeadlineDate = MinimumDeadlineDate;
             }
 
-            IsCompanyUser = string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase);
+            IsCompanyUser = string.Equals(UserSession.Role, AppRoles.Company, StringComparison.OrdinalIgnoreCase);
 
             var accessState = WorkerReportAccessState.None;
             if (!IsCompanyUser)
@@ -237,7 +242,7 @@ public partial class LeaderIndividualTaskPageViewModel(
                 .Where(user => user.Id != Guid.Empty));
 
             allCompanyGroups.Clear();
-            allCompanyGroups.AddRange(NormalizeGroups(await companyGroupsTask ?? []));
+            allCompanyGroups.AddRange(GroupHelper.NormalizeGroups(await companyGroupsTask ?? []));
 
             ConfigureManagedDepartments(currentUserId, accessState);
             ConfigureAccessState(accessState);
@@ -947,7 +952,7 @@ public partial class LeaderIndividualTaskPageViewModel(
     {
         var groups = await identityApiClient.GetAllCompanyGroupsAsync(companyId) ?? [];
         allCompanyGroups.Clear();
-        allCompanyGroups.AddRange(NormalizeGroups(groups));
+        allCompanyGroups.AddRange(GroupHelper.NormalizeGroups(groups));
         RefreshAvailableGroups(preferredGroupId);
     }
 
@@ -1086,39 +1091,6 @@ public partial class LeaderIndividualTaskPageViewModel(
         return $"{memberNames.Count} uye: {preview}";
     }
 
-    private static List<CompanyGroupDto> NormalizeGroups(IEnumerable<CompanyGroupDto> groups)
-    {
-        return groups
-            .Where(group => !string.IsNullOrWhiteSpace(group.GroupName))
-            .GroupBy(group => group.GroupName.Trim(), StringComparer.OrdinalIgnoreCase)
-            .Select(grouped => new CompanyGroupDto
-            {
-                GroupId = grouped
-                    .Select(group => group.GroupId)
-                    .FirstOrDefault(groupId => groupId != Guid.Empty),
-                GroupName = grouped.First().GroupName.Trim(),
-                WorkerUserIds = grouped
-                    .SelectMany(group => group.WorkerUserIds)
-                    .Where(userId => userId != Guid.Empty)
-                    .Distinct()
-                    .ToList(),
-                WorkerName = grouped
-                    .SelectMany(group => group.WorkerName)
-                    .Select(name => name?.Trim())
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Cast<string>()
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList(),
-                DepartmenName = grouped
-                    .SelectMany(group => group.DepartmenName)
-                    .Select(name => name?.Trim())
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Cast<string>()
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList()
-            })
-            .ToList();
-    }
 
     private static string ResolveDisplayName(CompanyUserDto user)
     {

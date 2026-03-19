@@ -2,7 +2,7 @@ using TaskFlowApp.Models.Chat;
 
 namespace TaskFlowApp.Services.Realtime;
 
-public interface ISignalRChatService
+public interface ISignalRChatService : IAsyncDisposable
 {
     bool IsConnected { get; }
 

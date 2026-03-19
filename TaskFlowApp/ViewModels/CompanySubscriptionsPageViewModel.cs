@@ -10,6 +10,8 @@ using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Tenant;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Authorization;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -17,8 +19,10 @@ public partial class CompanySubscriptionsPageViewModel(
     INavigationService navigationService,
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
-    TenantApiClient tenantApiClient)
-    : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    TenantApiClient tenantApiClient,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService)
+    : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
     private const string StartupStripePaymentLink = "https://buy.stripe.com/test_3cIcN61Gn6ip73CdPP2wU07";
     private const string BusinessStripePaymentLink = "https://buy.stripe.com/test_bJe5kEcl19uBew42772wU03";
@@ -378,9 +382,10 @@ public partial class CompanySubscriptionsPageViewModel(
             {
                 // Geçici bağlantı hatalarında polling devam eder.
             }
-            catch
+            catch (Exception ex)
             {
                 // Beklenmeyen hatalarda da polling akışını bozma.
+                LogSilentFailure(ex);
             }
 
             try

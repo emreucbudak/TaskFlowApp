@@ -7,7 +7,9 @@ using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Infrastructure.Helpers;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -15,7 +17,9 @@ public partial class ProfilePageViewModel(
     INavigationService navigationService,
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
-    IdentityApiClient identityApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    IdentityApiClient identityApiClient,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
     private const int DepartmentLeaderRoleId = 1;
 
@@ -165,7 +169,7 @@ public partial class ProfilePageViewModel(
         IEnumerable<CompanyGroupDto> groups,
         IEnumerable<DepartmentDto> departments)
     {
-        var normalizedGroups = NormalizeGroups(groups);
+        var normalizedGroups = GroupHelper.NormalizeGroups(groups);
         var departmentNames = NormalizeNames(departments.Select(department => department.Name));
         var groupNames = NormalizeNames(normalizedGroups.Select(group => group.GroupName));
 
@@ -294,61 +298,12 @@ public partial class ProfilePageViewModel(
     {
         userNameMap.TryGetValue(userId, out var currentUserName);
 
-        return NormalizeGroups(groups)
-            .Where(group => IsGroupMember(group, userId, currentUserName))
+        return GroupHelper.NormalizeGroups(groups)
+            .Where(group => GroupHelper.IsGroupMember(group, userId, currentUserName))
             .OrderBy(group => group.GroupName, StringComparer.OrdinalIgnoreCase)
             .ToList();
     }
 
-    private static bool IsGroupMember(CompanyGroupDto group, Guid userId, string? currentUserName)
-    {
-        if (group.WorkerUserIds.Contains(userId))
-        {
-            return true;
-        }
-
-        if (string.IsNullOrWhiteSpace(currentUserName))
-        {
-            return false;
-        }
-
-        return group.WorkerName.Any(name =>
-            string.Equals(name?.Trim(), currentUserName, StringComparison.OrdinalIgnoreCase));
-    }
-
-    private static List<CompanyGroupDto> NormalizeGroups(IEnumerable<CompanyGroupDto> groups)
-    {
-        return groups
-            .Where(group => !string.IsNullOrWhiteSpace(group.GroupName))
-            .GroupBy(group => group.GroupName.Trim(), StringComparer.OrdinalIgnoreCase)
-            .Select(grouped => new CompanyGroupDto
-            {
-                GroupId = grouped
-                    .Select(group => group.GroupId)
-                    .FirstOrDefault(groupId => groupId != Guid.Empty),
-                GroupName = grouped.First().GroupName.Trim(),
-                WorkerUserIds = grouped
-                    .SelectMany(group => group.WorkerUserIds)
-                    .Where(workerId => workerId != Guid.Empty)
-                    .Distinct()
-                    .ToList(),
-                WorkerName = grouped
-                    .SelectMany(group => group.WorkerName)
-                    .Select(name => name?.Trim())
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Cast<string>()
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList(),
-                DepartmenName = grouped
-                    .SelectMany(group => group.DepartmenName)
-                    .Select(name => name?.Trim())
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Cast<string>()
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList()
-            })
-            .ToList();
-    }
 
     private static List<string> NormalizeNames(IEnumerable<string?> names)
     {

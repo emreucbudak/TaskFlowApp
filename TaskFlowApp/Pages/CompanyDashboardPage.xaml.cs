@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using TaskFlowApp.Infrastructure;
 using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp.Pages;
@@ -9,10 +8,10 @@ public partial class CompanyDashboardPage : ContentPage
 {
     private CompanyDashboardPageViewModel ViewModel => (CompanyDashboardPageViewModel)BindingContext;
 
-    public CompanyDashboardPage()
+    public CompanyDashboardPage(CompanyDashboardPageViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = ServiceLocator.GetRequiredService<CompanyDashboardPageViewModel>();
+        BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()

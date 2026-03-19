@@ -6,6 +6,7 @@ using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Constants;
 using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
@@ -104,7 +105,7 @@ public partial class MainPageViewModel(
                 currentUserContext.Role);
             workerDashboardStateService.Clear();
 
-            if (string.Equals(userSession.Role, "worker", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(userSession.Role, AppRoles.Worker, StringComparison.OrdinalIgnoreCase))
             {
                 _ = workerDashboardStateService.WarmDailySummaryAsync();
             }
@@ -118,9 +119,9 @@ public partial class MainPageViewModel(
                 // Login should still succeed even if realtime channels are temporarily unavailable.
             }
 
-            var targetRoute = string.Equals(userSession.Role, "company", StringComparison.OrdinalIgnoreCase)
-                ? "CompanyDashboardPage"
-                : "DashBoardPage";
+            var targetRoute = string.Equals(userSession.Role, AppRoles.Company, StringComparison.OrdinalIgnoreCase)
+                ? AppRoutes.CompanyDashboard
+                : AppRoutes.Dashboard;
 
             await navigationService.GoToRootAsync(targetRoute);
         }

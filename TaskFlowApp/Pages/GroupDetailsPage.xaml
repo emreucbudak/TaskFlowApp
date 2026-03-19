@@ -171,6 +171,357 @@
                         </HorizontalStackLayout>
                     </ScrollView>
 
+                    <!-- Section Header: Yaklasan Etkinlikler -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <BoxView Color="#0F766E" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
+                        <Label Grid.Column="1"
+                               Text="Yaklasan Etkinlikler"
+                               TextColor="#1E1B4B"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center" />
+                    </Grid>
+
+                    <!-- Leader Event Form -->
+                    <Border BackgroundColor="#FFFFFF"
+                            Stroke="#0F766E"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="16"
+                            IsVisible="{Binding IsGroupLeader}">
+                        <Border.Shadow>
+                            <Shadow Brush="#200F766E" Offset="0,2" Radius="8" />
+                        </Border.Shadow>
+                        <VerticalStackLayout Spacing="12">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Label Grid.Column="0"
+                                       Text="Duyuru / Etkinlik Olustur"
+                                       TextColor="#1E1B4B"
+                                       FontSize="16"
+                                       FontAttributes="Bold" />
+                                <Border Grid.Column="1"
+                                        BackgroundColor="#0F766E"
+                                        Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 8"
+                                        Padding="10,6"
+                                        HorizontalOptions="End"
+                                        VerticalOptions="Center">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ShowGroupEventFormCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Image Source="{mi:MaterialOutlined Icon=Add}"
+                                               WidthRequest="16"
+                                               HeightRequest="16"
+                                               VerticalOptions="Center" />
+                                        <Label Text="Form"
+                                               TextColor="White"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </Grid>
+
+                            <Border BackgroundColor="#F8FAFC"
+                                    Stroke="#CBD5E1"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 8"
+                                    Padding="10"
+                                    IsVisible="{Binding IsGroupEventFormVisible}">
+                                <VerticalStackLayout Spacing="12">
+                                    <Border BackgroundColor="#FFFFFF"
+                                            Stroke="#CBD5E1"
+                                            StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 6"
+                                            Padding="8,4">
+                                        <Entry Placeholder="Etkinlik konusu"
+                                               Text="{Binding NewEventSubject}"
+                                               TextColor="#1E1B4B"
+                                               PlaceholderColor="#94A3B8"
+                                               FontSize="14" />
+                                    </Border>
+
+                                    <Border BackgroundColor="#FFFFFF"
+                                            Stroke="#CBD5E1"
+                                            StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 6"
+                                            Padding="8,4">
+                                        <Picker Title="Etkinlik turu"
+                                                ItemsSource="{Binding EventTypeOptions}"
+                                                SelectedItem="{Binding SelectedEventType}"
+                                                TextColor="#1E1B4B"
+                                                TitleColor="#94A3B8"
+                                                FontSize="14" />
+                                    </Border>
+
+                                    <Border BackgroundColor="#FFFFFF"
+                                            Stroke="#CBD5E1"
+                                            StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 6"
+                                            Padding="8,4">
+                                        <Entry Placeholder="Etkinlik basligi"
+                                               Text="{Binding NewEventTitle}"
+                                               TextColor="#1E1B4B"
+                                               PlaceholderColor="#94A3B8"
+                                               FontSize="14" />
+                                    </Border>
+
+                                    <Border BackgroundColor="#FFFFFF"
+                                            Stroke="#CBD5E1"
+                                            StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 6"
+                                            Padding="8,4">
+                                        <Editor Placeholder="Etkinlik aciklamasi"
+                                                Text="{Binding NewEventDescription}"
+                                                TextColor="#1E1B4B"
+                                                PlaceholderColor="#94A3B8"
+                                                FontSize="14"
+                                                HeightRequest="90"
+                                                AutoSize="TextChanges" />
+                                    </Border>
+
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                        <Border Grid.Column="0"
+                                                BackgroundColor="#FFFFFF"
+                                                Stroke="#CBD5E1"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 6"
+                                                Padding="8,4">
+                                            <DatePicker Date="{Binding NewEventStartDate}"
+                                                        TextColor="#1E1B4B" />
+                                        </Border>
+                                        <Border Grid.Column="1"
+                                                BackgroundColor="#FFFFFF"
+                                                Stroke="#CBD5E1"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 6"
+                                                Padding="8,4">
+                                            <TimePicker Time="{Binding NewEventStartTime}"
+                                                        TextColor="#1E1B4B" />
+                                        </Border>
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                        <Switch Grid.Column="0"
+                                                IsToggled="{Binding IsEventEndEnabled}"
+                                                VerticalOptions="Center" />
+                                        <Label Grid.Column="1"
+                                               Text="Bitis zamani ekle"
+                                               TextColor="#475569"
+                                               FontSize="12"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+
+                                    <VerticalStackLayout Spacing="10"
+                                                         IsVisible="{Binding IsEventEndEnabled}">
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                            <Border Grid.Column="0"
+                                                    BackgroundColor="#FFFFFF"
+                                                    Stroke="#CBD5E1"
+                                                    StrokeThickness="1"
+                                                    StrokeShape="RoundRectangle 6"
+                                                    Padding="8,4">
+                                                <DatePicker Date="{Binding NewEventEndDate}"
+                                                            TextColor="#1E1B4B" />
+                                            </Border>
+                                            <Border Grid.Column="1"
+                                                    BackgroundColor="#FFFFFF"
+                                                    Stroke="#CBD5E1"
+                                                    StrokeThickness="1"
+                                                    StrokeShape="RoundRectangle 6"
+                                                    Padding="8,4">
+                                                <TimePicker Time="{Binding NewEventEndTime}"
+                                                            TextColor="#1E1B4B" />
+                                            </Border>
+                                        </Grid>
+                                    </VerticalStackLayout>
+
+                                    <Border BackgroundColor="#FFFFFF"
+                                            Stroke="#CBD5E1"
+                                            StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 6"
+                                            Padding="8,4">
+                                        <Entry Placeholder="Toplanti baglantisi (istege bagli)"
+                                               Text="{Binding NewEventMeetingLink}"
+                                               TextColor="#1E1B4B"
+                                               PlaceholderColor="#94A3B8"
+                                               FontSize="14" />
+                                    </Border>
+
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                        <Border Grid.Column="0"
+                                                BackgroundColor="#F1F5F9"
+                                                Stroke="Transparent"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="12,10"
+                                                HorizontalOptions="Fill">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding HideGroupEventFormCommand}" />
+                                            </Border.GestureRecognizers>
+                                            <Label Text="Iptal"
+                                                   TextColor="#64748B"
+                                                   FontSize="14"
+                                                   FontAttributes="Bold"
+                                                   HorizontalTextAlignment="Center" />
+                                        </Border>
+                                        <Border Grid.Column="1"
+                                                BackgroundColor="#0F766E"
+                                                Stroke="Transparent"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="12,10"
+                                                HorizontalOptions="Fill">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding SubmitGroupEventCommand}" />
+                                            </Border.GestureRecognizers>
+                                            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                                                <ActivityIndicator IsRunning="{Binding IsSubmittingGroupEvent}"
+                                                                   IsVisible="{Binding IsSubmittingGroupEvent}"
+                                                                   Color="White"
+                                                                   WidthRequest="16"
+                                                                   HeightRequest="16" />
+                                                <Label Text="Yayinla"
+                                                       TextColor="White"
+                                                       FontSize="14"
+                                                       FontAttributes="Bold"
+                                                       HorizontalTextAlignment="Center" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Label Text="{Binding GroupEventsEmptyMessage}"
+                           TextColor="#94A3B8"
+                           FontSize="12"
+                           IsVisible="{Binding HasNoGroupEvents}" />
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding GroupEvents}"
+                                         Spacing="10"
+                                         IsVisible="{Binding HasGroupEvents}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border BackgroundColor="#FFFFFF"
+                                        Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 8"
+                                        Padding="14">
+                                    <Border.Shadow>
+                                        <Shadow Brush="#200F766E" Offset="0,2" Radius="8" />
+                                    </Border.Shadow>
+                                    <Grid ColumnDefinitions="*,Auto,Auto"
+                                          ColumnSpacing="10">
+                                        <VerticalStackLayout Grid.Column="0"
+                                                             Spacing="6">
+                                            <Grid ColumnDefinitions="Auto,Auto,*"
+                                                  ColumnSpacing="8">
+                                                <Border Grid.Column="0"
+                                                        BackgroundColor="#E6FFFB"
+                                                        Stroke="Transparent"
+                                                        StrokeShape="RoundRectangle 10"
+                                                        Padding="8,3">
+                                                    <Label Text="{Binding EventType}"
+                                                           TextColor="#0F766E"
+                                                           FontSize="10"
+                                                           FontAttributes="Bold" />
+                                                </Border>
+                                                <Border Grid.Column="1"
+                                                        BackgroundColor="#EEF2FF"
+                                                        Stroke="Transparent"
+                                                        StrokeShape="RoundRectangle 10"
+                                                        Padding="8,3">
+                                                    <Label Text="{Binding Subject}"
+                                                           TextColor="#4F46E5"
+                                                           FontSize="10"
+                                                           FontAttributes="Bold" />
+                                                </Border>
+                                                <Label Grid.Column="2"
+                                                       Text="{Binding StartsAtText}"
+                                                       TextColor="#94A3B8"
+                                                       FontSize="11"
+                                                       HorizontalOptions="End" />
+                                            </Grid>
+
+                                            <Label Text="{Binding Title}"
+                                                   TextColor="#1E1B4B"
+                                                   FontSize="15"
+                                                   FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation" />
+
+                                            <Label Text="{Binding Description}"
+                                                   TextColor="#64748B"
+                                                   FontSize="12"
+                                                   LineBreakMode="WordWrap"
+                                                   MaxLines="3" />
+
+                                            <Grid ColumnDefinitions="*,Auto"
+                                                  ColumnSpacing="8">
+                                                <Label Grid.Column="0"
+                                                       Text="{Binding CreatedByUserName}"
+                                                       TextColor="#475569"
+                                                       FontSize="11" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding CreatedAtText}"
+                                                       TextColor="#94A3B8"
+                                                       FontSize="11" />
+                                            </Grid>
+
+                                            <Label Text="{Binding EndsAtText}"
+                                                   TextColor="#64748B"
+                                                   FontSize="11"
+                                                   IsVisible="{Binding HasEndsAt}"
+                                                   LineBreakMode="TailTruncation" />
+                                        </VerticalStackLayout>
+
+                                        <Border Grid.Column="1"
+                                                BackgroundColor="#0F766E"
+                                                Stroke="Transparent"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="10,8"
+                                                VerticalOptions="Center"
+                                                IsVisible="{Binding HasMeetingLink}">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OpenMeetingLinkCommand}"
+                                                                      CommandParameter="{Binding MeetingLink}" />
+                                            </Border.GestureRecognizers>
+                                            <HorizontalStackLayout Spacing="4"
+                                                                  HorizontalOptions="Center">
+                                                <Image Source="{mi:MaterialOutlined Icon=Link}"
+                                                       WidthRequest="14"
+                                                       HeightRequest="14"
+                                                       VerticalOptions="Center" />
+                                                <Label Text="Katil"
+                                                       TextColor="White"
+                                                       FontSize="12"
+                                                       FontAttributes="Bold"
+                                                       VerticalOptions="Center" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+
+                                        <Border Grid.Column="2"
+                                                BackgroundColor="#EF4444"
+                                                Stroke="Transparent"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="10,8"
+                                                VerticalOptions="Center"
+                                                IsVisible="{Binding CanDelete}">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteGroupEventCommand}"
+                                                                      CommandParameter="{Binding GroupEventId}" />
+                                            </Border.GestureRecognizers>
+                                            <Image Source="{mi:MaterialOutlined Icon=Delete}"
+                                                   WidthRequest="16"
+                                                   HeightRequest="16"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
                     <!-- Section Header: Gruptan Son Aktiviteler -->
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                         <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />

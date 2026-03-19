@@ -1,5 +1,4 @@
-﻿using TaskFlowApp.Infrastructure;
-using TaskFlowApp.ViewModels;
+﻿using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp.Pages;
 
@@ -7,10 +6,10 @@ public partial class NotificationsPage : ContentPage
 {
     private NotificationsPageViewModel ViewModel => (NotificationsPageViewModel)BindingContext;
 
-    public NotificationsPage()
+    public NotificationsPage(NotificationsPageViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = ServiceLocator.GetRequiredService<NotificationsPageViewModel>();
+        BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()

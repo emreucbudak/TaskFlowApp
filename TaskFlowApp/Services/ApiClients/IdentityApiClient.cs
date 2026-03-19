@@ -80,4 +80,22 @@ public sealed class IdentityApiClient(IApiClient apiClient) : ControllerApiClien
             "GetGroupActivitiesQueryRequest",
             new { GroupId = groupId },
             cancellationToken: cancellationToken);
+
+    public Task<Guid> CreateGroupEventAsync(CreateGroupEventRequestDto request, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<Guid>(
+            "CreateGroupEventCommandRequest",
+            request,
+            cancellationToken: cancellationToken);
+
+    public Task DeleteGroupEventAsync(Guid groupEventId, CancellationToken cancellationToken = default) =>
+        PostAsync(
+            "DeleteGroupEventCommandRequest",
+            new { GroupEventId = groupEventId },
+            cancellationToken: cancellationToken);
+
+    public Task<List<GroupEventDto>> GetGroupEventsAsync(Guid groupId, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<List<GroupEventDto>>(
+            "GetGroupEventsQueryRequest",
+            new { GroupId = groupId },
+            cancellationToken: cancellationToken);
 }

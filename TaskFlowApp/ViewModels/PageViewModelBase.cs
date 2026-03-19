@@ -1,11 +1,12 @@
+using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using TaskFlowApp.Infrastructure;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Authorization;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Constants;
 using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
@@ -13,7 +14,9 @@ namespace TaskFlowApp.ViewModels;
 public abstract partial class PageViewModelBase(
     INavigationService navigationService,
     IUserSession userSession,
-    IRealtimeConnectionManager realtimeConnectionManager) : ObservableObject
+    IRealtimeConnectionManager realtimeConnectionManager,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService) : ObservableObject
 {
     private bool canAccessReportsPage;
     private string currentLeaderDepartmentName = string.Empty;
@@ -42,8 +45,8 @@ public abstract partial class PageViewModelBase(
         }
     }
 
-    public bool IsCompanyUser => string.Equals(UserSession.Role, "company", StringComparison.OrdinalIgnoreCase);
-    public bool IsWorkerUser => string.Equals(UserSession.Role, "worker", StringComparison.OrdinalIgnoreCase);
+    public bool IsCompanyUser => string.Equals(UserSession.Role, AppRoles.Company, StringComparison.OrdinalIgnoreCase);
+    public bool IsWorkerUser => string.Equals(UserSession.Role, AppRoles.Worker, StringComparison.OrdinalIgnoreCase);
     public bool ShowReportsNavigation => IsCompanyUser || CanAccessReportsPage;
     public bool ShowLeaderManagementNavigation => IsWorkerUser && CanAccessReportsPage;
     public bool ShowTasksNavigation => !ShowLeaderManagementNavigation;
@@ -109,14 +112,15 @@ public abstract partial class PageViewModelBase(
 
         try
         {
-            var resolver = ServiceLocator.GetRequiredService<IWorkerReportAccessResolver>();
+            var resolver = workerReportAccessResolver;
             var state = await resolver.GetStateAsync(cancellationToken);
             SetCurrentLeaderDepartmentName(state.DepartmentName);
             CanAccessReportsPage = state.CanAccessReportsPage;
             return state;
         }
-        catch
+        catch (Exception ex)
         {
+            LogSilentFailure(ex);
             SetCurrentLeaderDepartmentName(string.Empty);
             CanAccessReportsPage = false;
             return WorkerReportAccessState.None;
@@ -141,8 +145,8 @@ public abstract partial class PageViewModelBase(
         CloseProfileMenu();
 
         var homeRoute = IsCompanyUser
-            ? "CompanyDashboardPage"
-            : "DashBoardPage";
+            ? AppRoutes.CompanyDashboard
+            : AppRoutes.Dashboard;
 
         return NavigationService.GoToRootAsync(homeRoute);
     }
@@ -153,8 +157,8 @@ public abstract partial class PageViewModelBase(
         CloseProfileMenu();
 
         var reportsRoute = IsCompanyUser
-            ? "CompanyReportsPage"
-            : "ReportsPage";
+            ? AppRoutes.CompanyReports
+            : AppRoutes.Reports;
 
         return NavigationService.GoToRootAsync(reportsRoute);
     }
@@ -165,8 +169,8 @@ public abstract partial class PageViewModelBase(
         CloseProfileMenu();
 
         var tasksRoute = IsCompanyUser
-            ? "CompanyTasksPage"
-            : "TasksPage";
+            ? AppRoutes.CompanyTasks
+            : AppRoutes.Tasks;
 
         return NavigationService.GoToRootAsync(tasksRoute);
     }
@@ -181,7 +185,7 @@ public abstract partial class PageViewModelBase(
             return Task.CompletedTask;
         }
 
-        return NavigationService.GoToRootAsync("LeaderIndividualTaskPage");
+        return NavigationService.GoToRootAsync(AppRoutes.LeaderIndividualTask);
     }
 
     [RelayCommand]
@@ -190,8 +194,8 @@ public abstract partial class PageViewModelBase(
         CloseProfileMenu();
 
         var employeesRoute = IsCompanyUser
-            ? "CompanyEmployeesPage"
-            : "MessagesPage";
+            ? AppRoutes.CompanyEmployees
+            : AppRoutes.Messages;
 
         return NavigationService.GoToRootAsync(employeesRoute);
     }
@@ -202,8 +206,8 @@ public abstract partial class PageViewModelBase(
         CloseProfileMenu();
 
         var subscriptionsRoute = IsCompanyUser
-            ? "CompanySubscriptionsPage"
-            : "NotificationsPage";
+            ? AppRoutes.CompanySubscriptions
+            : AppRoutes.Notifications;
 
         return NavigationService.GoToRootAsync(subscriptionsRoute);
     }
@@ -218,7 +222,7 @@ public abstract partial class PageViewModelBase(
             return Task.CompletedTask;
         }
 
-        return NavigationService.GoToAsync("GroupDetailsPage");
+        return NavigationService.GoToAsync(AppRoutes.GroupDetails);
     }
 
     [RelayCommand]
@@ -231,14 +235,14 @@ public abstract partial class PageViewModelBase(
             return Task.CompletedTask;
         }
 
-        return NavigationService.GoToRootAsync("CreateReportPage");
+        return NavigationService.GoToRootAsync(AppRoutes.CreateReport);
     }
 
     [RelayCommand]
     private Task NavigateProfileAsync()
     {
         CloseProfileMenu();
-        return NavigationService.GoToAsync("ProfilePage");
+        return NavigationService.GoToAsync(AppRoutes.Profile);
     }
 
     [RelayCommand]
@@ -249,15 +253,16 @@ public abstract partial class PageViewModelBase(
         SetCurrentLeaderDepartmentName(string.Empty);
         try
         {
-            ServiceLocator.GetRequiredService<IWorkerDashboardStateService>().Clear();
+            workerDashboardStateService.Clear();
         }
-        catch
+        catch (Exception ex)
         {
+            LogSilentFailure(ex);
         }
 
         UserSession.Clear();
         CanAccessReportsPage = false;
-        await NavigationService.GoToRootAsync("MainPage");
+        await NavigationService.GoToRootAsync(AppRoutes.Main);
     }
 
 
@@ -274,11 +279,16 @@ public abstract partial class PageViewModelBase(
         OnPropertyChanged(nameof(CurrentUserRoleText));
     }
 
-    protected static string BuildInitials(string value)
+    protected static void LogSilentFailure(Exception ex, [CallerMemberName] string? caller = null)
+    {
+        System.Diagnostics.Debug.WriteLine($"[{caller}] Silent failure: {ex.Message}");
+    }
+
+    protected static string BuildInitials(string value, string defaultInitials = "TF")
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return "TF";
+            return defaultInitials;
         }
 
         var initials = string.Concat(value
@@ -286,7 +296,7 @@ public abstract partial class PageViewModelBase(
             .Take(2)
             .Select(part => char.ToUpperInvariant(part[0])));
 
-        return string.IsNullOrWhiteSpace(initials) ? "TF" : initials;
+        return string.IsNullOrWhiteSpace(initials) ? defaultInitials : initials;
     }
 }
 

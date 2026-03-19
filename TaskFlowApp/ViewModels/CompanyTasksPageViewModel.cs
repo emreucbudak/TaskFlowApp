@@ -6,7 +6,10 @@ using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.ProjectManagement;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Infrastructure.Helpers;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Authorization;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -15,8 +18,10 @@ public partial class CompanyTasksPageViewModel(
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
     ProjectManagementApiClient projectManagementApiClient,
-    IdentityApiClient identityApiClient)
-    : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    IdentityApiClient identityApiClient,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService)
+    : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
     private const int TasksPageSize = 100;
     private const int MaxPageTraversal = 200;
@@ -100,8 +105,8 @@ public partial class CompanyTasksPageViewModel(
 
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
             TotalTaskCount = items.Count;
-            OpenTaskCount = items.Count(item => !IsCompletedStatus(item.StatusName));
-            OverdueTaskCount = items.Count(item => item.DeadlineTime < now && !IsCompletedStatus(item.StatusName));
+            OpenTaskCount = items.Count(item => !TaskStatusHelper.IsCompletedStatus(item.StatusName));
+            OverdueTaskCount = items.Count(item => item.DeadlineTime < now && !TaskStatusHelper.IsCompletedStatus(item.StatusName));
 
             StatusText = $"Toplam: {TotalTaskCount} | Açık: {OpenTaskCount} | Geciken: {OverdueTaskCount}";
         }
@@ -155,19 +160,6 @@ public partial class CompanyTasksPageViewModel(
         return Task.CompletedTask;
     }
 
-    private static bool IsCompletedStatus(string? statusName)
-    {
-        if (string.IsNullOrWhiteSpace(statusName))
-        {
-            return false;
-        }
-
-        var normalizedStatus = statusName.Trim().ToLowerInvariant();
-        return normalizedStatus.Contains("tamam")
-            || normalizedStatus.Contains("complete")
-            || normalizedStatus.Contains("done")
-            || normalizedStatus.Contains("closed");
-    }
 
     private async Task<List<CompanyTaskDto>> LoadAllCompanyGroupTasksAsync(Guid companyId)
     {

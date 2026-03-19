@@ -8,6 +8,8 @@ using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Notification;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Authorization;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -16,7 +18,9 @@ public partial class NotificationsPageViewModel(
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
     NotificationApiClient notificationApiClient,
-    ISignalRNotificationService signalRNotificationService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    ISignalRNotificationService signalRNotificationService,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
     private const int PageSize = 20;
     private const int MaxNotificationWindowSize = 100;

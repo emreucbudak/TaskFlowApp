@@ -6,7 +6,11 @@ using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.ProjectManagement;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Infrastructure.Helpers;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Authorization;
+using TaskFlowApp.Infrastructure.Constants;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -14,7 +18,9 @@ public partial class AllIndividualTasksPageViewModel(
     INavigationService navigationService,
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
-    ProjectManagementApiClient projectManagementApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    ProjectManagementApiClient projectManagementApiClient,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
     private const int TasksPageSize = 100;
 
@@ -74,7 +80,7 @@ public partial class AllIndividualTasksPageViewModel(
     [RelayCommand]
     private Task GoBackAsync()
     {
-        return NavigationService.GoToRootAsync("TasksPage");
+        return NavigationService.GoToRootAsync(AppRoutes.Tasks);
     }
 
     private async Task<List<CompanyTaskDto>> LoadAllIndividualTasksAsync(Guid userId)
@@ -99,7 +105,7 @@ public partial class AllIndividualTasksPageViewModel(
 
         return allTasks
             .Select(MapIndividualTask)
-            .OrderBy(task => IsCompletedStatus(task.StatusName))
+            .OrderBy(task => TaskStatusHelper.IsCompletedStatus(task.StatusName))
             .ThenBy(task => task.DeadlineTime)
             .ThenBy(task => task.TaskName, StringComparer.OrdinalIgnoreCase)
             .ToList();
@@ -107,7 +113,7 @@ public partial class AllIndividualTasksPageViewModel(
 
     private static CompanyTaskDto MapIndividualTask(IndividualTaskDto task)
     {
-        var statusName = string.IsNullOrWhiteSpace(task.StatusName) ? "Acik" : task.StatusName;
+        var statusName = string.IsNullOrWhiteSpace(task.StatusName) ? TaskStatusHelper.DefaultOpenStatus : task.StatusName;
         var categoryName = string.IsNullOrWhiteSpace(task.CategoryName) ? "Bireysel" : task.CategoryName;
         var priorityName = string.IsNullOrWhiteSpace(task.TaskPriorityName) ? "Belirtilmedi" : task.TaskPriorityName;
 
@@ -164,17 +170,4 @@ public partial class AllIndividualTasksPageViewModel(
         };
     }
 
-    private static bool IsCompletedStatus(string? statusName)
-    {
-        if (string.IsNullOrWhiteSpace(statusName))
-        {
-            return false;
-        }
-
-        var normalizedStatus = statusName.Trim().ToLowerInvariant();
-        return normalizedStatus.Contains("tamam")
-            || normalizedStatus.Contains("complete")
-            || normalizedStatus.Contains("done")
-            || normalizedStatus.Contains("closed");
-    }
 }

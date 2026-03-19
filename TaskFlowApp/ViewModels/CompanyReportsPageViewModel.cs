@@ -7,6 +7,9 @@ using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Report;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Authorization;
+using TaskFlowApp.Infrastructure.Constants;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -14,8 +17,10 @@ public partial class CompanyReportsPageViewModel(
     INavigationService navigationService,
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
-    ReportApiClient reportApiClient)
-    : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    ReportApiClient reportApiClient,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService)
+    : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
     private const int FixedPageSize = 5;
 
@@ -158,9 +163,9 @@ public partial class CompanyReportsPageViewModel(
     {
         return reportTopicId switch
         {
-            1 => "Hata Bildirimi",
-            2 => "Geri Bildirim",
-            3 => "Diğer",
+            ReportTopics.BugReportId => ReportTopics.BugReport,
+            ReportTopics.FeedbackId => ReportTopics.Feedback,
+            ReportTopics.OtherId => ReportTopics.Other,
             _ => $"Konu #{reportTopicId}"
         };
     }

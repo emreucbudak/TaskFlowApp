@@ -7,7 +7,10 @@ using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Chat;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Infrastructure.Helpers;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Authorization;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -16,17 +19,22 @@ public partial class GroupDetailsPageViewModel(
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
     IdentityApiClient identityApiClient,
-    ChatApiClient chatApiClient) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    ChatApiClient chatApiClient,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
     private const int RecentActivityPreviewCount = 5;
     private const int RecentActivityPageSize = 20;
     private const string NoGroupMessage = "Uyesi olunan grup bulunamadi.";
     private const string NoMembersMessage = "Bu grup icin uye bilgisi bulunamadi.";
     private const string NoRecentActivityMessage = "Grupta henuz mesaj aktivitesi yok.";
+    private const string NoGroupEventsMessage = "Yaklasan etkinlik bulunamadi.";
 
     public ObservableCollection<GroupDetailMemberItem> GroupMembers { get; } = [];
     public ObservableCollection<GroupRecentActivityItem> RecentGroupActivities { get; } = [];
     public ObservableCollection<GroupActivityDisplayItem> Activities { get; } = [];
+    public ObservableCollection<GroupEventDisplayItem> GroupEvents { get; } = [];
+    public IReadOnlyList<string> EventTypeOptions { get; } = ["Duyuru", "Toplanti", "Hatirlatma"];
 
     private Guid currentGroupId;
 
@@ -60,25 +68,12 @@ public partial class GroupDetailsPageViewModel(
     [ObservableProperty]
     private string membersEmptyMessage = NoMembersMessage;
 
-    [ObservableProperty]
-    private string recentGroupActivityEmptyMessage = NoRecentActivityMessage;
-
-    [ObservableProperty]
-    private bool isActivityFormVisible;
-
-    [ObservableProperty]
-    private string newActivityTitle = string.Empty;
-
-    [ObservableProperty]
-    private string newActivityDescription = string.Empty;
-
-    [ObservableProperty]
-    private bool isSubmittingActivity;
-
     public bool HasNoGroup => !HasGroup;
     public bool HasNoMembers => !HasMembers;
     public bool HasNoActivities => !HasActivities;
     public bool HasNoRecentGroupActivities => !HasRecentGroupActivities;
+    public bool HasGroupEvents => GroupEvents.Count > 0;
+    public bool HasNoGroupEvents => GroupEvents.Count == 0;
 
     partial void OnHasGroupChanged(bool value)
     {
@@ -146,7 +141,8 @@ public partial class GroupDetailsPageViewModel(
 
             var activitiesTask = LoadActivitiesAsync();
             var recentActivitiesTask = LoadRecentGroupActivitiesAsync(userId, userNameMap);
-            await Task.WhenAll(activitiesTask, recentActivitiesTask);
+            var groupEventsTask = LoadGroupEventsAsync();
+            await Task.WhenAll(activitiesTask, recentActivitiesTask, groupEventsTask);
 
             StatusText = $"{GroupName} detaylari yuklendi.";
         }
@@ -177,216 +173,6 @@ public partial class GroupDetailsPageViewModel(
         IsGroupLeader = group.LeaderUserIds.Contains(userId);
     }
 
-    private async Task LoadActivitiesAsync()
-    {
-        if (currentGroupId == Guid.Empty)
-        {
-            return;
-        }
-
-        try
-        {
-            var activities = await identityApiClient.GetGroupActivitiesAsync(currentGroupId);
-            Activities.Clear();
-
-            if (activities is null || activities.Count == 0)
-            {
-                HasActivities = false;
-                return;
-            }
-
-            foreach (var activity in activities)
-            {
-                Activities.Add(new GroupActivityDisplayItem
-                {
-                    ActivityId = activity.ActivityId,
-                    Title = activity.Title,
-                    Description = activity.Description,
-                    SubmittedByUserName = activity.SubmittedByUserName,
-                    SubmittedAtText = activity.SubmittedAt.ToString("dd.MM.yyyy HH:mm"),
-                    Status = activity.Status,
-                    StatusText = activity.StatusText,
-                    StatusColor = activity.Status switch
-                    {
-                        0 => "#F59E0B",
-                        1 => "#10B981",
-                        2 => "#EF4444",
-                        _ => "#64748B"
-                    },
-                    ReviewedByUserName = activity.ReviewedByUserName,
-                    ReviewNote = activity.ReviewNote,
-                    CanReview = IsGroupLeader && activity.Status == 0,
-                    Initials = BuildInitials(activity.SubmittedByUserName)
-                });
-            }
-
-            HasActivities = Activities.Count > 0;
-        }
-        catch
-        {
-            HasActivities = false;
-        }
-    }
-
-    private async Task LoadRecentGroupActivitiesAsync(Guid userId, IReadOnlyDictionary<Guid, string> userNameMap)
-    {
-        ResetRecentGroupActivitiesState();
-
-        if (currentGroupId == Guid.Empty)
-        {
-            return;
-        }
-
-        try
-        {
-            var messages = await chatApiClient.GetMessagesByGroupIdQueryRequestAsync(new
-            {
-                CurrentUserId = userId,
-                GroupId = currentGroupId,
-                PageSize = RecentActivityPageSize,
-                Page = 1
-            }) ?? [];
-
-            var recentActivities = messages
-                .Where(message => !message.IsDeleted)
-                .OrderByDescending(message => message.SendTime)
-                .Take(RecentActivityPreviewCount)
-                .Select(message => new GroupRecentActivityItem
-                {
-                    ActorName = ResolveDisplayName(message.SenderId, userNameMap),
-                    ActionText = ResolveRecentActivityText(message.Content),
-                    OccurredAtText = FormatRelativeTime(message.SendTime)
-                })
-                .ToList();
-
-            foreach (var activity in recentActivities)
-            {
-                RecentGroupActivities.Add(activity);
-            }
-
-            HasRecentGroupActivities = RecentGroupActivities.Count > 0;
-            RecentGroupActivityEmptyMessage = HasRecentGroupActivities ? string.Empty : NoRecentActivityMessage;
-        }
-        catch
-        {
-            ResetRecentGroupActivitiesState();
-        }
-    }
-
-    [RelayCommand]
-    private void ShowActivityForm()
-    {
-        IsActivityFormVisible = true;
-        NewActivityTitle = string.Empty;
-        NewActivityDescription = string.Empty;
-    }
-
-    [RelayCommand]
-    private void HideActivityForm()
-    {
-        IsActivityFormVisible = false;
-        NewActivityTitle = string.Empty;
-        NewActivityDescription = string.Empty;
-    }
-
-    [RelayCommand]
-    private async Task SubmitActivityAsync()
-    {
-        if (string.IsNullOrWhiteSpace(NewActivityTitle))
-        {
-            ErrorMessage = "Aktivite basligi bos olamaz.";
-            return;
-        }
-
-        if (currentGroupId == Guid.Empty)
-        {
-            return;
-        }
-
-        try
-        {
-            IsSubmittingActivity = true;
-            ErrorMessage = string.Empty;
-
-            await identityApiClient.SubmitGroupActivityAsync(
-                currentGroupId,
-                NewActivityTitle.Trim(),
-                NewActivityDescription?.Trim() ?? string.Empty);
-
-            HideActivityForm();
-            await LoadActivitiesAsync();
-            StatusText = "Aktivite basariyla gonderildi.";
-        }
-        catch (ApiException ex)
-        {
-            ErrorMessage = ResolveApiErrorMessage(ex, "Aktivite gonderilemedi.");
-        }
-        catch (Exception)
-        {
-            ErrorMessage = "Aktivite gonderilirken bir hata olustu.";
-        }
-        finally
-        {
-            IsSubmittingActivity = false;
-        }
-    }
-
-    [RelayCommand]
-    private async Task ApproveActivityAsync(Guid activityId)
-    {
-        try
-        {
-            IsBusy = true;
-            ErrorMessage = string.Empty;
-            await identityApiClient.ApproveGroupActivityAsync(activityId);
-            await LoadActivitiesAsync();
-            StatusText = "Aktivite onaylandi.";
-        }
-        catch (ApiException ex)
-        {
-            ErrorMessage = ResolveApiErrorMessage(ex, "Aktivite onaylanamadi.");
-        }
-        catch (Exception)
-        {
-            ErrorMessage = "Onaylama sirasinda bir hata olustu.";
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    [RelayCommand]
-    private async Task RejectActivityAsync(Guid activityId)
-    {
-        try
-        {
-            IsBusy = true;
-            ErrorMessage = string.Empty;
-            await identityApiClient.RejectGroupActivityAsync(activityId);
-            await LoadActivitiesAsync();
-            StatusText = "Aktivite reddedildi.";
-        }
-        catch (ApiException ex)
-        {
-            ErrorMessage = ResolveApiErrorMessage(ex, "Aktivite reddedilemedi.");
-        }
-        catch (Exception)
-        {
-            ErrorMessage = "Reddetme sirasinda bir hata olustu.";
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    [RelayCommand]
-    private Task NavigateBackAsync()
-    {
-        return NavigationService.GoBackAsync();
-    }
-
     private void ResetState()
     {
         GroupName = string.Empty;
@@ -395,17 +181,23 @@ public partial class GroupDetailsPageViewModel(
         GroupEmptyMessage = NoGroupMessage;
         MembersEmptyMessage = NoMembersMessage;
         RecentGroupActivityEmptyMessage = NoRecentActivityMessage;
+        GroupEventsEmptyMessage = NoGroupEventsMessage;
         GroupMembers.Clear();
         RecentGroupActivities.Clear();
         Activities.Clear();
+        GroupEvents.Clear();
         HasGroup = false;
         HasMembers = false;
         HasActivities = false;
         HasRecentGroupActivities = false;
         IsGroupLeader = false;
         IsActivityFormVisible = false;
+        IsGroupEventFormVisible = false;
+        IsEventEndEnabled = false;
         currentGroupId = Guid.Empty;
         StatusText = string.Empty;
+        OnPropertyChanged(nameof(HasGroupEvents));
+        OnPropertyChanged(nameof(HasNoGroupEvents));
     }
 
     private void ApplyNoGroupState()
@@ -448,7 +240,7 @@ public partial class GroupDetailsPageViewModel(
             GroupMembers.Add(new GroupDetailMemberItem
             {
                 Name = memberName,
-                Initials = BuildInitials(memberName)
+                Initials = BuildInitials(memberName, "U")
             });
         }
 
@@ -458,105 +250,10 @@ public partial class GroupDetailsPageViewModel(
             : "Uye bilgisi bulunmuyor";
     }
 
-    private static IReadOnlyDictionary<Guid, string> BuildUserNameMap(IEnumerable<CompanyUserDto> users)
+    [RelayCommand]
+    private Task NavigateBackAsync()
     {
-        return users
-            .Where(user => user.Id != Guid.Empty && !string.IsNullOrWhiteSpace(user.Name))
-            .GroupBy(user => user.Id)
-            .ToDictionary(group => group.Key, group => group.First().Name.Trim());
-    }
-
-    private static List<CompanyGroupDto> ResolveUserGroups(
-        IEnumerable<CompanyGroupDto> groups,
-        Guid userId,
-        IReadOnlyDictionary<Guid, string> userNameMap)
-    {
-        userNameMap.TryGetValue(userId, out var currentUserName);
-
-        return NormalizeGroups(groups)
-            .Where(group => IsGroupMember(group, userId, currentUserName))
-            .OrderBy(group => group.GroupName, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-    }
-
-    private static bool IsGroupMember(CompanyGroupDto group, Guid userId, string? currentUserName)
-    {
-        if (group.WorkerUserIds.Contains(userId))
-        {
-            return true;
-        }
-
-        if (string.IsNullOrWhiteSpace(currentUserName))
-        {
-            return false;
-        }
-
-        return group.WorkerName.Any(name =>
-            string.Equals(name?.Trim(), currentUserName, StringComparison.OrdinalIgnoreCase));
-    }
-
-    private static List<CompanyGroupDto> NormalizeGroups(IEnumerable<CompanyGroupDto> groups)
-    {
-        return groups
-            .Where(group => !string.IsNullOrWhiteSpace(group.GroupName))
-            .GroupBy(group => group.GroupName.Trim(), StringComparer.OrdinalIgnoreCase)
-            .Select(grouped => new CompanyGroupDto
-            {
-                GroupId = grouped
-                    .Select(group => group.GroupId)
-                    .FirstOrDefault(groupId => groupId != Guid.Empty),
-                GroupName = grouped.First().GroupName.Trim(),
-                WorkerUserIds = grouped
-                    .SelectMany(group => group.WorkerUserIds)
-                    .Where(workerId => workerId != Guid.Empty)
-                    .Distinct()
-                    .ToList(),
-                WorkerName = grouped
-                    .SelectMany(group => group.WorkerName)
-                    .Select(name => name?.Trim())
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Cast<string>()
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList(),
-                DepartmenName = grouped
-                    .SelectMany(group => group.DepartmenName)
-                    .Select(name => name?.Trim())
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Cast<string>()
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList(),
-                LeaderUserIds = grouped
-                    .SelectMany(group => group.LeaderUserIds)
-                    .Where(id => id != Guid.Empty)
-                    .Distinct()
-                    .ToList()
-            })
-            .ToList();
-    }
-
-    private static string ResolveDisplayName(Guid userId, IReadOnlyDictionary<Guid, string> userNameMap)
-    {
-        if (userNameMap.TryGetValue(userId, out var userName) && !string.IsNullOrWhiteSpace(userName))
-        {
-            return userName;
-        }
-
-        return "Bilinmeyen kullanici";
-    }
-
-    private static string ResolveRecentActivityText(string? content)
-    {
-        var normalizedContent = content?.Trim();
-        return string.IsNullOrWhiteSpace(normalizedContent)
-            ? "gruba bir mesaj paylasti."
-            : $"mesaj paylasti: {normalizedContent}";
-    }
-
-    private void ResetRecentGroupActivitiesState()
-    {
-        RecentGroupActivities.Clear();
-        HasRecentGroupActivities = false;
-        RecentGroupActivityEmptyMessage = NoRecentActivityMessage;
+        return NavigationService.GoBackAsync();
     }
 
     private static DateTime ConvertToLocalTime(DateTime value)
@@ -572,6 +269,7 @@ public partial class GroupDetailsPageViewModel(
     private static string FormatRelativeTime(DateTime sendTime)
     {
         var localTime = ConvertToLocalTime(sendTime);
+        // DateTime.Now is correct here: comparing against already-localized time
         var elapsed = DateTime.Now - localTime;
         if (elapsed < TimeSpan.Zero)
         {
@@ -601,14 +299,40 @@ public partial class GroupDetailsPageViewModel(
         return localTime.ToString("dd.MM.yyyy HH:mm");
     }
 
-    private static string BuildInitials(string name)
+    private static string FormatDateTime(DateTime dateTime)
     {
-        var initials = string.Concat(name
-            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-            .Take(2)
-            .Select(part => char.ToUpperInvariant(part[0])));
+        return ConvertToLocalTime(dateTime).ToString("dd.MM.yyyy HH:mm");
+    }
 
-        return string.IsNullOrWhiteSpace(initials) ? "U" : initials;
+    private static string ResolveDisplayName(Guid userId, IReadOnlyDictionary<Guid, string> userNameMap)
+    {
+        if (userNameMap.TryGetValue(userId, out var userName) && !string.IsNullOrWhiteSpace(userName))
+        {
+            return userName;
+        }
+
+        return "Bilinmeyen kullanici";
+    }
+
+    private static List<CompanyGroupDto> ResolveUserGroups(
+        IEnumerable<CompanyGroupDto> groups,
+        Guid userId,
+        IReadOnlyDictionary<Guid, string> userNameMap)
+    {
+        userNameMap.TryGetValue(userId, out var currentUserName);
+
+        return GroupHelper.NormalizeGroups(groups)
+            .Where(group => GroupHelper.IsGroupMember(group, userId, currentUserName))
+            .OrderBy(group => group.GroupName, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    private static IReadOnlyDictionary<Guid, string> BuildUserNameMap(IEnumerable<CompanyUserDto> users)
+    {
+        return users
+            .Where(user => user.Id != Guid.Empty && !string.IsNullOrWhiteSpace(user.Name))
+            .GroupBy(user => user.Id)
+            .ToDictionary(group => group.Key, group => group.First().Name.Trim());
     }
 }
 
@@ -616,22 +340,4 @@ public sealed record GroupDetailMemberItem
 {
     public string Name { get; init; } = string.Empty;
     public string Initials { get; init; } = string.Empty;
-}
-
-public sealed record GroupActivityDisplayItem
-{
-    public Guid ActivityId { get; init; }
-    public string Title { get; init; } = string.Empty;
-    public string Description { get; init; } = string.Empty;
-    public string SubmittedByUserName { get; init; } = string.Empty;
-    public string SubmittedAtText { get; init; } = string.Empty;
-    public int Status { get; init; }
-    public string StatusText { get; init; } = string.Empty;
-    public string StatusColor { get; init; } = "#64748B";
-    public string? ReviewedByUserName { get; init; }
-    public string? ReviewNote { get; init; }
-    public bool CanReview { get; init; }
-    public string Initials { get; init; } = string.Empty;
-    public bool HasReviewNote => !string.IsNullOrWhiteSpace(ReviewNote);
-    public string ReviewNoteDisplay => HasReviewNote ? $"Not: {ReviewNote}" : string.Empty;
 }

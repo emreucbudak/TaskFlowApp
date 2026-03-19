@@ -139,7 +139,6 @@ public static class MauiProgram
 #endif
 
         var app = builder.Build();
-        ServiceLocator.Initialize(app.Services);
         return app;
     }
 }

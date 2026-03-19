@@ -8,6 +8,9 @@ using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Authorization;
+using TaskFlowApp.Infrastructure.Constants;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -15,9 +18,13 @@ public partial class CompanyEmployeesPageViewModel(
     INavigationService navigationService,
     IUserSession userSession,
     IRealtimeConnectionManager realtimeConnectionManager,
-    IdentityApiClient identityApiClient)
-    : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    IdentityApiClient identityApiClient,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService)
+    : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
+    private const string InvalidPasswordMessage = "Şifre en az 8 karakter olmalı ve büyük harf, küçük harf, rakam içermelidir.";
+
     public ObservableCollection<DepartmentDto> Departments { get; } = [];
     public ObservableCollection<CompanyUserDto> CompanyUsers { get; } = [];
 
@@ -184,7 +191,7 @@ public partial class CompanyEmployeesPageViewModel(
 
         if (!IsValidPassword(WorkerPasswordInput))
         {
-            ErrorMessage = "Şifre en az 8 karakter olmalı ve büyük harf, küçük harf, rakam içermelidir.";
+            ErrorMessage = InvalidPasswordMessage;
             return;
         }
 
@@ -504,7 +511,7 @@ public partial class CompanyEmployeesPageViewModel(
 
         if (!IsValidPassword(NewPasswordInput))
         {
-            ErrorMessage = "Şifre en az 8 karakter olmalı ve büyük harf, küçük harf, rakam içermelidir.";
+            ErrorMessage = InvalidPasswordMessage;
             return;
         }
 

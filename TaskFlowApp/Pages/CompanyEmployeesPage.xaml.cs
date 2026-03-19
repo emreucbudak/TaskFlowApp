@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using TaskFlowApp.Infrastructure;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.ViewModels;
 
@@ -11,10 +10,10 @@ public partial class CompanyEmployeesPage : ContentPage
     private bool isShowingFormMessage;
     private bool isViewModelSubscribed;
 
-    public CompanyEmployeesPage()
+    public CompanyEmployeesPage(CompanyEmployeesPageViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = ServiceLocator.GetRequiredService<CompanyEmployeesPageViewModel>();
+        BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()

@@ -5,10 +5,10 @@ namespace TaskFlowApp;
 
 public partial class MainPage : ContentPage
 {
-    public MainPage()
+    public MainPage(MainPageViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = ServiceLocator.GetRequiredService<MainPageViewModel>();
+        BindingContext = viewModel;
     }
 
     private void OnEntryHandlerChanged(object? sender, EventArgs e)

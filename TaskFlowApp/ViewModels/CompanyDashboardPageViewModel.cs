@@ -6,7 +6,10 @@ using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
+using TaskFlowApp.Infrastructure.Helpers;
 using TaskFlowApp.Services.Realtime;
+using TaskFlowApp.Infrastructure.Authorization;
+using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
 
@@ -18,8 +21,10 @@ public partial class CompanyDashboardPageViewModel(
     ProjectManagementApiClient projectManagementApiClient,
     ReportApiClient reportApiClient,
     IdentityApiClient identityApiClient,
-    TenantApiClient tenantApiClient)
-    : PageViewModelBase(navigationService, userSession, realtimeConnectionManager)
+    TenantApiClient tenantApiClient,
+    IWorkerReportAccessResolver workerReportAccessResolver,
+    IWorkerDashboardStateService workerDashboardStateService)
+    : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
     private const int TasksPageSize = 100;
     private const int ReportsPageSize = 100;
@@ -142,7 +147,9 @@ public partial class CompanyDashboardPageViewModel(
             await Task.WhenAll(usersTask, groupsTask, tasksTask, reportsTask, statsTask, plansTask);
 
             var users = await usersTask ?? [];
-            var normalizedGroups = NormalizeGroups(await groupsTask ?? []);
+            var normalizedGroups = GroupHelper.NormalizeGroups(await groupsTask ?? [])
+                .OrderBy(group => group.GroupName)
+                .ToList();
             var tasks = await tasksTask;
             var reports = await reportsTask;
             var stats = await statsTask;
@@ -161,8 +168,8 @@ public partial class CompanyDashboardPageViewModel(
                 .ToList();
             var overdueFromTasks = tasks.Count(task =>
                 task.DeadlineTime < period &&
-                !IsCompletedStatus(task.StatusName));
-            var completedFromTasks = tasks.Count(task => IsCompletedStatus(task.StatusName));
+                !TaskStatusHelper.IsCompletedStatus(task.StatusName));
+            var completedFromTasks = tasks.Count(task => TaskStatusHelper.IsCompletedStatus(task.StatusName));
             var individualTaskSnapshot = await LoadCompanyIndividualTaskSnapshotAsync(users, period);
             var totalTasksFromStats = companyStats.Sum(item => item.TotalTasksAssigned);
             var individualTaskCount = totalTasksFromStats > 0
@@ -215,19 +222,6 @@ public partial class CompanyDashboardPageViewModel(
 
     private static bool IsRejectedReportStatus(int reportStatusId) => reportStatusId == 4;
 
-    private static bool IsCompletedStatus(string? statusName)
-    {
-        if (string.IsNullOrWhiteSpace(statusName))
-        {
-            return false;
-        }
-
-        var normalizedStatus = statusName.Trim().ToLowerInvariant();
-        return normalizedStatus.Contains("tamam")
-            || normalizedStatus.Contains("complete")
-            || normalizedStatus.Contains("done")
-            || normalizedStatus.Contains("closed");
-    }
 
     private void UpdateEmployeeRanking(
         IReadOnlyCollection<CompanyUserDto> users,
@@ -444,7 +438,7 @@ public partial class CompanyDashboardPageViewModel(
 
             return (
                 TotalCount: allTasks.Count,
-                OverdueCount: allTasks.Count(task => task.Deadline < period && !IsCompletedStatus(task.StatusName)));
+                OverdueCount: allTasks.Count(task => task.Deadline < period && !TaskStatusHelper.IsCompletedStatus(task.StatusName)));
         }
         catch (ApiException)
         {
@@ -530,30 +524,6 @@ public partial class CompanyDashboardPageViewModel(
         return allStats;
     }
 
-    private static List<CompanyGroupDto> NormalizeGroups(IEnumerable<CompanyGroupDto> groups)
-    {
-        return groups
-            .Where(group => !string.IsNullOrWhiteSpace(group.GroupName))
-            .GroupBy(group => group.GroupName.Trim(), StringComparer.OrdinalIgnoreCase)
-            .Select(grouped => new CompanyGroupDto
-            {
-                GroupName = grouped.First().GroupName,
-                WorkerName = grouped
-                    .SelectMany(item => item.WorkerName ?? [])
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .OrderBy(name => name)
-                    .ToList(),
-                DepartmenName = grouped
-                    .SelectMany(item => item.DepartmenName ?? [])
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .OrderBy(name => name)
-                    .ToList()
-            })
-            .OrderBy(group => group.GroupName)
-            .ToList();
-    }
     partial void OnSelectedMonthOptionChanged(DashboardMonthOption? value)
     {
         SelectedMonthDisplayText = value?.Label ?? "Donem Secin";

@@ -1,4 +1,5 @@
 using TaskFlowApp.Infrastructure.Authorization;
+using TaskFlowApp.Infrastructure.Constants;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Services.ApiClients;
 
@@ -188,7 +189,7 @@ public sealed class WorkerDashboardStateService(
         userId = Guid.Empty;
         companyId = Guid.Empty;
 
-        if (!string.Equals(userSession.Role, "worker", StringComparison.OrdinalIgnoreCase) ||
+        if (!string.Equals(userSession.Role, AppRoles.Worker, StringComparison.OrdinalIgnoreCase) ||
             userSession.UserId is null ||
             userSession.CompanyId is null)
         {

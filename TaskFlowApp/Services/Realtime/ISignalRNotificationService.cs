@@ -2,7 +2,7 @@ using TaskFlowApp.Models.Notification;
 
 namespace TaskFlowApp.Services.Realtime;
 
-public interface ISignalRNotificationService
+public interface ISignalRNotificationService : IAsyncDisposable
 {
     bool IsConnected { get; }
 

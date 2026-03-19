@@ -1,4 +1,3 @@
-using TaskFlowApp.Infrastructure;
 using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp.Pages;
@@ -7,7 +6,7 @@ public partial class GroupDetailsPage : ContentPage
 {
     private GroupDetailsPageViewModel ViewModel => (GroupDetailsPageViewModel)BindingContext;
 
-    public GroupDetailsPage()
+    public GroupDetailsPage(GroupDetailsPageViewModel viewModel)
     {
         InitializeComponent();
         Shell.SetPresentationMode(this, PresentationMode.NotAnimated);
@@ -16,7 +15,7 @@ public partial class GroupDetailsPage : ContentPage
             IsVisible = false,
             IsEnabled = false
         });
-        BindingContext = ServiceLocator.GetRequiredService<GroupDetailsPageViewModel>();
+        BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()

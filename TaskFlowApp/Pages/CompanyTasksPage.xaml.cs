@@ -1,4 +1,3 @@
-using TaskFlowApp.Infrastructure;
 using TaskFlowApp.ViewModels;
 
 namespace TaskFlowApp.Pages;
@@ -7,10 +6,10 @@ public partial class CompanyTasksPage : ContentPage
 {
     private CompanyTasksPageViewModel ViewModel => (CompanyTasksPageViewModel)BindingContext;
 
-    public CompanyTasksPage()
+    public CompanyTasksPage(CompanyTasksPageViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = ServiceLocator.GetRequiredService<CompanyTasksPageViewModel>();
+        BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()
