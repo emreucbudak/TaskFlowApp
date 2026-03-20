@@ -74,6 +74,18 @@ public partial class CompanyEmployeesPageViewModel(
     private string newPasswordInput = string.Empty;
 
     [ObservableProperty]
+    private DepartmentDto? selectedLeaderDepartment;
+
+    [ObservableProperty]
+    private string selectedLeaderDepartmentDisplayText = "Departman Seçin";
+
+    [ObservableProperty]
+    private CompanyUserDto? selectedLeaderUser;
+
+    [ObservableProperty]
+    private string selectedLeaderUserDisplayText = "Çalışan Seçin";
+
+    [ObservableProperty]
     private string formMessage = string.Empty;
 
     [RelayCommand]
@@ -126,6 +138,16 @@ public partial class CompanyEmployeesPageViewModel(
             if (SelectedPasswordUser is not null && CompanyUsers.All(item => item.Id != SelectedPasswordUser.Id))
             {
                 SelectedPasswordUser = null;
+            }
+
+            if (SelectedLeaderDepartment is not null && Departments.All(item => item.Id != SelectedLeaderDepartment.Id))
+            {
+                SelectedLeaderDepartment = null;
+            }
+
+            if (SelectedLeaderUser is not null && CompanyUsers.All(item => item.Id != SelectedLeaderUser.Id))
+            {
+                SelectedLeaderUser = null;
             }
 
             if (string.IsNullOrWhiteSpace(FormMessage))
@@ -565,6 +587,82 @@ public partial class CompanyEmployeesPageViewModel(
         }
     }
 
+    [RelayCommand]
+    private async Task MakeLeaderAsync()
+    {
+        if (IsBusy)
+        {
+            return;
+        }
+
+        if (UserSession.CompanyId is null)
+        {
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
+            return;
+        }
+
+        if (SelectedLeaderDepartment is null)
+        {
+            ErrorMessage = "Lider atamak için bir departman seçin.";
+            return;
+        }
+
+        if (SelectedLeaderUser is null)
+        {
+            ErrorMessage = "Lider yapılacak çalışanı seçin.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            ErrorMessage = string.Empty;
+            FormMessage = string.Empty;
+
+            await identityApiClient.AddUserToDepartmentCommandRequestAsync(new
+            {
+                UserId = SelectedLeaderUser.Id,
+                DepartmentId = SelectedLeaderDepartment.Id,
+                RoleId = 1
+            });
+
+            var companyId = UserSession.CompanyId.Value;
+            var refreshed = await TryRefreshUsersAsync(companyId);
+            if (!refreshed)
+            {
+                ErrorMessage = "Lider atandı ancak liste güncellenemedi. Sayfayı yenileyin.";
+            }
+
+            SelectedLeaderUser = null;
+            SelectedLeaderDepartment = null;
+            FormMessage = "Çalışan başarıyla departman lideri yapıldı.";
+        }
+        catch (ApiException ex) when (ex.StatusCode == 400)
+        {
+            ErrorMessage = "Lider atama işlemi başarısız. Bilgileri kontrol edip tekrar deneyin.";
+        }
+        catch (ApiException ex)
+        {
+            ErrorMessage = ResolveApiErrorMessage(ex, "Lider atama işlemi başarısız. Lütfen tekrar deneyin.");
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
+        }
+        catch (TaskCanceledException)
+        {
+            ErrorMessage = GenericConnectionErrorMessage;
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     private async Task RefreshDepartmentsAsync(Guid companyId)
     {
         var response = await identityApiClient.GetAllCompanyDepartmentsAsync(companyId);
@@ -727,6 +825,19 @@ public partial class CompanyEmployeesPageViewModel(
     partial void OnSelectedPasswordUserChanged(CompanyUserDto? value)
     {
         SelectedPasswordUserDisplayText = value?.Name ?? "Çalışan Seçin";
+    }
+
+    partial void OnSelectedLeaderDepartmentChanged(DepartmentDto? value)
+    {
+        SelectedLeaderDepartmentDisplayText = value?.Name ?? "Departman Seçin";
+        OnPropertyChanged(nameof(IsLeaderDepartmentSelected));
+    }
+
+    public bool IsLeaderDepartmentSelected => SelectedLeaderDepartment is not null;
+
+    partial void OnSelectedLeaderUserChanged(CompanyUserDto? value)
+    {
+        SelectedLeaderUserDisplayText = value?.Name ?? "Çalışan Seçin";
     }
 
 }

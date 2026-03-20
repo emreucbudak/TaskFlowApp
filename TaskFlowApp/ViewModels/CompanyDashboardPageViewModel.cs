@@ -6,9 +6,9 @@ using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
-using TaskFlowApp.Infrastructure.Helpers;
 using TaskFlowApp.Services.Realtime;
 using TaskFlowApp.Infrastructure.Authorization;
+using TaskFlowApp.Infrastructure.Helpers;
 using TaskFlowApp.Services.State;
 
 namespace TaskFlowApp.ViewModels;
@@ -147,9 +147,7 @@ public partial class CompanyDashboardPageViewModel(
             await Task.WhenAll(usersTask, groupsTask, tasksTask, reportsTask, statsTask, plansTask);
 
             var users = await usersTask ?? [];
-            var normalizedGroups = GroupHelper.NormalizeGroups(await groupsTask ?? [])
-                .OrderBy(group => group.GroupName)
-                .ToList();
+            var normalizedGroups = (await groupsTask ?? []).ToList();
             var tasks = await tasksTask;
             var reports = await reportsTask;
             var stats = await statsTask;
@@ -166,10 +164,19 @@ public partial class CompanyDashboardPageViewModel(
             var companyStats = stats
                 .Where(workerStat => companyUserIds.Contains(workerStat.UserId))
                 .ToList();
-            var overdueFromTasks = tasks.Count(task =>
-                task.DeadlineTime < period &&
-                !TaskStatusHelper.IsCompletedStatus(task.StatusName));
-            var completedFromTasks = tasks.Count(task => TaskStatusHelper.IsCompletedStatus(task.StatusName));
+            int overdueFromTasks = 0, completedFromTasks = 0;
+            foreach (var task in tasks)
+            {
+                var isCompleted = TaskStatusHelper.IsCompletedStatus(task.StatusName);
+                if (isCompleted)
+                {
+                    completedFromTasks++;
+                }
+                else if (task.DeadlineTime < period)
+                {
+                    overdueFromTasks++;
+                }
+            }
             var individualTaskSnapshot = await LoadCompanyIndividualTaskSnapshotAsync(users, period);
             var totalTasksFromStats = companyStats.Sum(item => item.TotalTasksAssigned);
             var individualTaskCount = totalTasksFromStats > 0

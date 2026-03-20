@@ -279,7 +279,7 @@
                                                            LineBreakMode="TailTruncation" />
                                                 </VerticalStackLayout>
                                                 <Button Grid.Column="1"
-                                                        Text="Kaldir"
+                                                        Text="Kaldır"
                                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveGroupMemberCommand}"
                                                         CommandParameter="{Binding}"
                                                         BackgroundColor="#FEE2E2"
@@ -294,44 +294,24 @@
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
 
-                            <!-- Group Task Toggle -->
-                            <Border BackgroundColor="#EEF2FF"
-                                    Stroke="#C7D2FE"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 8"
-                                    Padding="14,10">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <Label Grid.Column="0"
-                                           Text="Grup Gorevi Ekle"
+                            <!-- Group Task Form -->
+                            <VerticalStackLayout Spacing="12">
+
+                                <!-- Section Header -->
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                    <BoxView Grid.Column="0" Color="#4F46E5" WidthRequest="4" HeightRequest="18" VerticalOptions="Center" />
+                                    <Label Grid.Column="1"
+                                           Text="Grup Görevi"
                                            TextColor="#1E1B4B"
                                            FontSize="14"
                                            FontAttributes="Bold"
-                                           VerticalTextAlignment="Center" />
-                                    <Switch Grid.Column="1"
-                                            IsToggled="{Binding IsGroupTaskEnabled}"
-                                            OnColor="#4F46E5"
-                                            ThumbColor="#FFFFFF" />
+                                           VerticalOptions="Center" />
                                 </Grid>
-                            </Border>
-
-                            <!-- Group Task Form -->
-                            <VerticalStackLayout Spacing="12"
-                                                 IsVisible="{Binding IsGroupTaskEnabled}">
-
-                                <Border BackgroundColor="#EEF2FF"
-                                        Stroke="Transparent"
-                                        StrokeShape="RoundRectangle 4"
-                                        Padding="12">
-                                    <Label Text="Ana g&#246;rev bilgilerini doldurun. Her &#252;ye i&#231;in alt g&#246;revler otomatik olu&#351;turulur."
-                                           TextColor="#64748B"
-                                           FontSize="11"
-                                           LineBreakMode="WordWrap" />
-                                </Border>
 
                                 <Picker ItemsSource="{Binding PriorityOptions}"
                                         SelectedItem="{Binding SelectedGroupTaskPriority}"
                                         ItemDisplayBinding="{Binding DisplayName}"
-                                        Title="Gorev onceligi sec"
+                                        Title="Görev önceliği seç"
                                         TitleColor="#94A3B8"
                                         TextColor="#1E1B4B"
                                         BackgroundColor="Transparent"
@@ -372,7 +352,7 @@
                                         StrokeShape="RoundRectangle 4"
                                         Padding="12,8">
                                     <VerticalStackLayout Spacing="6">
-                                        <Label Text="Gorev Teslim Tarihi"
+                                        <Label Text="Görev Teslim Tarihi"
                                                TextColor="#94A3B8"
                                                FontSize="11" />
                                         <DatePicker Date="{Binding GroupTaskDeadlineDate}"

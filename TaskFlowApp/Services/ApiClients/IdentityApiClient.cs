@@ -98,4 +98,10 @@ public sealed class IdentityApiClient(IApiClient apiClient) : ControllerApiClien
             "GetGroupEventsQueryRequest",
             new { GroupId = groupId },
             cancellationToken: cancellationToken);
+
+    public Task<CheckDepartmentLeadershipResponseDto> CheckDepartmentLeadershipAsync(Guid userId, CancellationToken cancellationToken = default) =>
+        PostForResultAsync<CheckDepartmentLeadershipResponseDto>(
+            "CheckDepartmentLeadershipQueryRequest",
+            new { UserId = userId },
+            cancellationToken: cancellationToken);
 }

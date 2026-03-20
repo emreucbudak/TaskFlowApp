@@ -103,71 +103,7 @@ public partial class AllIndividualTasksPageViewModel(
             allTasks.AddRange(pageItems);
         }
 
-        return allTasks
-            .Select(MapIndividualTask)
-            .OrderBy(task => TaskStatusHelper.IsCompletedStatus(task.StatusName))
-            .ThenBy(task => task.DeadlineTime)
-            .ThenBy(task => task.TaskName, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-    }
-
-    private static CompanyTaskDto MapIndividualTask(IndividualTaskDto task)
-    {
-        var statusName = string.IsNullOrWhiteSpace(task.StatusName) ? TaskStatusHelper.DefaultOpenStatus : task.StatusName;
-        var categoryName = string.IsNullOrWhiteSpace(task.CategoryName) ? "Bireysel" : task.CategoryName;
-        var priorityName = string.IsNullOrWhiteSpace(task.TaskPriorityName) ? "Belirtilmedi" : task.TaskPriorityName;
-
-        return NormalizeCategoryAndPriority(new CompanyTaskDto
-        {
-            TaskName = task.TaskTitle,
-            Description = task.Description,
-            DeadlineTime = task.Deadline,
-            StatusName = statusName,
-            CategoryName = categoryName,
-            TaskPriorityName = priorityName
-        });
-    }
-
-    private static bool IsPriorityValue(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        return value.Trim().ToLowerInvariant() is "dusuk"
-            or "orta"
-            or "yuksek"
-            or "low"
-            or "medium"
-            or "high";
-    }
-
-    private static CompanyTaskDto NormalizeCategoryAndPriority(CompanyTaskDto task)
-    {
-        var categoryName = string.IsNullOrWhiteSpace(task.CategoryName)
-            ? "Bireysel"
-            : task.CategoryName.Trim();
-
-        var priorityName = string.IsNullOrWhiteSpace(task.TaskPriorityName)
-            ? "Belirtilmedi"
-            : task.TaskPriorityName.Trim();
-
-        if (IsPriorityValue(categoryName))
-        {
-            if (!IsPriorityValue(priorityName))
-            {
-                priorityName = categoryName;
-            }
-
-            categoryName = "Bireysel";
-        }
-
-        return task with
-        {
-            CategoryName = categoryName,
-            TaskPriorityName = priorityName
-        };
+        return TaskHelper.OrderTasks(allTasks.Select(TaskHelper.MapIndividualTask));
     }
 
 }

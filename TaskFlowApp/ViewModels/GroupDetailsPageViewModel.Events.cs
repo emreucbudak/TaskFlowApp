@@ -127,25 +127,25 @@ public partial class GroupDetailsPageViewModel
     {
         if (!IsGroupLeader)
         {
-            ErrorMessage = "Etkinlik olusturmak icin grup lideri olmalisiniz.";
+            ErrorMessage = "Etkinlik oluşturmak için grup lideri olmalısınız.";
             return;
         }
 
         if (string.IsNullOrWhiteSpace(NewEventSubject))
         {
-            ErrorMessage = "Etkinlik konusu bos olamaz.";
+            ErrorMessage = "Etkinlik konusu boş olamaz.";
             return;
         }
 
         if (string.IsNullOrWhiteSpace(SelectedEventType))
         {
-            ErrorMessage = "Etkinlik turu bos olamaz.";
+            ErrorMessage = "Etkinlik türü boş olamaz.";
             return;
         }
 
         if (string.IsNullOrWhiteSpace(NewEventTitle))
         {
-            ErrorMessage = "Etkinlik basligi bos olamaz.";
+            ErrorMessage = "Etkinlik başlığı boş olamaz.";
             return;
         }
 
@@ -162,7 +162,7 @@ public partial class GroupDetailsPageViewModel
             endsAtLocal = CombineDateAndTime(NewEventEndDate, NewEventEndTime);
             if (endsAtLocal <= startsAtLocal)
             {
-                ErrorMessage = "Bitis zamani baslangic zamanindan sonra olmali.";
+                ErrorMessage = "Bitiş zamanı başlangıç zamanından sonra olmalı.";
                 return;
             }
         }
@@ -170,7 +170,7 @@ public partial class GroupDetailsPageViewModel
         var meetingLink = NewEventMeetingLink?.Trim();
         if (!string.IsNullOrWhiteSpace(meetingLink) && !Uri.TryCreate(meetingLink, UriKind.Absolute, out _))
         {
-            ErrorMessage = "Gecerli bir toplanti baglantisi girin.";
+            ErrorMessage = "Geçerli bir toplantı bağlantısı girin.";
             return;
         }
 
@@ -195,15 +195,15 @@ public partial class GroupDetailsPageViewModel
 
             HideGroupEventForm();
             await LoadGroupEventsAsync();
-            StatusText = "Etkinlik yayimlandi.";
+            StatusText = "Etkinlik yayımlandı.";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = ResolveApiErrorMessage(ex, "Etkinlik olusturulamadi.");
+            ErrorMessage = ResolveApiErrorMessage(ex, "Etkinlik oluşturulamadı.");
         }
         catch (Exception)
         {
-            ErrorMessage = "Etkinlik olusturulurken bir hata olustu.";
+            ErrorMessage = "Etkinlik oluşturulurken bir hata oluştu.";
         }
         finally
         {
@@ -234,7 +234,7 @@ public partial class GroupDetailsPageViewModel
         }
         catch (Exception)
         {
-            ErrorMessage = "Etkinlik silinirken bir hata olustu.";
+            ErrorMessage = "Etkinlik silinirken bir hata oluştu.";
         }
         finally
         {
@@ -252,7 +252,7 @@ public partial class GroupDetailsPageViewModel
 
         if (!Uri.TryCreate(meetingLink.Trim(), UriKind.Absolute, out var uri))
         {
-            ErrorMessage = "Gecerli bir toplanti baglantisi bulunamadi.";
+            ErrorMessage = "Geçerli bir toplantı bağlantısı bulunamadı.";
             return;
         }
 
@@ -262,7 +262,7 @@ public partial class GroupDetailsPageViewModel
         }
         catch
         {
-            ErrorMessage = "Toplanti baglantisi acilamadi.";
+            ErrorMessage = "Toplantı bağlantısı açılamadı.";
         }
     }
 

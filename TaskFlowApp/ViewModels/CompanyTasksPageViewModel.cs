@@ -105,8 +105,22 @@ public partial class CompanyTasksPageViewModel(
 
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
             TotalTaskCount = items.Count;
-            OpenTaskCount = items.Count(item => !TaskStatusHelper.IsCompletedStatus(item.StatusName));
-            OverdueTaskCount = items.Count(item => item.DeadlineTime < now && !TaskStatusHelper.IsCompletedStatus(item.StatusName));
+
+            int openCount = 0, overdueCount = 0;
+            foreach (var item in items)
+            {
+                if (!TaskStatusHelper.IsCompletedStatus(item.StatusName))
+                {
+                    openCount++;
+                    if (item.DeadlineTime < now)
+                    {
+                        overdueCount++;
+                    }
+                }
+            }
+
+            OpenTaskCount = openCount;
+            OverdueTaskCount = overdueCount;
 
             StatusText = $"Toplam: {TotalTaskCount} | Açık: {OpenTaskCount} | Geciken: {OverdueTaskCount}";
         }
@@ -187,7 +201,7 @@ public partial class CompanyTasksPageViewModel(
         }
 
         return allTasks
-            .Select(NormalizeCategoryAndPriority)
+            .Select(TaskHelper.NormalizeCategoryAndPriority)
             .Select(task => task with { CategoryName = "Grup" })
             .ToList();
     }
@@ -229,8 +243,7 @@ public partial class CompanyTasksPageViewModel(
         return tasksByUser
             .SelectMany(tasks => tasks)
             .GroupBy(
-                task => $"{task.TaskName}|{task.Description}|{task.DeadlineTime}|{task.StatusName}|{task.CategoryName}|{task.TaskPriorityName}",
-                StringComparer.OrdinalIgnoreCase)
+                task => (task.TaskName, task.Description, task.DeadlineTime, task.StatusName, task.CategoryName, task.TaskPriorityName))
             .Select(group => group.First())
             .ToList();
     }
@@ -261,7 +274,7 @@ public partial class CompanyTasksPageViewModel(
                 }
             }
 
-            return allTasks.Select(MapIndividualTask).ToList();
+            return allTasks.Select(TaskHelper.MapIndividualTask).ToList();
         }
         catch (ApiException)
         {
@@ -275,68 +288,6 @@ public partial class CompanyTasksPageViewModel(
         {
             return [];
         }
-    }
-
-    private static CompanyTaskDto MapIndividualTask(IndividualTaskDto task)
-    {
-        var statusName = string.IsNullOrWhiteSpace(task.StatusName) ? "Açık" : task.StatusName;
-        var categoryName = string.IsNullOrWhiteSpace(task.CategoryName) ? "Bireysel" : task.CategoryName;
-        var priorityName = string.IsNullOrWhiteSpace(task.TaskPriorityName) ? "Belirtilmedi" : task.TaskPriorityName;
-        var mappedTask = new CompanyTaskDto
-        {
-            TaskName = task.TaskTitle,
-            Description = task.Description,
-            DeadlineTime = task.Deadline,
-            StatusName = statusName,
-            CategoryName = categoryName,
-            TaskPriorityName = priorityName
-        };
-
-        return NormalizeCategoryAndPriority(mappedTask);
-    }
-
-    private static bool IsPriorityValue(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        return value.Trim().ToLowerInvariant() is "düşük"
-            or "dusuk"
-            or "orta"
-            or "yüksek"
-            or "yuksek"
-            or "low"
-            or "medium"
-            or "high";
-    }
-
-    private static CompanyTaskDto NormalizeCategoryAndPriority(CompanyTaskDto task)
-    {
-        var categoryName = string.IsNullOrWhiteSpace(task.CategoryName)
-            ? "Bireysel"
-            : task.CategoryName.Trim();
-
-        var priorityName = string.IsNullOrWhiteSpace(task.TaskPriorityName)
-            ? "Belirtilmedi"
-            : task.TaskPriorityName.Trim();
-
-        if (IsPriorityValue(categoryName))
-        {
-            if (!IsPriorityValue(priorityName))
-            {
-                priorityName = categoryName;
-            }
-
-            categoryName = "Bireysel";
-        }
-
-        return task with
-        {
-            CategoryName = categoryName,
-            TaskPriorityName = priorityName
-        };
     }
 
     private void RefreshVisibleTaskCollections()

@@ -129,8 +129,8 @@ public partial class GroupDetailsPageViewModel
     {
         var normalizedContent = content?.Trim();
         return string.IsNullOrWhiteSpace(normalizedContent)
-            ? "gruba bir mesaj paylasti."
-            : $"mesaj paylasti: {normalizedContent}";
+            ? "gruba bir mesaj paylaştı."
+            : $"mesaj paylaştı: {normalizedContent}";
     }
 
     [RelayCommand]
@@ -154,7 +154,7 @@ public partial class GroupDetailsPageViewModel
     {
         if (string.IsNullOrWhiteSpace(NewActivityTitle))
         {
-            ErrorMessage = "Aktivite basligi bos olamaz.";
+            ErrorMessage = "Aktivite başlığı boş olamaz.";
             return;
         }
 
@@ -175,15 +175,15 @@ public partial class GroupDetailsPageViewModel
 
             HideActivityForm();
             await LoadActivitiesAsync();
-            StatusText = "Aktivite basariyla gonderildi.";
+            StatusText = "Aktivite başarıyla gönderildi.";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = ResolveApiErrorMessage(ex, "Aktivite gonderilemedi.");
+            ErrorMessage = ResolveApiErrorMessage(ex, "Aktivite gönderilemedi.");
         }
         catch (Exception)
         {
-            ErrorMessage = "Aktivite gonderilirken bir hata olustu.";
+            ErrorMessage = "Aktivite gönderilirken bir hata oluştu.";
         }
         finally
         {
@@ -200,15 +200,15 @@ public partial class GroupDetailsPageViewModel
             ErrorMessage = string.Empty;
             await identityApiClient.ApproveGroupActivityAsync(activityId);
             await LoadActivitiesAsync();
-            StatusText = "Aktivite onaylandi.";
+            StatusText = "Aktivite onaylandı.";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = ResolveApiErrorMessage(ex, "Aktivite onaylanamadi.");
+            ErrorMessage = ResolveApiErrorMessage(ex, "Aktivite onaylanamadı.");
         }
         catch (Exception)
         {
-            ErrorMessage = "Onaylama sirasinda bir hata olustu.";
+            ErrorMessage = "Onaylama sırasında bir hata oluştu.";
         }
         finally
         {
@@ -233,7 +233,7 @@ public partial class GroupDetailsPageViewModel
         }
         catch (Exception)
         {
-            ErrorMessage = "Reddetme sirasinda bir hata olustu.";
+            ErrorMessage = "Reddetme sırasında bir hata oluştu.";
         }
         finally
         {

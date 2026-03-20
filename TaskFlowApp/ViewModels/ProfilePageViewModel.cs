@@ -169,9 +169,8 @@ public partial class ProfilePageViewModel(
         IEnumerable<CompanyGroupDto> groups,
         IEnumerable<DepartmentDto> departments)
     {
-        var normalizedGroups = GroupHelper.NormalizeGroups(groups);
         var departmentNames = NormalizeNames(departments.Select(department => department.Name));
-        var groupNames = NormalizeNames(normalizedGroups.Select(group => group.GroupName));
+        var groupNames = NormalizeNames(groups.Select(group => group.GroupName));
 
         RoleTitle = "Şirket yönetim hesabı";
         Subtitle = !string.IsNullOrWhiteSpace(UserSession.Email)
@@ -194,8 +193,8 @@ public partial class ProfilePageViewModel(
         WorkerReportAccessState accessState)
     {
         var departmentNames = ResolveDepartmentNames(currentUser, accessState);
-        var userNameMap = BuildUserNameMap(users);
-        var userGroups = ResolveUserGroups(groups, userId, userNameMap);
+        var userNameMap = UserHelper.BuildUserNameMap(users);
+        var userGroups = GroupHelper.ResolveUserGroups(groups, userId, userNameMap);
         var groupNames = NormalizeNames(userGroups.Select(group => group.GroupName));
         var leaderDepartmentName = ResolveLeaderDepartmentName(currentUser, accessState);
 
@@ -282,28 +281,6 @@ public partial class ProfilePageViewModel(
             Value = value.Trim()
         });
     }
-
-    private static IReadOnlyDictionary<Guid, string> BuildUserNameMap(IEnumerable<CompanyUserDto> users)
-    {
-        return users
-            .Where(user => user.Id != Guid.Empty && !string.IsNullOrWhiteSpace(user.Name))
-            .GroupBy(user => user.Id)
-            .ToDictionary(group => group.Key, group => group.First().Name.Trim());
-    }
-
-    private static List<CompanyGroupDto> ResolveUserGroups(
-        IEnumerable<CompanyGroupDto> groups,
-        Guid userId,
-        IReadOnlyDictionary<Guid, string> userNameMap)
-    {
-        userNameMap.TryGetValue(userId, out var currentUserName);
-
-        return GroupHelper.NormalizeGroups(groups)
-            .Where(group => GroupHelper.IsGroupMember(group, userId, currentUserName))
-            .OrderBy(group => group.GroupName, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-    }
-
 
     private static List<string> NormalizeNames(IEnumerable<string?> names)
     {

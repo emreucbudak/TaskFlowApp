@@ -34,7 +34,7 @@
             </Border>
 
             <Label Grid.Column="1"
-                   Text="Grup Detayı"
+                   Text="Grubum"
                    TextColor="White"
                    FontSize="18"
                    FontAttributes="Bold"
@@ -107,9 +107,6 @@
                                    TextColor="#1E1B4B"
                                    FontSize="22"
                                    FontAttributes="Bold" />
-                            <Label Text="{Binding GroupDepartmentsText}"
-                                   TextColor="#64748B"
-                                   FontSize="12" />
                             <Label Text="{Binding GroupMembersSummaryText}"
                                    TextColor="#4F46E5"
                                    FontSize="12"
@@ -120,7 +117,7 @@
                     <!-- Section Header: Uyeler -->
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                         <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
-                        <Label Grid.Column="1" Text="Uyeler" TextColor="#1E1B4B" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="Üyeler" TextColor="#1E1B4B" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
                     </Grid>
 
                     <Label Text="{Binding MembersEmptyMessage}"
@@ -175,7 +172,7 @@
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                         <BoxView Color="#0F766E" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
                         <Label Grid.Column="1"
-                               Text="Yaklasan Etkinlikler"
+                               Text="Yaklaşan Etkinlikler"
                                TextColor="#1E1B4B"
                                FontSize="18"
                                FontAttributes="Bold"
@@ -195,7 +192,7 @@
                         <VerticalStackLayout Spacing="12">
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                 <Label Grid.Column="0"
-                                       Text="Duyuru / Etkinlik Olustur"
+                                       Text="Duyuru / Etkinlik Oluştur"
                                        TextColor="#1E1B4B"
                                        FontSize="16"
                                        FontAttributes="Bold" />
@@ -209,17 +206,10 @@
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding ShowGroupEventFormCommand}" />
                                     </Border.GestureRecognizers>
-                                    <HorizontalStackLayout Spacing="4">
-                                        <Image Source="{mi:MaterialOutlined Icon=Add}"
-                                               WidthRequest="16"
-                                               HeightRequest="16"
-                                               VerticalOptions="Center" />
-                                        <Label Text="Form"
-                                               TextColor="White"
-                                               FontSize="12"
-                                               FontAttributes="Bold"
-                                               VerticalOptions="Center" />
-                                    </HorizontalStackLayout>
+                                    <Image Source="{mi:MaterialOutlined Icon=Add}"
+                                           WidthRequest="16"
+                                           HeightRequest="16"
+                                           VerticalOptions="Center" />
                                 </Border>
                             </Grid>
 
@@ -235,7 +225,7 @@
                                             StrokeThickness="1"
                                             StrokeShape="RoundRectangle 6"
                                             Padding="8,4">
-                                        <Entry Placeholder="Etkinlik konusu"
+                                        <Entry Placeholder="Etkinlik Konusu"
                                                Text="{Binding NewEventSubject}"
                                                TextColor="#1E1B4B"
                                                PlaceholderColor="#94A3B8"
@@ -247,7 +237,7 @@
                                             StrokeThickness="1"
                                             StrokeShape="RoundRectangle 6"
                                             Padding="8,4">
-                                        <Picker Title="Etkinlik turu"
+                                        <Picker Title="Etkinlik Türü"
                                                 ItemsSource="{Binding EventTypeOptions}"
                                                 SelectedItem="{Binding SelectedEventType}"
                                                 TextColor="#1E1B4B"
@@ -260,7 +250,7 @@
                                             StrokeThickness="1"
                                             StrokeShape="RoundRectangle 6"
                                             Padding="8,4">
-                                        <Entry Placeholder="Etkinlik basligi"
+                                        <Entry Placeholder="Etkinlik Başlığı"
                                                Text="{Binding NewEventTitle}"
                                                TextColor="#1E1B4B"
                                                PlaceholderColor="#94A3B8"
@@ -272,7 +262,7 @@
                                             StrokeThickness="1"
                                             StrokeShape="RoundRectangle 6"
                                             Padding="8,4">
-                                        <Editor Placeholder="Etkinlik aciklamasi"
+                                        <Editor Placeholder="Etkinlik Açıklaması"
                                                 Text="{Binding NewEventDescription}"
                                                 TextColor="#1E1B4B"
                                                 PlaceholderColor="#94A3B8"
@@ -307,7 +297,7 @@
                                                 IsToggled="{Binding IsEventEndEnabled}"
                                                 VerticalOptions="Center" />
                                         <Label Grid.Column="1"
-                                               Text="Bitis zamani ekle"
+                                               Text="Bitiş zamanı ekle"
                                                TextColor="#475569"
                                                FontSize="12"
                                                VerticalOptions="Center" />
@@ -342,7 +332,7 @@
                                             StrokeThickness="1"
                                             StrokeShape="RoundRectangle 6"
                                             Padding="8,4">
-                                        <Entry Placeholder="Toplanti baglantisi (istege bagli)"
+                                        <Entry Placeholder="Toplantı bağlantısı (isteğe bağlı)"
                                                Text="{Binding NewEventMeetingLink}"
                                                TextColor="#1E1B4B"
                                                PlaceholderColor="#94A3B8"
@@ -359,7 +349,7 @@
                                             <Border.GestureRecognizers>
                                                 <TapGestureRecognizer Command="{Binding HideGroupEventFormCommand}" />
                                             </Border.GestureRecognizers>
-                                            <Label Text="Iptal"
+                                            <Label Text="İptal"
                                                    TextColor="#64748B"
                                                    FontSize="14"
                                                    FontAttributes="Bold"
@@ -380,7 +370,7 @@
                                                                    Color="White"
                                                                    WidthRequest="16"
                                                                    HeightRequest="16" />
-                                                <Label Text="Yayinla"
+                                                <Label Text="Yayınla"
                                                        TextColor="White"
                                                        FontSize="14"
                                                        FontAttributes="Bold"
@@ -491,7 +481,7 @@
                                                        WidthRequest="14"
                                                        HeightRequest="14"
                                                        VerticalOptions="Center" />
-                                                <Label Text="Katil"
+                                                <Label Text="Katıl"
                                                        TextColor="White"
                                                        FontSize="12"
                                                        FontAttributes="Bold"
@@ -526,7 +516,7 @@
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                         <BoxView Color="#4F46E5" WidthRequest="4" HeightRequest="20" CornerRadius="2" VerticalOptions="Center" />
                         <Label Grid.Column="1"
-                               Text="Gruptan Son Aktiviteler"
+                               Text="Son Aktiviteler"
                                TextColor="#1E1B4B"
                                FontSize="18"
                                FontAttributes="Bold"
@@ -628,7 +618,7 @@
                             <Shadow Brush="#204F46E5" Offset="0,2" Radius="8" />
                         </Border.Shadow>
                         <VerticalStackLayout Spacing="12">
-                            <Label Text="Yeni Aktivite"
+                            <Label Text="Yeni Aktivite Ekle"
                                    TextColor="#1E1B4B"
                                    FontSize="16"
                                    FontAttributes="Bold" />
@@ -638,7 +628,7 @@
                                     StrokeThickness="1"
                                     StrokeShape="RoundRectangle 6"
                                     Padding="8,4">
-                                <Entry Placeholder="Aktivite basligi"
+                                <Entry Placeholder="Aktivite Başlığı"
                                        Text="{Binding NewActivityTitle}"
                                        TextColor="#1E1B4B"
                                        PlaceholderColor="#94A3B8"
@@ -650,7 +640,7 @@
                                     StrokeThickness="1"
                                     StrokeShape="RoundRectangle 6"
                                     Padding="8,4">
-                                <Editor Placeholder="Aciklama (istege bagli)"
+                                <Editor Placeholder="Açıklama (isteğe bağlı)"
                                         Text="{Binding NewActivityDescription}"
                                         TextColor="#1E1B4B"
                                         PlaceholderColor="#94A3B8"
@@ -670,7 +660,7 @@
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HideActivityFormCommand}" />
                                     </Border.GestureRecognizers>
-                                    <Label Text="Iptal"
+                                    <Label Text="İptal"
                                            TextColor="#64748B"
                                            FontSize="14"
                                            FontAttributes="Bold"
@@ -692,7 +682,7 @@
                                                            Color="White"
                                                            WidthRequest="16"
                                                            HeightRequest="16" />
-                                        <Label Text="Gonder"
+                                        <Label Text="Gönder"
                                                TextColor="White"
                                                FontSize="14"
                                                FontAttributes="Bold"
@@ -704,7 +694,7 @@
                     </Border>
 
                     <!-- No Activities Message -->
-                    <Label Text="Henuz aktivite bulunmuyor."
+                    <Label Text="Henüz aktivite bulunmuyor."
                            TextColor="#94A3B8"
                            FontSize="12"
                            IsVisible="{Binding HasNoActivities}" />

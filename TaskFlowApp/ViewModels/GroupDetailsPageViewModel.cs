@@ -25,10 +25,10 @@ public partial class GroupDetailsPageViewModel(
 {
     private const int RecentActivityPreviewCount = 5;
     private const int RecentActivityPageSize = 20;
-    private const string NoGroupMessage = "Uyesi olunan grup bulunamadi.";
-    private const string NoMembersMessage = "Bu grup icin uye bilgisi bulunamadi.";
-    private const string NoRecentActivityMessage = "Grupta henuz mesaj aktivitesi yok.";
-    private const string NoGroupEventsMessage = "Yaklasan etkinlik bulunamadi.";
+    private const string NoGroupMessage = "Üyesi olunan grup bulunamadı.";
+    private const string NoMembersMessage = "Bu grup için üye bilgisi bulunamadı.";
+    private const string NoRecentActivityMessage = "Grupta henüz mesaj aktivitesi yok.";
+    private const string NoGroupEventsMessage = "Yaklaşan etkinlik bulunamadı.";
 
     public ObservableCollection<GroupDetailMemberItem> GroupMembers { get; } = [];
     public ObservableCollection<GroupRecentActivityItem> RecentGroupActivities { get; } = [];
@@ -105,7 +105,7 @@ public partial class GroupDetailsPageViewModel(
 
         if (UserSession.UserId is null || UserSession.CompanyId is null)
         {
-            ErrorMessage = "Oturum bilgisi eksik. Tekrar giris yapin.";
+            ErrorMessage = "Oturum bilgisi eksik. Tekrar giriş yapın.";
             return;
         }
 
@@ -126,8 +126,8 @@ public partial class GroupDetailsPageViewModel(
 
             var users = await usersTask ?? [];
             var groups = await groupsTask ?? [];
-            var userNameMap = BuildUserNameMap(users);
-            var userGroups = ResolveUserGroups(groups, userId, userNameMap);
+            var userNameMap = UserHelper.BuildUserNameMap(users);
+            var userGroups = GroupHelper.ResolveUserGroups(groups, userId, userNameMap);
             var currentGroup = userGroups.FirstOrDefault();
 
             if (currentGroup is null)
@@ -144,7 +144,7 @@ public partial class GroupDetailsPageViewModel(
             var groupEventsTask = LoadGroupEventsAsync();
             await Task.WhenAll(activitiesTask, recentActivitiesTask, groupEventsTask);
 
-            StatusText = $"{GroupName} detaylari yuklendi.";
+            StatusText = $"{GroupName} detayları yüklendi.";
         }
         catch (ApiException ex)
         {
@@ -160,7 +160,7 @@ public partial class GroupDetailsPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -211,17 +211,9 @@ public partial class GroupDetailsPageViewModel(
         currentGroupId = group.GroupId;
         GroupName = group.GroupName.Trim();
 
-        var departmentNames = group.DepartmenName
-            .Select(name => name?.Trim())
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Cast<string>()
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
-            .ToList();
+        var departmentNames = group.DepartmenName.ToList();
 
-        GroupDepartmentsText = departmentNames.Count == 0
-            ? "Departman bilgisi bulunmuyor."
-            : string.Join(", ", departmentNames);
+        GroupDepartmentsText = string.Empty;
 
         var memberNames = group.WorkerUserIds
             .Where(userId => userId != Guid.Empty)
@@ -246,8 +238,8 @@ public partial class GroupDetailsPageViewModel(
 
         HasMembers = GroupMembers.Count > 0;
         GroupMembersSummaryText = HasMembers
-            ? $"{GroupMembers.Count} uye"
-            : "Uye bilgisi bulunmuyor";
+            ? $"{GroupMembers.Count} üye"
+            : "Üye bilgisi bulunmuyor";
     }
 
     [RelayCommand]
@@ -278,22 +270,22 @@ public partial class GroupDetailsPageViewModel(
 
         if (elapsed < TimeSpan.FromMinutes(1))
         {
-            return "Az once";
+            return "Az önce";
         }
 
         if (elapsed < TimeSpan.FromHours(1))
         {
-            return $"{Math.Max(1, (int)elapsed.TotalMinutes)} dk once";
+            return $"{Math.Max(1, (int)elapsed.TotalMinutes)} dk önce";
         }
 
         if (elapsed < TimeSpan.FromDays(1))
         {
-            return $"{Math.Max(1, (int)elapsed.TotalHours)} sa once";
+            return $"{Math.Max(1, (int)elapsed.TotalHours)} sa önce";
         }
 
         if (elapsed < TimeSpan.FromDays(7))
         {
-            return $"{Math.Max(1, (int)elapsed.TotalDays)} gun once";
+            return $"{Math.Max(1, (int)elapsed.TotalDays)} gün önce";
         }
 
         return localTime.ToString("dd.MM.yyyy HH:mm");
@@ -311,29 +303,9 @@ public partial class GroupDetailsPageViewModel(
             return userName;
         }
 
-        return "Bilinmeyen kullanici";
+        return "Bilinmeyen kullanıcı";
     }
 
-    private static List<CompanyGroupDto> ResolveUserGroups(
-        IEnumerable<CompanyGroupDto> groups,
-        Guid userId,
-        IReadOnlyDictionary<Guid, string> userNameMap)
-    {
-        userNameMap.TryGetValue(userId, out var currentUserName);
-
-        return GroupHelper.NormalizeGroups(groups)
-            .Where(group => GroupHelper.IsGroupMember(group, userId, currentUserName))
-            .OrderBy(group => group.GroupName, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-    }
-
-    private static IReadOnlyDictionary<Guid, string> BuildUserNameMap(IEnumerable<CompanyUserDto> users)
-    {
-        return users
-            .Where(user => user.Id != Guid.Empty && !string.IsNullOrWhiteSpace(user.Name))
-            .GroupBy(user => user.Id)
-            .ToDictionary(group => group.Key, group => group.First().Name.Trim());
-    }
 }
 
 public sealed record GroupDetailMemberItem

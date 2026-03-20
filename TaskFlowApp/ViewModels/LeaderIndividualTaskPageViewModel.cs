@@ -7,7 +7,6 @@ using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
 using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Services.ApiClients;
-using TaskFlowApp.Infrastructure.Helpers;
 using TaskFlowApp.Services.Realtime;
 using TaskFlowApp.Infrastructure.Constants;
 using TaskFlowApp.Services.State;
@@ -23,7 +22,7 @@ public partial class LeaderIndividualTaskPageViewModel(
     IWorkerReportAccessResolver workerReportAccessResolver,
     IWorkerDashboardStateService workerDashboardStateService) : PageViewModelBase(navigationService, userSession, realtimeConnectionManager, workerReportAccessResolver, workerDashboardStateService)
 {
-    private const string AccessDeniedMessageText = "Bu sayfa sadece sirket hesabi veya departman liderleri icindir.";
+    private const string AccessDeniedMessageText = "Bu sayfa sadece şirket hesabı veya departman liderleri içindir.";
     private const int DepartmentLeaderRoleId = 1;
 
     private readonly List<CompanyUserDto> allCompanyUsers = [];
@@ -98,7 +97,7 @@ public partial class LeaderIndividualTaskPageViewModel(
     private string groupCreationStatus = string.Empty;
 
     [ObservableProperty]
-    private bool isGroupTaskEnabled;
+    private bool isGroupTaskEnabled = true;
 
     [ObservableProperty]
     private string groupTaskTitle = string.Empty;
@@ -138,7 +137,7 @@ public partial class LeaderIndividualTaskPageViewModel(
     public bool ShowGroupDepartmentPicker => !IsCompanyUser && ManagedDepartments.Count > 0;
     public bool HasSelectedGroupToDelete => SelectedGroupToDelete is not null;
     public bool CanUseDeleteGroupForm => CanDeleteGroups && HasSelectedGroupToDelete && !IsDeletingGroup;
-    public string GroupCreateButtonText => IsGroupTaskEnabled ? "Grup ve Gorev Olustur" : "Grup Olustur";
+    public string GroupCreateButtonText => "Grup ve Görev Oluştur";
 
     partial void OnHasManagementAccessChanged(bool value)
     {
@@ -201,13 +200,13 @@ public partial class LeaderIndividualTaskPageViewModel(
 
         if (UserSession.UserId is not Guid currentUserId)
         {
-            ErrorMessage = "Kullanici bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Kullanıcı bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
         if (UserSession.CompanyId is not Guid companyId)
         {
-            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
@@ -242,7 +241,7 @@ public partial class LeaderIndividualTaskPageViewModel(
                 .Where(user => user.Id != Guid.Empty));
 
             allCompanyGroups.Clear();
-            allCompanyGroups.AddRange(GroupHelper.NormalizeGroups(await companyGroupsTask ?? []));
+            allCompanyGroups.AddRange(await companyGroupsTask ?? []);
 
             ConfigureManagedDepartments(currentUserId, accessState);
             ConfigureAccessState(accessState);
@@ -277,7 +276,7 @@ public partial class LeaderIndividualTaskPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -295,40 +294,40 @@ public partial class LeaderIndividualTaskPageViewModel(
 
         if (UserSession.CompanyId is not Guid companyId)
         {
-            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
         if (SelectedAssignedUser is null)
         {
-            ErrorMessage = "Gorevi atamak icin bir kullanici secin.";
+            ErrorMessage = "Görevi atamak için bir kullanıcı seçin.";
             return;
         }
 
         if (SelectedPriority is null)
         {
-            ErrorMessage = "Gorev onceligi secilmelidir.";
+            ErrorMessage = "Görev önceliği seçilmelidir.";
             return;
         }
 
         var trimmedTitle = TaskTitle.Trim();
         if (trimmedTitle.Length < 3 || trimmedTitle.Length > 120)
         {
-            ErrorMessage = "Gorev basligi 3 ile 120 karakter arasinda olmalidir.";
+            ErrorMessage = "Görev başlığı 3 ile 120 karakter arasında olmalıdır.";
             return;
         }
 
         var trimmedDescription = Description.Trim();
         if (trimmedDescription.Length < 5 || trimmedDescription.Length > 1000)
         {
-            ErrorMessage = "Gorev aciklamasi 5 ile 1000 karakter arasinda olmalidir.";
+            ErrorMessage = "Görev açıklaması 5 ile 1000 karakter arasında olmalıdır.";
             return;
         }
 
         var resolvedDeadline = DateOnly.FromDateTime(DeadlineDate.Date);
         if (resolvedDeadline < DateOnly.FromDateTime(DateTime.Today))
         {
-            ErrorMessage = "Teslim tarihi bugunden once olamaz.";
+            ErrorMessage = "Teslim tarihi bugünden önce olamaz.";
             return;
         }
 
@@ -356,18 +355,18 @@ public partial class LeaderIndividualTaskPageViewModel(
             DeadlineDate = MinimumDeadlineDate.AddDays(1);
             SelectedAssignedUser = EligibleUsers.FirstOrDefault(item => item.UserId == assignedUserId)
                 ?? EligibleUsers.FirstOrDefault();
-            CreateStatus = $"Gorev {assignedUserName} kullanicisina basariyla atandi.";
+            CreateStatus = $"Görev {assignedUserName} kullanıcısına başarıyla atandı.";
             StatusText = IsCompanyUser
-                ? $"Yeni bireysel gorev {assignedUserName} kullanicisina atandi."
-                : $"{CurrentDepartmentName} icin yeni bireysel gorev atandi.";
+                ? $"Yeni bireysel görev {assignedUserName} kullanıcısına atandı."
+                : $"{CurrentDepartmentName} için yeni bireysel görev atandı.";
         }
         catch (ApiException ex) when (ex.StatusCode == 400)
         {
-            ErrorMessage = "Gorev olusturulamadi. Alanlari ve oncelik bilgisini kontrol edin.";
+            ErrorMessage = "Görev oluşturulamadı. Alanları ve öncelik bilgisini kontrol edin.";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = ResolveApiErrorMessage(ex, "Gorev olusturulamadi. Lutfen tekrar deneyin.");
+            ErrorMessage = ResolveApiErrorMessage(ex, "Görev oluşturulamadı. Lütfen tekrar deneyin.");
         }
         catch (HttpRequestException)
         {
@@ -379,7 +378,7 @@ public partial class LeaderIndividualTaskPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Gorev olusturulurken bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Görev oluşturulurken bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -401,10 +400,7 @@ public partial class LeaderIndividualTaskPageViewModel(
         AvailableGroupUserOptions.Remove(user);
         SelectedGroupUserToAdd = null;
 
-        if (IsGroupTaskEnabled)
-        {
-            RefreshGroupMemberSubTasks();
-        }
+        RefreshGroupMemberSubTasks();
     }
 
     [RelayCommand]
@@ -432,10 +428,7 @@ public partial class LeaderIndividualTaskPageViewModel(
         }
         AvailableGroupUserOptions.Insert(insertIndex, user);
 
-        if (IsGroupTaskEnabled)
-        {
-            RefreshGroupMemberSubTasks();
-        }
+        RefreshGroupMemberSubTasks();
     }
 
     [RelayCommand]
@@ -448,7 +441,7 @@ public partial class LeaderIndividualTaskPageViewModel(
 
         if (UserSession.CompanyId is not Guid companyId)
         {
-            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
@@ -457,7 +450,7 @@ public partial class LeaderIndividualTaskPageViewModel(
         {
             if (SelectedManagedDepartment is null)
             {
-                ErrorMessage = "Grup icin yonettiginiz departmani secin.";
+                ErrorMessage = "Grup için yönettiğiniz departmanı seçin.";
                 return;
             }
 
@@ -467,7 +460,7 @@ public partial class LeaderIndividualTaskPageViewModel(
         var trimmedGroupName = GroupNameInput.Trim();
         if (trimmedGroupName.Length < 3 || trimmedGroupName.Length > 100)
         {
-            ErrorMessage = "Grup adi 3 ile 100 karakter arasinda olmalidir.";
+            ErrorMessage = "Grup adı 3 ile 100 karakter arasında olmalıdır.";
             return;
         }
 
@@ -479,7 +472,7 @@ public partial class LeaderIndividualTaskPageViewModel(
 
         if (selectedUserIds.Count == 0)
         {
-            ErrorMessage = "Gruba eklemek icin en az bir kullanici secin.";
+            ErrorMessage = "Gruba eklemek için en az bir kullanıcı seçin.";
             return;
         }
 
@@ -513,81 +506,73 @@ public partial class LeaderIndividualTaskPageViewModel(
             GroupNameInput = string.Empty;
             await ReloadGroupsAsync(companyId);
 
-            if (IsGroupTaskEnabled)
+            try
             {
-                try
+                var trimmedGroupTaskTitle = GroupTaskTitle.Trim();
+                if (trimmedGroupTaskTitle.Length < 3 || trimmedGroupTaskTitle.Length > 120)
                 {
-                    var trimmedGroupTaskTitle = GroupTaskTitle.Trim();
-                    if (trimmedGroupTaskTitle.Length < 3 || trimmedGroupTaskTitle.Length > 120)
-                    {
-                        GroupCreationStatus = "Grup olusturuldu ancak grup gorevi olusturulamadi: Gorev basligi 3 ile 120 karakter arasinda olmalidir.";
-                        ResetGroupTaskFields();
-                        return;
-                    }
-
-                    var trimmedGroupTaskDescription = GroupTaskDescription.Trim();
-                    if (trimmedGroupTaskDescription.Length < 5 || trimmedGroupTaskDescription.Length > 1000)
-                    {
-                        GroupCreationStatus = "Grup olusturuldu ancak grup gorevi olusturulamadi: Gorev aciklamasi 5 ile 1000 karakter arasinda olmalidir.";
-                        ResetGroupTaskFields();
-                        return;
-                    }
-
-                    var groupTaskDeadline = DateOnly.FromDateTime(GroupTaskDeadlineDate.Date);
-                    if (groupTaskDeadline < DateOnly.FromDateTime(DateTime.Today))
-                    {
-                        GroupCreationStatus = "Grup olusturuldu ancak grup gorevi olusturulamadi: Teslim tarihi bugunden once olamaz.";
-                        ResetGroupTaskFields();
-                        return;
-                    }
-
-                    if (SelectedGroupTaskPriority is null)
-                    {
-                        GroupCreationStatus = "Grup olusturuldu ancak grup gorevi olusturulamadi: Gorev onceligi secilmelidir.";
-                        ResetGroupTaskFields();
-                        return;
-                    }
-
-                    var subTaskAssignments = GroupMemberSubTasks
-                        .Select(item => new
-                        {
-                            AssignedUserId = item.UserId,
-                            TaskTitle = string.IsNullOrWhiteSpace(item.SubTaskTitle) ? $"{trimmedGroupTaskTitle} - {item.MemberName}" : item.SubTaskTitle.Trim(),
-                            Description = string.IsNullOrWhiteSpace(item.SubTaskDescription) ? trimmedGroupTaskDescription : item.SubTaskDescription.Trim()
-                        })
-                        .ToList();
-
-                    await projectManagementApiClient.CreateGroupTaskWithSubTasksCommandRequestAsync(new
-                    {
-                        TaskName = trimmedGroupTaskTitle,
-                        Description = trimmedGroupTaskDescription,
-                        DeadlineTime = GroupTaskDeadlineDate,
-                        TaskPriorityCategoryId = SelectedGroupTaskPriority.Id,
-                        SubTaskAssignments = subTaskAssignments
-                    });
-
+                    GroupCreationStatus = "Grup oluşturuldu ancak grup görevi oluşturulamadı: Görev başlığı 3 ile 120 karakter arasında olmalıdır.";
                     ResetGroupTaskFields();
-                    GroupCreationStatus = $"Grup ve grup gorevi basariyla olusturuldu.";
-                    StatusText = $"{trimmedGroupName} grubu ve gorevi olusturuldu. Uye sayisi: {selectedUserIds.Count}";
+                    return;
                 }
-                catch (Exception)
+
+                var trimmedGroupTaskDescription = GroupTaskDescription.Trim();
+                if (trimmedGroupTaskDescription.Length < 5 || trimmedGroupTaskDescription.Length > 1000)
                 {
-                    GroupCreationStatus = "Grup olusturuldu ancak grup gorevi olusturulamadi. Lutfen tekrar deneyin.";
+                    GroupCreationStatus = "Grup oluşturuldu ancak grup görevi oluşturulamadı: Görev açıklaması 5 ile 1000 karakter arasında olmalıdır.";
+                    ResetGroupTaskFields();
+                    return;
                 }
 
-                return;
-            }
+                var groupTaskDeadline = DateOnly.FromDateTime(GroupTaskDeadlineDate.Date);
+                if (groupTaskDeadline < DateOnly.FromDateTime(DateTime.Today))
+                {
+                    GroupCreationStatus = "Grup oluşturuldu ancak grup görevi oluşturulamadı: Teslim tarihi bugünden önce olamaz.";
+                    ResetGroupTaskFields();
+                    return;
+                }
 
-            GroupCreationStatus = "Grup basariyla olusturuldu.";
-            StatusText = $"{trimmedGroupName} grubu olusturuldu. Secilen uye sayisi: {selectedUserIds.Count}";
+                if (SelectedGroupTaskPriority is null)
+                {
+                    GroupCreationStatus = "Grup oluşturuldu ancak grup görevi oluşturulamadı: Görev önceliği seçilmelidir.";
+                    ResetGroupTaskFields();
+                    return;
+                }
+
+                var subTaskAssignments = GroupMemberSubTasks
+                    .Select(item => new
+                    {
+                        AssignedUserId = item.UserId,
+                        TaskTitle = string.IsNullOrWhiteSpace(item.SubTaskTitle) ? $"{trimmedGroupTaskTitle} - {item.MemberName}" : item.SubTaskTitle.Trim(),
+                        Description = string.IsNullOrWhiteSpace(item.SubTaskDescription) ? trimmedGroupTaskDescription : item.SubTaskDescription.Trim()
+                    })
+                    .ToList();
+
+                await projectManagementApiClient.CreateGroupTaskWithSubTasksCommandRequestAsync(new
+                {
+                    TaskName = trimmedGroupTaskTitle,
+                    Description = trimmedGroupTaskDescription,
+                    DeadlineTime = GroupTaskDeadlineDate,
+                    TaskPriorityCategoryId = SelectedGroupTaskPriority.Id,
+                    SubTaskAssignments = subTaskAssignments
+                });
+
+                ResetGroupTaskFields();
+                GroupCreationStatus = "Grup ve grup görevi başarıyla oluşturuldu.";
+                StatusText = $"{trimmedGroupName} grubu ve görevi oluşturuldu. Üye sayısı: {selectedUserIds.Count}";
+            }
+            catch (Exception)
+            {
+                GroupCreationStatus = "Grup oluşturuldu ancak grup görevi oluşturulamadı. Lütfen tekrar deneyin.";
+            }
         }
         catch (ApiException ex) when (ex.StatusCode == 400)
         {
-            ErrorMessage = "Grup olusturulamadi. Grup adi ve secilen kullanicilari kontrol edin.";
+            ErrorMessage = "Grup oluşturulamadı. Grup adı ve seçilen kullanıcıları kontrol edin.";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = ResolveApiErrorMessage(ex, "Grup olusturulamadi. Lutfen tekrar deneyin.");
+            ErrorMessage = ResolveApiErrorMessage(ex, "Grup oluşturulamadı. Lütfen tekrar deneyin.");
         }
         catch (HttpRequestException)
         {
@@ -599,7 +584,7 @@ public partial class LeaderIndividualTaskPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Grup olusturulurken bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Grup oluşturulurken bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -623,13 +608,13 @@ public partial class LeaderIndividualTaskPageViewModel(
 
         if (UserSession.CompanyId is not Guid companyId)
         {
-            ErrorMessage = "Sirket bilgisi bulunamadi. Tekrar giris yapin.";
+            ErrorMessage = "Şirket bilgisi bulunamadı. Tekrar giriş yapın.";
             return;
         }
 
         if (SelectedGroupToDelete is null || SelectedGroupToDelete.GroupId == Guid.Empty)
         {
-            ErrorMessage = "Silmek icin bir grup secin.";
+            ErrorMessage = "Silmek için bir grup seçin.";
             return;
         }
 
@@ -653,11 +638,11 @@ public partial class LeaderIndividualTaskPageViewModel(
         }
         catch (ApiException ex) when (ex.StatusCode == 400)
         {
-            ErrorMessage = "Grup silinemedi. Secimi tekrar kontrol edin.";
+            ErrorMessage = "Grup silinemedi. Seçimi tekrar kontrol edin.";
         }
         catch (ApiException ex)
         {
-            ErrorMessage = ResolveApiErrorMessage(ex, "Grup silinemedi. Lutfen tekrar deneyin.");
+            ErrorMessage = ResolveApiErrorMessage(ex, "Grup silinemedi. Lütfen tekrar deneyin.");
         }
         catch (HttpRequestException)
         {
@@ -669,7 +654,7 @@ public partial class LeaderIndividualTaskPageViewModel(
         }
         catch (Exception)
         {
-            ErrorMessage = "Grup silinirken bir sorun olustu. Lutfen tekrar deneyin.";
+            ErrorMessage = "Grup silinirken bir sorun oluştu. Lütfen tekrar deneyin.";
         }
         finally
         {
@@ -952,7 +937,7 @@ public partial class LeaderIndividualTaskPageViewModel(
     {
         var groups = await identityApiClient.GetAllCompanyGroupsAsync(companyId) ?? [];
         allCompanyGroups.Clear();
-        allCompanyGroups.AddRange(GroupHelper.NormalizeGroups(groups));
+        allCompanyGroups.AddRange(groups);
         RefreshAvailableGroups(preferredGroupId);
     }
 
@@ -983,8 +968,8 @@ public partial class LeaderIndividualTaskPageViewModel(
         }
 
         GroupCreateHelperText = ShowGroupDepartmentPicker
-            ? "Yonettiginiz departmandan kullanicilar secerek grup olusturabilirsiniz."
-            : "Sirket genelinden kullanicilar secerek grup olusturabilirsiniz.";
+            ? "Yönettiğiniz departmandan kullanıcılar seçerek grup oluşturabilirsiniz."
+            : "Şirket genelinden kullanıcılar seçerek grup oluşturabilirsiniz.";
     }
 
     private void RefreshGroupDeleteHelperText()
@@ -997,18 +982,17 @@ public partial class LeaderIndividualTaskPageViewModel(
 
         if (!CanDeleteGroups)
         {
-            GroupDeleteHelperText = "Grup silme sadece sirket hesabi icin aciktir.";
+            GroupDeleteHelperText = "Grup silme sadece şirket hesabı için açıktır.";
             return;
         }
 
         GroupDeleteHelperText = AvailableGroups.Count == 0
-            ? "Silinecek grup bulunamadi."
-            : "Silmek istediginiz grubu secin.";
+            ? "Silinecek grup bulunamadı."
+            : "Silmek istediğiniz grubu seçin.";
     }
 
     private void ResetGroupTaskFields()
     {
-        IsGroupTaskEnabled = false;
         GroupTaskTitle = string.Empty;
         GroupTaskDescription = string.Empty;
         GroupTaskDeadlineDate = DateTime.Today.AddDays(1);
@@ -1043,7 +1027,7 @@ public partial class LeaderIndividualTaskPageViewModel(
     {
         return IsCompanyUser
             ? "Sirket genelinde gorev atayabilir ve gruplari yonetebilirsiniz."
-            : $"{CurrentDepartmentName} icin gorev atayabilir ve grup olusturabilirsiniz.";
+            : $"{CurrentDepartmentName} için görev atayabilir ve grup oluşturabilirsiniz.";
     }
 
     private string BuildManagedDepartmentSummary()
@@ -1095,7 +1079,7 @@ public partial class LeaderIndividualTaskPageViewModel(
     private static string ResolveDisplayName(CompanyUserDto user)
     {
         return string.IsNullOrWhiteSpace(user.Name)
-            ? "Kullanici"
+            ? "Kullanıcı"
             : user.Name.Trim();
     }
 }

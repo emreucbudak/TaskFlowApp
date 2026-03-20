@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
-using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Models.ProjectManagement;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Infrastructure.Helpers;
@@ -67,8 +66,8 @@ public partial class TasksPageViewModel(
 
             await Task.WhenAll(individualTasksTask, groupTasksTask);
 
-            var individualTasks = OrderTasks(await individualTasksTask);
-            var groupTasks = OrderTasks(await groupTasksTask);
+            var individualTasks = TaskHelper.OrderTasks(await individualTasksTask);
+            var groupTasks = TaskHelper.OrderTasks(await groupTasksTask);
 
             allIndividualTasks.Clear();
             allGroupTasks.Clear();
@@ -144,7 +143,7 @@ public partial class TasksPageViewModel(
             allTasks.AddRange(pageItems);
         }
 
-        return allTasks.Select(MapIndividualTask).ToList();
+        return allTasks.Select(TaskHelper.MapIndividualTask).ToList();
     }
 
     private async Task<List<CompanyTaskDto>> LoadAllGroupTasksSafeAsync(Guid userId, Guid? companyId)
@@ -181,10 +180,10 @@ public partial class TasksPageViewModel(
 
         var users = await usersTask ?? [];
         var groups = await groupsTask ?? [];
-        var userNameMap = BuildUserNameMap(users);
-        var userIdByNameMap = BuildUserIdByNameMap(users);
-        var userGroups = ResolveUserGroups(groups, userId, userNameMap);
-        var groupMemberIds = ResolveGroupMemberIds(userGroups, userIdByNameMap);
+        var userNameMap = UserHelper.BuildUserNameMap(users);
+        var userIdByNameMap = UserHelper.BuildUserIdByNameMap(users);
+        var userGroups = GroupHelper.ResolveUserGroups(groups, userId, userNameMap);
+        var groupMemberIds = GroupHelper.ResolveGroupMemberIds(userGroups, userIdByNameMap);
 
         if (groupMemberIds.Count == 0)
         {
@@ -210,75 +209,7 @@ public partial class TasksPageViewModel(
         }
 
         return allTasks
-            .Select(NormalizeCategoryAndPriority)
-            .ToList();
-    }
-
-    private static CompanyTaskDto MapIndividualTask(IndividualTaskDto task)
-    {
-        var statusName = string.IsNullOrWhiteSpace(task.StatusName) ? TaskStatusHelper.DefaultOpenStatus : task.StatusName;
-        var categoryName = string.IsNullOrWhiteSpace(task.CategoryName) ? "Bireysel" : task.CategoryName;
-        var priorityName = string.IsNullOrWhiteSpace(task.TaskPriorityName) ? "Belirtilmedi" : task.TaskPriorityName;
-
-        return NormalizeCategoryAndPriority(new CompanyTaskDto
-        {
-            TaskName = task.TaskTitle,
-            Description = task.Description,
-            DeadlineTime = task.Deadline,
-            StatusName = statusName,
-            CategoryName = categoryName,
-            TaskPriorityName = priorityName
-        });
-    }
-
-    private static bool IsPriorityValue(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        return value.Trim().ToLowerInvariant() is "dusuk"
-            or "orta"
-            or "yuksek"
-            or "low"
-            or "medium"
-            or "high";
-    }
-
-    private static CompanyTaskDto NormalizeCategoryAndPriority(CompanyTaskDto task)
-    {
-        var categoryName = string.IsNullOrWhiteSpace(task.CategoryName)
-            ? "Bireysel"
-            : task.CategoryName.Trim();
-
-        var priorityName = string.IsNullOrWhiteSpace(task.TaskPriorityName)
-            ? "Belirtilmedi"
-            : task.TaskPriorityName.Trim();
-
-        if (IsPriorityValue(categoryName))
-        {
-            if (!IsPriorityValue(priorityName))
-            {
-                priorityName = categoryName;
-            }
-
-            categoryName = "Bireysel";
-        }
-
-        return task with
-        {
-            CategoryName = categoryName,
-            TaskPriorityName = priorityName
-        };
-    }
-
-    private static List<CompanyTaskDto> OrderTasks(IEnumerable<CompanyTaskDto> tasks)
-    {
-        return tasks
-            .OrderBy(task => TaskStatusHelper.IsCompletedStatus(task.StatusName))
-            .ThenBy(task => task.DeadlineTime)
-            .ThenBy(task => task.TaskName, StringComparer.OrdinalIgnoreCase)
+            .Select(TaskHelper.NormalizeCategoryAndPriority)
             .ToList();
     }
 
@@ -304,61 +235,6 @@ public partial class TasksPageViewModel(
         {
             GroupTasks.Add(task);
         }
-    }
-
-    private static IReadOnlyDictionary<Guid, string> BuildUserNameMap(IEnumerable<CompanyUserDto> users)
-    {
-        return users
-            .Where(user => user.Id != Guid.Empty && !string.IsNullOrWhiteSpace(user.Name))
-            .GroupBy(user => user.Id)
-            .ToDictionary(group => group.Key, group => group.First().Name.Trim());
-    }
-
-    private static IReadOnlyDictionary<string, Guid> BuildUserIdByNameMap(IEnumerable<CompanyUserDto> users)
-    {
-        return users
-            .Where(user => user.Id != Guid.Empty && !string.IsNullOrWhiteSpace(user.Name))
-            .GroupBy(user => user.Name.Trim(), StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(group => group.Key, group => group.First().Id, StringComparer.OrdinalIgnoreCase);
-    }
-
-    private static List<CompanyGroupDto> ResolveUserGroups(
-        IEnumerable<CompanyGroupDto> groups,
-        Guid userId,
-        IReadOnlyDictionary<Guid, string> userNameMap)
-    {
-        userNameMap.TryGetValue(userId, out var currentUserName);
-
-        return GroupHelper.NormalizeGroups(groups)
-            .Where(group => GroupHelper.IsGroupMember(group, userId, currentUserName))
-            .OrderBy(group => group.GroupName, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-    }
-
-    private static List<Guid> ResolveGroupMemberIds(
-        IEnumerable<CompanyGroupDto> groups,
-        IReadOnlyDictionary<string, Guid> userIdByNameMap)
-    {
-        var memberIds = new HashSet<Guid>(
-            groups
-                .SelectMany(group => group.WorkerUserIds)
-                .Where(userId => userId != Guid.Empty));
-
-        foreach (var workerName in groups.SelectMany(group => group.WorkerName))
-        {
-            var normalizedWorkerName = workerName?.Trim();
-            if (string.IsNullOrWhiteSpace(normalizedWorkerName))
-            {
-                continue;
-            }
-
-            if (userIdByNameMap.TryGetValue(normalizedWorkerName, out var workerId) && workerId != Guid.Empty)
-            {
-                memberIds.Add(workerId);
-            }
-        }
-
-        return memberIds.ToList();
     }
 
 }

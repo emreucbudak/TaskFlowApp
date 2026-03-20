@@ -192,6 +192,66 @@ public partial class CompanyEmployeesPage : ContentPage
         }
     }
 
+    private async void OnLeaderDepartmentSelectTapped(object? sender, TappedEventArgs e)
+    {
+        var departments = await EnsureDepartmentsLoadedAsync();
+        if (departments.Count == 0)
+        {
+            await DisplayAlertAsync("Bilgi", "Departman listesi şu anda alınamadı.", "Tamam");
+            return;
+        }
+
+        var cancelText = "İptal";
+        var selectedName = await DisplayActionSheetAsync(
+            "Departman Seçin",
+            cancelText,
+            null,
+            departments.Select(item => item.Name).ToArray());
+
+        if (string.IsNullOrWhiteSpace(selectedName) || selectedName == cancelText)
+        {
+            return;
+        }
+
+        var selectedDepartment = departments.FirstOrDefault(item =>
+            string.Equals(item.Name, selectedName, StringComparison.Ordinal));
+
+        if (selectedDepartment is not null)
+        {
+            ViewModel.SelectedLeaderDepartment = selectedDepartment;
+        }
+    }
+
+    private async void OnLeaderUserSelectTapped(object? sender, TappedEventArgs e)
+    {
+        var users = ViewModel.CompanyUsers.ToList();
+        if (users.Count == 0)
+        {
+            await DisplayAlertAsync("Bilgi", "Çalışanlar listesi şu anda alınamadı.", "Tamam");
+            return;
+        }
+
+        var cancelText = "İptal";
+        var selectedName = await DisplayActionSheetAsync(
+            "Lider Yapılacak Çalışanı Seçin",
+            cancelText,
+            null,
+            users.Select(item => item.Name).ToArray());
+
+        if (string.IsNullOrWhiteSpace(selectedName) || selectedName == cancelText)
+        {
+            return;
+        }
+
+        var selectedUser = users.FirstOrDefault(item =>
+            string.Equals(item.Name, selectedName, StringComparison.Ordinal));
+
+        if (selectedUser is not null)
+        {
+            ViewModel.SelectedLeaderUser = selectedUser;
+        }
+    }
+
     private void EnsureViewModelSubscription()
     {
         if (isViewModelSubscribed)

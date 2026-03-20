@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using TaskFlowApp.Infrastructure.Api;
 using TaskFlowApp.Infrastructure.Navigation;
 using TaskFlowApp.Infrastructure.Session;
-using TaskFlowApp.Models.Identity;
 using TaskFlowApp.Models.ProjectManagement;
 using TaskFlowApp.Services.ApiClients;
 using TaskFlowApp.Infrastructure.Helpers;
@@ -112,15 +111,38 @@ public partial class DashBoardPageViewModel(
             var individualTasks = await individualTasksTask;
             var unread = await unreadTask;
 
-            var userNameMap = BuildUserNameMap(users);
-            var userGroups = ResolveUserGroups(groups, userId, userNameMap);
-            var groupMemberIds = ResolveGroupMemberIds(userGroups);
+            var userNameMap = UserHelper.BuildUserNameMap(users);
+            var userGroups = GroupHelper.ResolveUserGroups(groups, userId, userNameMap);
+            var groupMemberIds = GroupHelper.ResolveGroupMemberIds(userGroups);
             var groupTasks = await LoadAllGroupTasksAsync(companyId, groupMemberIds);
 
-            var completedIndividualTasks = individualTasks.Count(task => TaskStatusHelper.IsCompletedStatus(task.StatusName));
-            var completedGroupTasks = groupTasks.Count(task => TaskStatusHelper.IsCompletedStatus(task.StatusName));
-            var overdueIndividualTasks = individualTasks.Count(task => task.Deadline < today && !TaskStatusHelper.IsCompletedStatus(task.StatusName));
-            var overdueGroupTasks = groupTasks.Count(task => task.DeadlineTime < today && !TaskStatusHelper.IsCompletedStatus(task.StatusName));
+            int completedIndividualTasks = 0, overdueIndividualTasks = 0;
+            foreach (var task in individualTasks)
+            {
+                var isCompleted = TaskStatusHelper.IsCompletedStatus(task.StatusName);
+                if (isCompleted)
+                {
+                    completedIndividualTasks++;
+                }
+                else if (task.Deadline < today)
+                {
+                    overdueIndividualTasks++;
+                }
+            }
+
+            int completedGroupTasks = 0, overdueGroupTasks = 0;
+            foreach (var task in groupTasks)
+            {
+                var isCompleted = TaskStatusHelper.IsCompletedStatus(task.StatusName);
+                if (isCompleted)
+                {
+                    completedGroupTasks++;
+                }
+                else if (task.DeadlineTime < today)
+                {
+                    overdueGroupTasks++;
+                }
+            }
 
             IndividualTaskCount = individualTasks.Count;
             GroupTaskCount = groupTasks.Count;
@@ -216,38 +238,8 @@ public partial class DashBoardPageViewModel(
         }
 
         return matchingTasks
-            .GroupBy(task => $"{task.TaskName}|{task.Description}|{task.DeadlineTime}|{task.StatusName}|{task.CategoryName}|{task.TaskPriorityName}")
+            .GroupBy(task => (task.TaskName, task.Description, task.DeadlineTime, task.StatusName, task.CategoryName, task.TaskPriorityName))
             .Select(group => group.First())
-            .ToList();
-    }
-
-    private static IReadOnlyDictionary<Guid, string> BuildUserNameMap(IEnumerable<CompanyUserDto> users)
-    {
-        return users
-            .Where(user => user.Id != Guid.Empty && !string.IsNullOrWhiteSpace(user.Name))
-            .GroupBy(user => user.Id)
-            .ToDictionary(group => group.Key, group => group.First().Name.Trim());
-    }
-
-    private static List<CompanyGroupDto> ResolveUserGroups(
-        IEnumerable<CompanyGroupDto> groups,
-        Guid userId,
-        IReadOnlyDictionary<Guid, string> userNameMap)
-    {
-        userNameMap.TryGetValue(userId, out var currentUserName);
-
-        return GroupHelper.NormalizeGroups(groups)
-            .Where(group => GroupHelper.IsGroupMember(group, userId, currentUserName))
-            .OrderBy(group => group.GroupName)
-            .ToList();
-    }
-
-    private static List<Guid> ResolveGroupMemberIds(IEnumerable<CompanyGroupDto> groups)
-    {
-        return groups
-            .SelectMany(group => group.WorkerUserIds)
-            .Where(userId => userId != Guid.Empty)
-            .Distinct()
             .ToList();
     }
 

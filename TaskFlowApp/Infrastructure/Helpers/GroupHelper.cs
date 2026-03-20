@@ -20,42 +20,50 @@ public static class GroupHelper
             string.Equals(name?.Trim(), currentUserName, StringComparison.OrdinalIgnoreCase));
     }
 
-    public static List<CompanyGroupDto> NormalizeGroups(IEnumerable<CompanyGroupDto> groups)
+    public static List<CompanyGroupDto> ResolveUserGroups(
+        IEnumerable<CompanyGroupDto> groups,
+        Guid userId,
+        IReadOnlyDictionary<Guid, string> userNameMap)
+    {
+        userNameMap.TryGetValue(userId, out var currentUserName);
+
+        return groups
+            .Where(group => IsGroupMember(group, userId, currentUserName))
+            .ToList();
+    }
+
+    public static List<Guid> ResolveGroupMemberIds(
+        IEnumerable<CompanyGroupDto> groups,
+        IReadOnlyDictionary<string, Guid> userIdByNameMap)
+    {
+        var memberIds = new HashSet<Guid>(
+            groups
+                .SelectMany(group => group.WorkerUserIds)
+                .Where(userId => userId != Guid.Empty));
+
+        foreach (var workerName in groups.SelectMany(group => group.WorkerName))
+        {
+            var normalizedWorkerName = workerName?.Trim();
+            if (string.IsNullOrWhiteSpace(normalizedWorkerName))
+            {
+                continue;
+            }
+
+            if (userIdByNameMap.TryGetValue(normalizedWorkerName, out var workerId) && workerId != Guid.Empty)
+            {
+                memberIds.Add(workerId);
+            }
+        }
+
+        return memberIds.ToList();
+    }
+
+    public static List<Guid> ResolveGroupMemberIds(IEnumerable<CompanyGroupDto> groups)
     {
         return groups
-            .Where(group => !string.IsNullOrWhiteSpace(group.GroupName))
-            .GroupBy(group => group.GroupName.Trim(), StringComparer.OrdinalIgnoreCase)
-            .Select(grouped => new CompanyGroupDto
-            {
-                GroupId = grouped
-                    .Select(group => group.GroupId)
-                    .FirstOrDefault(groupId => groupId != Guid.Empty),
-                GroupName = grouped.First().GroupName.Trim(),
-                WorkerUserIds = grouped
-                    .SelectMany(group => group.WorkerUserIds)
-                    .Where(workerId => workerId != Guid.Empty)
-                    .Distinct()
-                    .ToList(),
-                WorkerName = grouped
-                    .SelectMany(group => group.WorkerName)
-                    .Select(name => name?.Trim())
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Cast<string>()
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList(),
-                DepartmenName = grouped
-                    .SelectMany(group => group.DepartmenName)
-                    .Select(name => name?.Trim())
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                    .Cast<string>()
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList(),
-                LeaderUserIds = grouped
-                    .SelectMany(group => group.LeaderUserIds)
-                    .Where(id => id != Guid.Empty)
-                    .Distinct()
-                    .ToList()
-            })
+            .SelectMany(group => group.WorkerUserIds)
+            .Where(userId => userId != Guid.Empty)
+            .Distinct()
             .ToList();
     }
 }
